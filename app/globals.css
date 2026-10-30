@@ -5,11 +5,30 @@
   --foreground: #171717;
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* bg */
+  --color-primary: #ff5200;
+  --color-secondary: #ffffff;
+  /* text */
+  --color-text-primary: #fff;
+  --color-text-secondary: #02060ceb;
+  --color-text-third: #02060c73;
+  --text-font-primary: Gilroy;
+  /* box */
+  --color-box-primary: "white";
+  /* border */
+  --color-border: #e5e7eb;
+}
+
+@utility custom-scroll {
+  &::-webkit-scrollbar{
+    width:14px
+    heigth: 12px;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +38,10 @@
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+  }
 }
