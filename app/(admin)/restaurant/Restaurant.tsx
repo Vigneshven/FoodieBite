@@ -21,7 +21,9 @@ async function Restaurant() {
                     List of Restaurant
                   </h1>
                   <div className="flex justify-items-start items-center">
-                    <p className="text-xl font-bold text-font-primary">{restaurants.length} shows restaurants</p>
+                    <p className="text-xl font-bold text-font-primary">
+                      {restaurants.length} shows restaurants
+                    </p>
                   </div>
                   <div className="flex flex-1/4 gap-1 overflow-x-auto custom-scroll w-full">
                     {restaurants.map((restaurant) => (

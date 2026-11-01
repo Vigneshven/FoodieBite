@@ -8,11 +8,23 @@ export type User = RowDataPacket & {
   password: string;
 };
 
+export type UserRole = "customer" | "restaurant_owner" | "admin";
+
 export async function findCustomerByEmail(email: string) {
   const [row] = await pool.execute<User[]>(
-    `select id,username,email,password from customer where email=?`,
+    `select id,username,email,password,role from customers where email=?`,
     [email],
   );
+
+  return row[0] ?? null;
+}
+
+export async function findCustomerById(id: number) {
+  const [row] = await pool.execute<(RowDataPacket & {
+    id: number;
+    username: string;
+    role: UserRole;
+  })[]>(`select id, username, role from customers where id = ?`, [id]);
 
   return row[0] ?? null;
 }
@@ -31,10 +43,11 @@ export async function createCustomer(
   username: string,
   email: string,
   passwordHash: string,
+  role: Exclude<UserRole, "admin">,
 ) {
   const [row] = await pool.execute<ResultSetHeader>(
-    `insert into customers (username,email,password) values(?,?,?)`,
-    [username, email, passwordHash],
+    `insert into customers (username,email,password,role) values(?,?,?,?)`,
+    [username, email, passwordHash, role],
   );
 
   return row.insertId;
