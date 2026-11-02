@@ -48,12 +48,13 @@ export async function requireAuth(
     }
 
     req.id = decode.id;
-    req.userRole = decode.role;
-
     const user = await findCustomerById(req.id);
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
+
+    req.userRole = user.role;
+    req.currentUser = user;
 
     if (user.status === "inactive" && user.role !== "admin") {
       res.clearCookie("token", {

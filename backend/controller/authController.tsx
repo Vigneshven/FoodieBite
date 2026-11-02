@@ -10,7 +10,7 @@ export async function register(req: Request, res: Response) {
   try {
     const { username, email, password, role } = req.body;
 
-    const allowedRoles = ["customer", "restaurant_owner"];
+    const allowedRoles = ["customer", "restaurant_owner", "delivery_partner"];
 
     if (!allowedRoles.includes(role)) {
       return res.status(400).json({
@@ -120,6 +120,7 @@ export async function login(req: Request, res: Response) {
     return res.status(200).json({
       message: "Login Successfully",
       role: user.role,
+      status: user.status,
     });
   } catch (error) {
     console.log(error);

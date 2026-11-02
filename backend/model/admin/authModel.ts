@@ -10,7 +10,11 @@ export type User = RowDataPacket & {
   status: UserStatus;
 };
 
-export type UserRole = "customer" | "restaurant_owner" | "admin";
+export type UserRole =
+  | "customer"
+  | "restaurant_owner"
+  | "delivery_partner"
+  | "admin";
 export type UserStatus = "active" | "inactive";
 
 export async function findCustomerByEmail(email: string) {
@@ -52,8 +56,8 @@ export async function createCustomer(
   role: Exclude<UserRole, "admin">,
 ) {
   const [row] = await pool.execute<ResultSetHeader>(
-    `insert into customers (username,email,password,role) values(?,?,?,?)`,
-    [username, email, passwordHash, role],
+    `insert into customers (username,email,password,role,status) values(?,?,?,?,?)`,
+    [username, email, passwordHash, role, "active"],
   );
 
   return row.insertId;

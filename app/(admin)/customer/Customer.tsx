@@ -1,10 +1,15 @@
 import { getCustomers } from "@/api/api";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import RemoveButton from "@/component/RemoveButton";
 import SuspendCustomer from "@/component/restaurant/SuspendCustomer";
 import SuspendButton from "@/component/SuspendButton";
 
 async function Customer() {
-  const customers = await getCustomers();
+  const token = (await cookies()).get("token");
+  if (!token) redirect("/login");
+
+  const customers = await getCustomers(`token=${token.value}`);
   const activeCustomers = customers.filter(
     (customer) => customer.status === "active",
   );

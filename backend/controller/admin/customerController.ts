@@ -11,15 +11,7 @@ import type { Request, Response } from "express";
 export async function getCustomers(req: Request, res: Response) {
   try {
     const rows = await getAllCustomer();
-
-    const customers = rows.map((customer) => ({
-      ...customer,
-      name: String(customer.name),
-      email: String(customer.email),
-      role: String(customer.role),
-    }));
-
-    return res.json(customers);
+    return res.json(rows);
   } catch (error) {
     console.log(error);
     return res.status(500).json({

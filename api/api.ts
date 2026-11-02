@@ -7,7 +7,7 @@ export type RegisterCustomer = {
   username: string;
   email: string;
   password: string;
-  role: "customer" | "restaurant_owner";
+  role: "customer" | "restaurant_owner" | "delivery_partner";
 };
 
 export type LoginCustomer = {
@@ -17,21 +17,14 @@ export type LoginCustomer = {
 
 export type LoginResponse = {
   message: string;
-  role: "customer" | "restaurant_owner" | "admin";
+  role: "customer" | "restaurant_owner" | "delivery_partner" | "admin";
   status: "active" | "inactive";
-};
-
-export type AdminAccess = {
-  message: string;
-  id: number;
-  role: "admin";
-  status: "active";
 };
 
 export type CurrentUser = {
   id: number;
   username: string;
-  role: "customer" | "restaurant_owner" | "admin";
+  role: "customer" | "restaurant_owner" | "delivery_partner" | "admin";
   status: "active" | "inactive";
 };
 
@@ -73,23 +66,6 @@ export async function login(data: LoginCustomer): Promise<LoginResponse> {
   }
 
   return result;
-}
-
-export async function getAdminAccess(
-  cookieHeader: string,
-): Promise<AdminAccess | null> {
-  const res = await fetch(`${BASE_URL}/api/admin`, {
-    headers: {
-      Cookie: cookieHeader,
-    },
-    credentials: "include",
-    cache: "no-store",
-  });
-
-  if (res.status === 401 || res.status === 403) return null;
-  if (!res.ok) throw new Error("Failed to verify admin access");
-
-  return res.json();
 }
 
 export async function getCurrentUser(
@@ -181,13 +157,15 @@ export async function deleteRestaurantInDb(name: string) {
   return res.json();
 }
 
-export async function getCustomers(): Promise<Customer[]> {
+export async function getCustomers(cookieHeader: string): Promise<Customer[]> {
   const res = await fetch(`${BASE_URL}/api/customers`, {
+    headers: {
+      Cookie: cookieHeader,
+    },
     cache: "no-store",
-    credentials: "include",
   });
   if (!res.ok) {
-    throw new Error("Failed to Fetch Customer");
+    throw new Error(`Failed to fetch customers (${res.status})`);
   }
 
   return res.json();

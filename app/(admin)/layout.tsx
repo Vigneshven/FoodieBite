@@ -1,7 +1,7 @@
 import NavBar from "@/component/NavBar";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getAdminAccess } from "@/api/api";
+import { getCurrentUser } from "@/api/api";
 
 export default async function ProtectedLayout({
   children,
@@ -12,12 +12,13 @@ export default async function ProtectedLayout({
 
   if (!tokenCookie) redirect("/login");
 
-  const admin = await getAdminAccess(`token=${tokenCookie.value}`);
-  if (!admin) redirect("/");
+  const user = await getCurrentUser(`token=${tokenCookie.value}`);
+  if (!user) redirect("/login");
+  if (user.role !== "admin") redirect("/");
 
   return (
     <>
-      <NavBar />
+      <NavBar user={user} />
       <>{children}</>
     </>
   );

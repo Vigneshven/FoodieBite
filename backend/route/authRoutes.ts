@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { login, register } from "../controller/authController";
 import { requireAuth } from "../middleware/requireAuth";
-import { findCustomerById } from "@/backend/model/admin/authModel";
 
 const router = Router();
 
@@ -9,7 +8,7 @@ router.post("/register", register);
 router.post("/login", login);
 
 router.get("/me", requireAuth, async (req, res) => {
-  const user = await findCustomerById(req.id);
+  const user = req.currentUser;
 
   if (!user) {
     return res.status(404).json({ message: "User not found" });
@@ -19,6 +18,7 @@ router.get("/me", requireAuth, async (req, res) => {
     id: user.id,
     username: user.username,
     role: user.role,
+    status: user.status,
   });
 });
 

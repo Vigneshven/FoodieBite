@@ -1,7 +1,12 @@
 import { getCustomers } from "@/api/api";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 async function CustomerReport() {
-  const customers = await getCustomers();
+  const token = (await cookies()).get("token");
+  if (!token) redirect("/login");
+
+  const customers = await getCustomers(`token=${token.value}`);
 
   return (
     <>

@@ -12,7 +12,7 @@ const registerSchema = z.object({
   username: z.string().trim().min(3, "Username must be at least 3 character "),
   email: z.string().trim().email("Enter a valid email"),
   password: z.string().min(8, "password must be at least 8 character"),
-  role: z.enum(["customer", "restaurant_owner"]),
+  role: z.enum(["customer", "restaurant_owner", "delivery_partner"]),
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -124,6 +124,20 @@ function Register() {
               htmlFor="customer"
             >
               customer
+            </label>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="radio"
+              id="delivery_partner"
+              value="delivery_partner"
+              {...register("role")}
+            />
+            <label
+              className="font-bold text-font-primary text-text-secondary"
+              htmlFor="delivery_partner"
+            >
+              Delivery Partner
             </label>
           </div>
           {errors.role && (
