@@ -8,6 +8,7 @@ export type RegisterCustomer = {
   email: string;
   password: string;
   role: "customer" | "restaurant_owner";
+  status: "active" | "inactive";
 };
 
 export type LoginCustomer = {
@@ -18,18 +19,21 @@ export type LoginCustomer = {
 export type LoginResponse = {
   message: string;
   role: "customer" | "restaurant_owner" | "admin";
+  status: "active" | "inactive";
 };
 
 export type AdminAccess = {
   message: string;
   id: number;
   role: "admin";
+  status: "active";
 };
 
 export type CurrentUser = {
   id: number;
   username: string;
   role: "customer" | "restaurant_owner" | "admin";
+  status: "active" | "inactive";
 };
 
 export async function registerCustomer(
@@ -214,6 +218,25 @@ export async function deleteCustomerInDb(email: string) {
 
   if (!res.ok) {
     throw new Error("Failed to delete customer");
+  }
+
+  return res.json();
+}
+
+export async function statusUpdate(
+  email: string,
+  status: "active" | "inactive",
+) {
+  const res = await fetch(`${BASE_URL}/api/customers/${email}/${status}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+  if (!res.ok) {
+    console.log(res.text);
+    throw new Error("Failed to update status");
   }
 
   return res.json();
