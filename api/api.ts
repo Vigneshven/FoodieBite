@@ -1,4 +1,5 @@
-import { Restaurant } from "@/backend/type/restaurant";
+import { Restaurant } from "@/api/type/restaurant";
+import { Customer } from "./type/customer";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -78,6 +79,7 @@ export async function getAdminAccess(
     headers: {
       Cookie: cookieHeader,
     },
+    credentials: "include",
     cache: "no-store",
   });
 
@@ -94,6 +96,7 @@ export async function getCurrentUser(
     headers: {
       Cookie: cookieHeader,
     },
+    credentials: "include",
     cache: "no-store",
   });
 
@@ -171,6 +174,47 @@ export async function deleteRestaurantInDb(name: string) {
   });
 
   if (!res.ok) throw new Error("Failed to delete restaurant");
+
+  return res.json();
+}
+
+export async function getCustomers(): Promise<Customer[]> {
+  const res = await fetch(`${BASE_URL}/api/customers`, {
+    cache: "no-store",
+    credentials: "include",
+  });
+  if (!res.ok) {
+    throw new Error("Failed to Fetch Customer");
+  }
+
+  return res.json();
+}
+
+export async function getCustomerEmail(email: string) {
+  const res = await fetch(`${BASE_URL}/api/customers/${email}`, {
+    next: { revalidate: 60 },
+    credentials: "include",
+  });
+
+  if (res.status === 404) return null;
+
+  if (!res.ok) throw new Error("Failed to get customer");
+
+  return res.json();
+}
+
+export async function deleteCustomerInDb(email: string) {
+  const res = await fetch(`${BASE_URL}/api/customers/${email}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to delete customer");
+  }
 
   return res.json();
 }

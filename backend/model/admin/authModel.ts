@@ -1,5 +1,5 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import pool from "../config/db";
+import pool from "@/backend/config/db";
 
 export type User = RowDataPacket & {
   id: number;
@@ -20,11 +20,13 @@ export async function findCustomerByEmail(email: string) {
 }
 
 export async function findCustomerById(id: number) {
-  const [row] = await pool.execute<(RowDataPacket & {
-    id: number;
-    username: string;
-    role: UserRole;
-  })[]>(`select id, username, role from customers where id = ?`, [id]);
+  const [row] = await pool.execute<
+    (RowDataPacket & {
+      id: number;
+      username: string;
+      role: UserRole;
+    })[]
+  >(`select id, username, role from customers where id = ?`, [id]);
 
   return row[0] ?? null;
 }

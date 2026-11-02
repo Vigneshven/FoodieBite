@@ -1,6 +1,6 @@
 import { getRestaurants } from "@/api/api";
-import RestuarantAddForm from "@/component/RestaurantAddForm";
-import RestaurantRemoveForm from "@/component/RestaurantRemoveForm";
+import RestuarantAddForm from "@/component/restaurant/RestaurantAddForm";
+import RestaurantRemoveForm from "@/component/restaurant/RestaurantRemoveForm";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -20,7 +20,7 @@ async function Restaurant() {
                   <h1 className="text-center text-2xl text-text-primary font-bold">
                     List of Restaurant
                   </h1>
-                  <div className="flex justify-items-start items-center">
+                  <div className="flex justify-center items-center">
                     <p className="text-xl font-bold text-font-primary">
                       {restaurants.length} shows restaurants
                     </p>

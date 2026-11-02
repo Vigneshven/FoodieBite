@@ -1,11 +1,6 @@
+import { addRestaurant, checkRestaurant, deleteRestaurant, getAllRestaurants, getRestaurantById } from "@/backend/model/admin/restaurantModel";
 import type { Request, Response } from "express";
-import {
-  addRestaurant,
-  checkRestaurant,
-  deleteRestaurant,
-  getAllRestaurants,
-  getRestaurantById,
-} from "../model/restaurantModel";
+
 
 export async function getRestaurants(req: Request, res: Response) {
   try {

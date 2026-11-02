@@ -1,5 +1,5 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import pool from "../config/db";
+import pool from "../../config/db";
 
 export async function getAllRestaurants() {
   const [rows] = await pool.query<RowDataPacket[]>(`

@@ -1,5 +1,6 @@
-import RecentAddedRestaurant from "@/component/RecentAddedRestaurant";
-import RestaurantReport from "@/component/RestaurantReport";
+import CustomerReport from "@/component/reports/CustomerReport";
+import RecentAddedRestaurant from "@/component/reports/RecentAddedRestaurant";
+import RestaurantReport from "@/component/reports/RestaurantReport";
 
 function AdminDashBoard() {
   return (
@@ -14,9 +15,12 @@ function AdminDashBoard() {
           </div>
 
           <div className="border-border w-1/2 flex justify-center bg-secondary">
-            <h2 className="font-bold text-font-primary text-black-50">
-              Customer Reports
-            </h2>
+            <div className="border-border w-1/2 flex flex-col gap-10 items-center justify-start bg-secondary">
+              <h2 className="font-bold text-font-primary text-black-50 mt-3">
+                Customer Reports
+              </h2>
+              <CustomerReport />
+            </div>
           </div>
         </div>
         <div className="flex w-full h-1/3 border-border bg-secondary">

@@ -4,7 +4,7 @@ import {
   getRestaurant,
   getRestaurants,
   removeRestaurant,
-} from "../controller/restaurantController";
+} from "@/backend/controller/admin/restaurantController";
 
 const router = Router();
 

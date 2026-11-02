@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { createCustomer, findCustomerByEmail } from "../model/authModel";
+import { createCustomer, findCustomerByEmail } from "@/backend/model/admin/authModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 

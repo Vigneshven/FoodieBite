@@ -87,8 +87,9 @@ function RestaurantRemoveForm() {
               <button
                 className="hover: cursor-pointer bg-amber-300 w-20 p-2 rounded-xl text-text-secondary font-bold text-font-primary"
                 onClick={handleRemoveRestaurant}
+                disabled={removing}
               >
-                Remove
+                {removing ? "Removing..." : "Remove"}
               </button>
               <button
                 className="hover:cursor-pointer bg-amber-50 w-20 p-2 rounded-xl text-text-secondary font-bold text-font-primary"

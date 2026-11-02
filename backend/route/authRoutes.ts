@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { login, register } from "../controller/authController";
 import { requireAuth } from "../middleware/requireAuth";
-import { findCustomerById } from "../model/authModel";
+import { findCustomerById } from "@/backend/model/admin/authModel";
 
 const router = Router();
 
