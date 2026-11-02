@@ -6,13 +6,16 @@ export type User = RowDataPacket & {
   username: string;
   email: string;
   password: string;
+  role: UserRole;
+  status: UserStatus;
 };
 
 export type UserRole = "customer" | "restaurant_owner" | "admin";
+export type UserStatus = "active" | "inactive";
 
 export async function findCustomerByEmail(email: string) {
   const [row] = await pool.execute<User[]>(
-    `select id,username,email,password,role from customers where email=?`,
+    `select id,username,email,password,role,status from customers where email=?`,
     [email],
   );
 
@@ -25,8 +28,9 @@ export async function findCustomerById(id: number) {
       id: number;
       username: string;
       role: UserRole;
+      status: UserStatus;
     })[]
-  >(`select id, username, role from customers where id = ?`, [id]);
+  >(`select id, username, role, status from customers where id = ?`, [id]);
 
   return row[0] ?? null;
 }

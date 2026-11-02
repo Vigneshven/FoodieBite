@@ -33,8 +33,7 @@ function Login() {
       router.replace(res.role === "admin" ? "/admin" : "/");
       router.refresh();
     } catch (error) {
-      console.log(error);
-      toast.error("Login Failed");
+      toast.error(error instanceof Error ? error.message : "Login Failed");
     } finally {
       setIsLoading(false);
     }
@@ -58,6 +57,7 @@ function Login() {
       <form
         onSubmit={handleSubmit(handleLogin)}
         className="flex w-full max-w-md flex-col gap-4 rounded-xl border bg-amber-50 bg-card-background p-8 shadow"
+        autoComplete="off"
       >
         <h4 className="mb-2 text-center text-2xl font-bold text-heading text-font-primary text-text-secondary">
           Login

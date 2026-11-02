@@ -8,7 +8,6 @@ export type RegisterCustomer = {
   email: string;
   password: string;
   role: "customer" | "restaurant_owner";
-  status: "active" | "inactive";
 };
 
 export type LoginCustomer = {
@@ -70,7 +69,7 @@ export async function login(data: LoginCustomer): Promise<LoginResponse> {
   const result = await res.json();
 
   if (!res.ok) {
-    throw new Error("Failed to Login");
+    throw new Error(result.message ?? "Failed to Login");
   }
 
   return result;
@@ -104,7 +103,7 @@ export async function getCurrentUser(
     cache: "no-store",
   });
 
-  if (res.status === 401 || res.status === 404) return null;
+  if (res.status === 401 || res.status === 403 || res.status === 404) return null;
   if (!res.ok) throw new Error("Failed to get current user");
 
   return res.json();

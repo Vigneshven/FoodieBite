@@ -1,5 +1,8 @@
 import type { Request, Response } from "express";
-import { createCustomer, findCustomerByEmail } from "@/backend/model/admin/authModel";
+import {
+  createCustomer,
+  findCustomerByEmail,
+} from "@/backend/model/admin/authModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -85,6 +88,12 @@ export async function login(req: Request, res: Response) {
     if (!comparePassword) {
       return res.status(401).json({
         message: "invalid email and password",
+      });
+    }
+
+    if (user.status === "inactive") {
+      return res.status(403).json({
+        message: "Your account is suspended. Please contact an admin.",
       });
     }
 
