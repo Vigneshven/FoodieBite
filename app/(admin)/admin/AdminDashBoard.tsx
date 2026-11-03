@@ -1,11 +1,14 @@
-import CustomerReport from "@/component/reports/CustomerReport";
-import RecentAddedRestaurant from "@/component/reports/RecentAddedRestaurant";
-import RestaurantReport from "@/component/reports/RestaurantReport";
+import OrderStatusAnalytics from "@/component/admin/OrderStatusAnalytics";
+import RevenueAnalytics from "@/component/admin/RevenueAnalytics";
+import TotalCustomersCard from "@/component/admin/TotalCustomersCard";
+import TotalOrderCard from "@/component/admin/TotalOrderCard";
+import TotalRestaurantsCard from "@/component/admin/TotalRestaurantsCard";
+import TotalRevenueCard from "@/component/admin/TotalRevenueCard";
 
 function AdminDashBoard() {
   return (
-    <>
-      <div className="flex flex-col w-full justify-center items-center h-screen bg-primary">
+    <div>
+      {/* <div className="flex flex-col w-full justify-center items-center h-screen bg-primary">
         <div className="flex w-full h-1/2 border-border">
           <div className="border-border w-1/2 flex flex-col gap-10 items-center justify-start bg-secondary ">
             <h2 className="font-bold text-font-primary text-black-50 mt-3">
@@ -44,8 +47,25 @@ function AdminDashBoard() {
             <RecentAddedRestaurant />
           </div>
         </div>
+      </div> */}
+
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold text-gray-900">
+          DashBoard Overview
+          <p className="mt-1 text-gray-600 text-sm">Welcome Back!</p>
+        </h1>
       </div>
-    </>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mt-3 ">
+        <TotalRevenueCard />
+        <TotalOrderCard />
+        <TotalCustomersCard />
+        <TotalRestaurantsCard />
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 mt-3">
+        <RevenueAnalytics />
+        <OrderStatusAnalytics />
+      </div>
+    </div>
   );
 }
 
