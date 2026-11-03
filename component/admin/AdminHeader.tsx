@@ -40,19 +40,24 @@ export default function AdminHeader() {
         </Button>
 
         <DropdownMenu>
-          <DropdownMenuTrigger aschild="true">
-            <div className="flex items-center gap-2 rounded-lg hover:bg-gray-100">
-              <Avatar className="h-9 w-9">
-                <AvatarFallback className="bg-orange-100 font-semibold text-orange-500">
-                  AD
-                </AvatarFallback>
-              </Avatar>
-              <div className="hidden text-left sm:block">
-                <p className="text-sm font-semibold">Admin</p>
-                <p className="text-xs text-gray-500">Administrator</p>
-              </div>
-              <ChevronDown size={16} className="hidden sm:block" />
+          <DropdownMenuTrigger
+            render={
+              <button
+                type="button"
+                className="flex items-center gap-2 rounded-lg hover:bg-gray-100"
+              />
+            }
+          >
+            <Avatar className="h-9 w-9">
+              <AvatarFallback className="bg-orange-100 font-semibold text-orange-500">
+                AD
+              </AvatarFallback>
+            </Avatar>
+            <div className="hidden text-left sm:block">
+              <p className="text-sm font-semibold">Admin</p>
+              <p className="text-xs text-gray-500">Administrator</p>
             </div>
+            <ChevronDown size={16} className="hidden sm:block" />
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end">

@@ -1,3 +1,15 @@
+"use client";
+
+import {
+  MoreHorizontal,
+  Eye,
+  Pencil,
+  Ban,
+  CheckCircle2,
+  Trash2,
+  Star,
+} from "lucide-react";
+
 import {
   Table,
   TableBody,
@@ -6,18 +18,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  RestaurantSortOption,
-  RestaurantStatusFilter,
-} from "./RestaurantFilters";
-import { Badge, MoreHorizontal, Star } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import { Button } from "@/components/ui/button";
+
+import type {
+  RestaurantStatusFilter,
+  RestaurantSortOption,
+} from "./RestaurantFilters";
 
 type RestaurantStatus = "Active" | "Pending" | "Suspended";
 
@@ -43,7 +60,7 @@ const restaurants: Restaurant[] = [
     reviews: 4,
     status: "Active",
     phone: "+91 12345 67890",
-    joinDate: "15-01-2026",
+    joinDate: "2026-01-15",
   },
   {
     id: "#R-2",
@@ -54,7 +71,7 @@ const restaurants: Restaurant[] = [
     reviews: 100,
     status: "Active",
     phone: "+91 12395 67890",
-    joinDate: "01-01-2026",
+    joinDate: "2026-01-01",
   },
   {
     id: "#R-3",
@@ -65,7 +82,7 @@ const restaurants: Restaurant[] = [
     reviews: 4,
     status: "Active",
     phone: "+91 12145 67890",
-    joinDate: "15-01-2026",
+    joinDate: "2026-01-15",
   },
   {
     id: "#R-4",
@@ -76,7 +93,7 @@ const restaurants: Restaurant[] = [
     reviews: 10,
     status: "Active",
     phone: "+91 11345 67890",
-    joinDate: "10-01-2026",
+    joinDate: "2026-01-10",
   },
   {
     id: "#R-5",
@@ -87,7 +104,7 @@ const restaurants: Restaurant[] = [
     reviews: 10,
     status: "Pending",
     phone: "+91 12315 67890",
-    joinDate: "11-01-2026",
+    joinDate: "2026-01-11",
   },
   {
     id: "#R-6",
@@ -98,7 +115,7 @@ const restaurants: Restaurant[] = [
     reviews: 1,
     status: "Active",
     phone: "+91 12245 67890",
-    joinDate: "12-03-2026",
+    joinDate: "2026-03-12",
   },
   {
     id: "#R-7",
@@ -109,7 +126,7 @@ const restaurants: Restaurant[] = [
     reviews: 2,
     status: "Suspended",
     phone: "+91 18345 67890",
-    joinDate: "05-02-2026",
+    joinDate: "2026-02-05",
   },
   {
     id: "#R-8",
@@ -120,7 +137,7 @@ const restaurants: Restaurant[] = [
     reviews: 5,
     status: "Active",
     phone: "+91 12347 67890",
-    joinDate: "13-05-2026",
+    joinDate: "2026-05-13",
   },
 ];
 
@@ -130,13 +147,22 @@ const statusStyles: Record<RestaurantStatus, string> = {
   Suspended: "border-red-200 bg-red-50 text-red-700",
 };
 
+function formatJoinDate(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 type RestaurantsTableProps = {
   activeStatus: RestaurantStatusFilter;
   search: string;
   sortBy: RestaurantSortOption;
 };
 
-export default function RestaurantTable({
+export default function RestaurantsTable({
   activeStatus,
   search,
   sortBy,
@@ -144,38 +170,44 @@ export default function RestaurantTable({
   const searchText = search.toLowerCase().trim();
 
   const filteredRestaurants = restaurants.filter((restaurant) => {
-    const matchedStatus =
+    const matchesStatus =
       activeStatus === "All" || restaurant.status === activeStatus;
 
-    const matchedSearch =
+    const matchesSearch =
       restaurant.id.toLowerCase().includes(searchText) ||
       restaurant.name.toLowerCase().includes(searchText) ||
       restaurant.email.toLowerCase().includes(searchText) ||
       restaurant.cuisine.toLowerCase().includes(searchText);
 
-    return matchedSearch && matchedStatus;
+    return matchesStatus && matchesSearch;
   });
 
   const sortedRestaurants = [...filteredRestaurants].sort((a, b) => {
     switch (sortBy) {
       case "name":
         return a.name.localeCompare(b.name);
+
       case "rating":
         return b.rating - a.rating;
+
       case "newest":
+      default:
         return new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime();
     }
   });
 
-  const handleAction = (action:string,restaurant:Restaurant)=>{
-    
-  }
+  const handleAction = (action: string, restaurant: Restaurant) => {
+    console.log(`${action}: ${restaurant.name}`);
+  };
 
   return (
-    <div>
-      <div>
-        <h2>All Restaurants</h2>
-        <p>View and manage restaurants</p>
+    <div className="overflow-hidden rounded-xl border bg-card">
+      <div className="border-b p-5">
+        <h2 className="text-lg font-semibold">All Restaurants</h2>
+
+        <p className="mt-1 text-sm text-muted-foreground">
+          View and manage restaurants on your platform.
+        </p>
       </div>
       <div className="overflow-x-auto">
         <Table>
@@ -188,47 +220,108 @@ export default function RestaurantTable({
               <TableHead>Status</TableHead>
               <TableHead>Contact</TableHead>
               <TableHead>Join Date</TableHead>
-              <TableHead>Action</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {sortedRestaurants.length > 0 ? (
               sortedRestaurants.map((restaurant) => (
                 <TableRow key={restaurant.id}>
+                  <TableCell className="font-medium">{restaurant.id}</TableCell>
                   <TableCell>
-                    <div>{restaurant.name}</div>
-                    <div>{restaurant.email}</div>
-                  </TableCell>
-                  <TableCell>{restaurant.cuisine}</TableCell>
-                  <TableCell>
-                    <div>
-                      <Star />
-                      <span>{restaurant.rating}</span>
-                      <span>{restaurant.reviews.toLocaleString("en-IN")}</span>
+                    <div className="font-medium">{restaurant.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {restaurant.email}
                     </div>
                   </TableCell>
+
+                  <TableCell>{restaurant.cuisine}</TableCell>
+
                   <TableCell>
-                    <Badge>{restaurant.status}</Badge>{" "}
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <span className="font-medium">{restaurant.rating}</span>
+                      <span className="text-xs text-muted-foreground">
+                        ({restaurant.reviews.toLocaleString("en-IN")})
+                      </span>
+                    </div>
                   </TableCell>
+
                   <TableCell>
-                    <div>{restaurant.phone}</div>
+                    <Badge
+                      variant="outline"
+                      className={statusStyles[restaurant.status]}
+                    >
+                      {restaurant.status}
+                    </Badge>
                   </TableCell>
+
+                  <TableCell>
+                    <div className="text-sm">{restaurant.phone}</div>
+                  </TableCell>
+
                   <TableCell className="whitespace-nowrap text-muted-foreground">
-                    {new Date(restaurant.joinDate).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
+                    {formatJoinDate(restaurant.joinDate)}
                   </TableCell>
-                  <TableCell>
+
+                  <TableCell className="text-right">
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label={`Actions for ${restaurant.name}`}
+                          />
+                        }
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem onClick={()=>handleAction("View",restaurant)}>View Details</DropdownMenuItem>
+
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => handleAction("View", restaurant)}
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Details
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={() => handleAction("Edit", restaurant)}
+                        >
+                          <Pencil className="mr-2 h-4 w-4" />
+                          Edit
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+
+                        {restaurant.status === "Pending" && (
+                          <DropdownMenuItem
+                            onClick={() => handleAction("Approve", restaurant)}
+                          >
+                            <CheckCircle2 className="mr-2 h-4 w-4" />
+                            Approve
+                          </DropdownMenuItem>
+                        )}
+
+                        {restaurant.status !== "Suspended" && (
+                          <DropdownMenuItem
+                            onClick={() => handleAction("Suspend", restaurant)}
+                          >
+                            <Ban className="mr-2 h-4 w-4" />
+                            Suspend
+                          </DropdownMenuItem>
+                        )}
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={() => handleAction("Delete", restaurant)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -236,11 +329,19 @@ export default function RestaurantTable({
               ))
             ) : (
               <TableRow>
-                <TableCell>No Restaurant Found</TableCell>
+                <TableCell
+                  colSpan={8}
+                  className="h-32 text-center text-muted-foreground"
+                >
+                  No restaurants found.
+                </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="border-t px-5 py-4 text-sm text-muted-foreground">
+        Showing {sortedRestaurants.length} of {restaurants.length} restaurants
       </div>
     </div>
   );
