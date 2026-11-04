@@ -40,8 +40,8 @@ const menuItems = [
     icon: Bike,
   },
   {
-    title: "Reports",
-    href: "/admin/reports",
+    title: "Queries",
+    href: "/admin/queries",
     icon: ChartNoAxesCombined,
   },
 ];
