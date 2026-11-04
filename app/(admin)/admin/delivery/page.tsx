@@ -5,7 +5,9 @@ import DeliveryFilters, {
   DeliveryDateFilter,
   DeliveryStatusFilter,
 } from "@/component/admin/delivery/DeliveryFilters";
+import DeliveryPerformance from "@/component/admin/delivery/DeliveryPerformance";
 import DeliveryStats from "@/component/admin/delivery/DeliveryStats";
+import TopDeliveryPartners from "@/component/admin/delivery/TopDeliveryPartners";
 import { useState } from "react";
 
 export default function DeliveryPage() {
@@ -36,6 +38,10 @@ export default function DeliveryPage() {
         search={search}
         dateRange={dateRange}
       />
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <DeliveryPerformance />
+        <TopDeliveryPartners />
+      </div>
     </div>
   );
 }
