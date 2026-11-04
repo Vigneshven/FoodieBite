@@ -35,6 +35,7 @@ import type {
   RestaurantStatusFilter,
   RestaurantSortOption,
 } from "./RestaurantFilters";
+import RestaurantPagination from "./RestaurantPagination";
 
 type RestaurantStatus = "Active" | "Pending" | "Suspended";
 
@@ -160,12 +161,20 @@ type RestaurantsTableProps = {
   activeStatus: RestaurantStatusFilter;
   search: string;
   sortBy: RestaurantSortOption;
+  currentPage: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 };
 
 export default function RestaurantsTable({
   activeStatus,
   search,
   sortBy,
+  currentPage,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
 }: RestaurantsTableProps) {
   const searchText = search.toLowerCase().trim();
 
@@ -196,6 +205,13 @@ export default function RestaurantsTable({
     }
   });
 
+  const startIndex = (currentPage - 1) * pageSize;
+
+  const paginatedRestaurants = sortedRestaurants.slice(
+    startIndex,
+    startIndex + pageSize,
+  );
+
   const handleAction = (action: string, restaurant: Restaurant) => {
     console.log(`${action}: ${restaurant.name}`);
   };
@@ -225,7 +241,7 @@ export default function RestaurantsTable({
           </TableHeader>
           <TableBody>
             {sortedRestaurants.length > 0 ? (
-              sortedRestaurants.map((restaurant) => (
+              paginatedRestaurants.map((restaurant) => (
                 <TableRow key={restaurant.id}>
                   <TableCell className="font-medium">{restaurant.id}</TableCell>
                   <TableCell>
@@ -340,9 +356,13 @@ export default function RestaurantsTable({
           </TableBody>
         </Table>
       </div>
-      <div className="border-t px-5 py-4 text-sm text-muted-foreground">
-        Showing {sortedRestaurants.length} of {restaurants.length} restaurants
-      </div>
+      <RestaurantPagination
+        currentPage={currentPage}
+        totalItems={sortedRestaurants.length}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 }
