@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import DeliveryPagination from "./DeliveryPagination";
+import { useRouter } from "next/navigation";
 
 type DeliveryStatus = "Delivered" | "In Transit" | "Delayed" | "Cancelled";
 
@@ -41,7 +42,7 @@ type Delivery = {
 
 const deliveries: Delivery[] = [
   {
-    id: "#OD-1",
+    id: "OD-1",
     customer: "test1",
     email: "test1@gmail.com",
     restaurant: "Pizza Palace",
@@ -52,7 +53,7 @@ const deliveries: Delivery[] = [
     orderDate: "2026-11-04",
   },
   {
-    id: "#OD-2",
+    id: "OD-2",
     customer: "test2",
     email: "test2@gmail.com",
     restaurant: "Pizza Palace",
@@ -63,7 +64,7 @@ const deliveries: Delivery[] = [
     orderDate: "2026-11-04",
   },
   {
-    id: "#OD-3",
+    id: "OD-3",
     customer: "test3",
     email: "test3@gmail.com",
     restaurant: "Pizza Palace",
@@ -74,7 +75,7 @@ const deliveries: Delivery[] = [
     orderDate: "2026-11-04",
   },
   {
-    id: "#OD-4",
+    id: "OD-4",
     customer: "test4",
     email: "test4@gmail.com",
     restaurant: "Pizza Palace",
@@ -85,7 +86,7 @@ const deliveries: Delivery[] = [
     orderDate: "2026-11-04",
   },
   {
-    id: "#OD-5",
+    id: "OD-5",
     customer: "test5",
     email: "test5@gmail.com",
     restaurant: "Pizza Palace",
@@ -96,7 +97,7 @@ const deliveries: Delivery[] = [
     orderDate: "2026-11-04",
   },
   {
-    id: "#OD-6",
+    id: "OD-6",
     customer: "test6",
     email: "test6@gmail.com",
     restaurant: "Healthy Bites",
@@ -173,6 +174,8 @@ export default function DeliveriesTable({
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
   );
+
+  const router = useRouter();
 
   return (
     <div className="overflow-hidden rounded-xl border bg-card">
@@ -251,7 +254,11 @@ export default function DeliveriesTable({
                         }
                       />
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            router.push(`/admin/delivery/${delivery.id}`);
+                          }}
+                        >
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </DropdownMenuItem>

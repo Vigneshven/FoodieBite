@@ -104,8 +104,10 @@ export default function DeliveryPartnerInformation({
           </div>
         </div>
         <Separator />
-        <div>
-          <p>Vehicle Information</p>
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground font-bold">
+            Vehicle Information
+          </p>
           <div>
             <div className="flex items-start gap-3">
               <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
