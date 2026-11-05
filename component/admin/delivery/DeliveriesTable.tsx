@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import DeliveryPagination from "./DeliveryPagination";
 
 type DeliveryStatus = "Delivered" | "In Transit" | "Delayed" | "Cancelled";
 
@@ -118,12 +119,20 @@ type DeliveriesTableProps = {
   activeStatus: DeliveryStatusFilter;
   search: string;
   dateRange: DeliveryDateFilter;
+  currentPage: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 };
 
 export default function DeliveriesTable({
   activeStatus,
   search,
   dateRange,
+  currentPage,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
 }: DeliveriesTableProps) {
   const searchText = search.toLowerCase().trim();
 
@@ -156,6 +165,15 @@ export default function DeliveriesTable({
     return orderDate >= startDate && orderDate <= today;
   });
 
+  const totalItems = filteredDeliveries.length;
+
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+
+  const paginatedDeliveries = filteredDeliveries.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
+
   return (
     <div className="overflow-hidden rounded-xl border bg-card">
       <div className="flex items-center justify-between border-b p-4">
@@ -183,8 +201,8 @@ export default function DeliveriesTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {dateFilterDeliveries.length > 0 ? (
-              dateFilterDeliveries.map((delivery) => (
+            {filteredDeliveries.length > 0 ? (
+              paginatedDeliveries.map((delivery) => (
                 <TableRow key={delivery.id}>
                   <TableCell className="font-medium">{delivery.id}</TableCell>
                   <TableCell>
@@ -252,7 +270,10 @@ export default function DeliveriesTable({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="h-32 text-center text-muted-foreground">
+                <TableCell
+                  colSpan={8}
+                  className="h-32 text-center text-muted-foreground"
+                >
                   No Delivery orders found
                 </TableCell>
               </TableRow>
@@ -260,6 +281,13 @@ export default function DeliveriesTable({
           </TableBody>
         </Table>
       </div>
+      <DeliveryPagination
+        currentPage={currentPage}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 }
