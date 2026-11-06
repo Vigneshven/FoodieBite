@@ -18,7 +18,7 @@ const rider = {
   status: "On Delivery" as const,
 };
 
-export default async function TrackDeliveryPage() {
+export default function TrackDeliveryPage() {
   return (
     <div className="space-y-6 p-4">
       <div>
