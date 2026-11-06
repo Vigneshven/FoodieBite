@@ -268,7 +268,7 @@ export default function DeliveriesTable({
                           }}
                         >
                           <MapPin className="mr-2 h-4 w-4" />
-                          Track Order
+                          Track Delivery
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Pencil className="mr-2 h-4 w-4" />

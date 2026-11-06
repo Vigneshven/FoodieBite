@@ -61,7 +61,7 @@ export default async function TrackDeliveryPage() {
       </div>
       <div>
         <DeliveryProgress
-          status="Out for Delivery"
+          status="Picked Up"
           lastUpdated="Nov 06, 2026 at 01:30 PM"
         />
       </div>
