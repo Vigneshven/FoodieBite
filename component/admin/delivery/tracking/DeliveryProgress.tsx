@@ -169,7 +169,10 @@ export default function DeliveryProgress({
             const isCurrent = index === currentStep && status !== "Delivered";
 
             return (
-              <div key={step.id} className="relative flex gap-3 lg:flex-col">
+              <div
+                key={step.id}
+                className="relative flex gap-3 lg:h-full lg:flex-col"
+              >
                 <div className="">
                   <div
                     className={`flex h-full w-full p-1 items-center justify-center rounded-full ${
@@ -185,7 +188,7 @@ export default function DeliveryProgress({
                     <StepIcon className="h-4 w-4" />
                   </div>
                 </div>
-                <div className="flex-1 pb-2 ">
+                <div className="flex-1 pb-2 lg:flex lg:h-full lg:flex-col">
                   <div className="flex flex-wrap items-center justify-between">
                     <p
                       className={`text-sm font-bold ${isCompleted ? "text-emerald-600" : isCurrent ? (status === "Delayed" ? "text-red-600" : "text-blue-600") : "text-muted-foreground"}`}
@@ -205,13 +208,11 @@ export default function DeliveryProgress({
                     <Clock3 className="h-3 w-3" />
                     {isCompleted || isCurrent ? step.timestamp : "Waiting"}
                   </div>
-                  <div>
-                    {index !== deliverySteps.length - 1 && (
-                      <div
-                        className={`absolute bottom-0 left-0 right-0 h-1 top-25 ${isCompleted ? "bg-emerald-500" : "bg-border"}`}
-                      />
-                    )}
-                  </div>
+                  {index !== deliverySteps.length - 1 && (
+                    <div
+                      className={`mt-3 h-1 w-full shrink-0 rounded-full lg:mt-auto lg:w-[calc(100%+0.75rem)] ${isCompleted ? "bg-emerald-500" : "bg-border"}`}
+                    />
+                  )}
                 </div>
               </div>
             );
