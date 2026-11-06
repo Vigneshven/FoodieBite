@@ -10,6 +10,7 @@ import {
 } from "react-leaflet";
 
 import type { LatLngExpression } from "leaflet";
+import MapSizeHandler from "./utils/MapSizeHandler";
 
 const restaurantPosition: LatLngExpression = [12.9165, 79.1325];
 const riderPosition: LatLngExpression = [12.9195, 79.1375];
@@ -31,8 +32,9 @@ export default function MapView() {
       center={[12.9165, 79.1325]}
       zoom={13}
       scrollWheelZoom={false}
-      className="h-full min-h-87.5 w-full"
+      className="h-full min-h-87.5 w-full rounded-xl"
     >
+      <MapSizeHandler />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -78,6 +80,24 @@ export default function MapView() {
           <div>
             <strong>Test3</strong>
             <p>Current sample rider location</p>
+          </div>
+        </Popup>
+      </CircleMarker>
+      <CircleMarker
+        center={customerPosition}
+        radius={10}
+        pathOptions={{
+          color: "#ffffff",
+          weight: 3,
+          fillColor: "#16a34a",
+          fillOpacity: 1,
+        }}
+      >
+        <Tooltip direction="top">Customer</Tooltip>
+        <Popup>
+          <div>
+            <strong>Test1</strong>
+            <p>Delivery Destination</p>
           </div>
         </Popup>
       </CircleMarker>

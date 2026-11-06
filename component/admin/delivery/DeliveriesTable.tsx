@@ -262,7 +262,11 @@ export default function DeliveriesTable({
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            router.push(`/admin/delivery/${delivery.id}/track`);
+                          }}
+                        >
                           <MapPin className="mr-2 h-4 w-4" />
                           Track Order
                         </DropdownMenuItem>
