@@ -1,5 +1,6 @@
 "use client";
 
+import { logout } from "@/api/api";
 import {
   Bike,
   ChartNoAxesCombined,
@@ -11,7 +12,8 @@ import {
   Utensils,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const menuItems = [
   {
@@ -47,7 +49,18 @@ const menuItems = [
 ];
 
 function SideBarContent() {
+  const router = useRouter();
   const path = usePathname();
+  const handleLogOut = async () => {
+    try {
+      await logout();
+      router.push("/");
+      toast.success("Logout Successfully");
+    } catch (error) {
+      console.log(error);
+      toast.error("Logout Failed");
+    }
+  };
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -102,6 +115,7 @@ function SideBarContent() {
         <button
           type="button"
           className="mt-2 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-500 transition-colors hover:bg-red-50 hover:cursor-pointer"
+          onClick={handleLogOut}
         >
           <LogOut size={19} />
           Logout
