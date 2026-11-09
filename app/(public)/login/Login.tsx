@@ -2,6 +2,7 @@
 
 import { login, LoginCustomer } from "@/api/api";
 import LoginLayout from "@/component/auth/login/LoginLayout";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import Link from "next/link";
@@ -10,6 +11,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const loginSchema = z.object({
   email: z.string().trim().email("Enter a valid email"),
@@ -83,20 +88,18 @@ export default function Login() {
           noValidate
         >
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-semibold">
-              Email Address
-            </label>
+            <Label htmlFor="email">Email Address</Label>
 
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
 
-              <input
+              <Input
                 id="email"
                 type="email"
                 autoComplete="email"
                 placeholder="you@example.com"
                 {...register("email")}
-                className="h-12 w-full rounded-lg border border-input bg-background pl-10 pr-4 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-12 pl-10"
               />
             </div>
 
@@ -105,26 +108,26 @@ export default function Login() {
             )}
           </div>
           <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-semibold">
-              Password
-            </label>
+            <Label htmlFor="password">Password</Label>
 
             <div className="relative">
               <LockKeyhole className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
 
-              <input
+              <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 placeholder="Enter your password"
                 {...register("password")}
-                className="h-12 w-full rounded-lg border border-input bg-background pl-10 pr-11 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-12 pl-10 pr-11"
               />
 
-              <button
+              <Button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-1 top-1/2 size-9 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
@@ -132,7 +135,7 @@ export default function Login() {
                 ) : (
                   <Eye className="size-4" />
                 )}
-              </button>
+              </Button>
             </div>
 
             {errors.password && (
@@ -141,14 +144,12 @@ export default function Login() {
               </p>
             )}
           </div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-          >
+
+          <Button type="submit" disabled={isLoading} className="h-12 w-full">
             {isLoading ? "Signing in..." : "Sign In"}
-          </button>
+          </Button>
         </form>
+
         <div className="border-t pt-6 text-center">
           <p className="text-sm text-muted-foreground">
             Don't have an account yet?{" "}

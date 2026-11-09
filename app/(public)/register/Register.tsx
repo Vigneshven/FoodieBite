@@ -1,6 +1,8 @@
 "use client";
 
 import { registerCustomer } from "@/api/api";
+import RegisterLayout from "@/component/auth/register/RegisterLayout";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -8,16 +10,18 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Bike, Store, UserRound, Eye, EyeOff } from "lucide-react";
-import RegisterLayout from "@/component/auth/register/RegisterLayout";
+
+import { Bike, Store, UserRound, Eye, EyeOff, Check } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 
 const registerSchema = z.object({
   username: z.string().trim().min(3, "Username must be at least 3 characters"),
-
   email: z.string().trim().email("Enter a valid email"),
-
   password: z.string().min(8, "Password must be at least 8 characters"),
-
   role: z.enum(["customer", "restaurant_owner", "delivery_partner"]),
 });
 
@@ -81,7 +85,9 @@ export default function Register() {
       router.refresh();
     } catch (error) {
       console.error(error);
-      toast.error("Registration failed");
+      toast.error(
+        error instanceof Error ? error.message : "Registration failed",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -102,11 +108,7 @@ export default function Register() {
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit(handleRegister)}
-          className="space-y-5"
-          noValidate
-        >
+        <form onSubmit={handleSubmit(handleRegister)} className="space-y-5">
           <div className="space-y-3">
             <div>
               <h3 className="text-sm font-semibold">
@@ -124,14 +126,7 @@ export default function Register() {
                 const isSelected = selectedRole === account.value;
 
                 return (
-                  <label
-                    key={account.value}
-                    className={`relative flex cursor-pointer flex-col gap-3 rounded-xl border p-3 transition-all ${
-                      isSelected
-                        ? "border-primary bg-primary/5 ring-1 ring-primary"
-                        : "border-border hover:border-primary/50 hover:bg-muted/50"
-                    }`}
-                  >
+                  <label key={account.value} className="cursor-pointer">
                     <input
                       type="radio"
                       value={account.value}
@@ -139,118 +134,130 @@ export default function Register() {
                       className="sr-only"
                     />
 
-                    <div className="flex items-center justify-between">
-                      <div
-                        className={`flex size-9 items-center justify-center rounded-lg ${
-                          isSelected
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        <Icon className="size-5" />
-                      </div>
+                    <Card
+                      className={`h-full transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary/5 ring-1 ring-primary"
+                          : "hover:border-primary/50"
+                      }`}
+                    >
+                      <CardContent className="flex h-full flex-col gap-3 p-3">
+                        <div className="flex items-center justify-between">
+                          <div
+                            className={`flex size-9 items-center justify-center rounded-lg ${
+                              isSelected
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            <Icon className="size-5" />
+                          </div>
 
-                      <div
-                        className={`size-4 rounded-full border-2 ${
-                          isSelected
-                            ? "border-primary bg-primary ring-2 ring-primary/20"
-                            : "border-muted-foreground/40"
-                        }`}
-                      />
-                    </div>
+                          <div
+                            className={`flex size-5 items-center justify-center rounded-full border ${
+                              isSelected
+                                ? "border-primary bg-primary text-primary-foreground"
+                                : "border-muted-foreground/40"
+                            }`}
+                          >
+                            {isSelected && <Check className="size-3" />}
+                          </div>
+                        </div>
 
-                    <div>
-                      <p className="text-sm font-semibold">{account.label}</p>
+                        <div>
+                          <p className="text-sm font-semibold">
+                            {account.label}
+                          </p>
 
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {account.description}
-                      </p>
-                    </div>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {account.description}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </label>
                 );
               })}
             </div>
 
             {errors.role && (
-              <p className="text-sm text-red-400">{errors.role.message}</p>
+              <p className="text-sm text-destructive">{errors.role.message}</p>
             )}
           </div>
           <div className="space-y-2">
-            <label htmlFor="username" className="text-sm font-medium">
-              Username
-            </label>
+            <Label htmlFor="username">Username</Label>
 
-            <input
+            <Input
               id="username"
               type="text"
               autoComplete="username"
               placeholder="Enter your username"
               {...register("username")}
-              className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
             />
 
             {errors.username && (
-              <p className="text-sm text-red-400">{errors.username.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.username.message}
+              </p>
             )}
           </div>
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email Address
-            </label>
+            <Label htmlFor="email">Email Address</Label>
 
-            <input
+            <Input
               id="email"
               type="email"
               autoComplete="email"
-              placeholder="test1@example.com"
+              placeholder="you@example.com"
               {...register("email")}
-              className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition"
             />
 
             {errors.email && (
-              <p className="text-sm text-red-400">{errors.email.message}</p>
+              <p className="text-sm text-destructive">{errors.email.message}</p>
             )}
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Password</label>
+            <Label htmlFor="password">Password</Label>
 
             <div className="relative">
-              <input
+              <Input
+                id="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 placeholder="Create a strong password"
                 {...register("password")}
-                className="h-11 w-full rounded-lg border border-input bg-background px-3 pr-11 text-sm outline-none transition"
+                className="pr-11"
               />
 
-              <button
+              <Button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-1 top-1/2 size-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <EyeOff className="size-4" />
                 ) : (
                   <Eye className="size-4" />
                 )}
-              </button>
+              </Button>
             </div>
 
             {errors.password && (
-              <p className="text-sm text-red-400">{errors.password.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.password.message}
+              </p>
             )}
 
             <p className="text-xs text-muted-foreground">
               Password must contain at least 8 characters.
             </p>
           </div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="flex h-11 w-full items-center justify-center rounded-lg bg-primary font-semibold text-primary-foreground transition"
-          >
+          <Button type="submit" disabled={isLoading} className="h-11 w-full">
             {isLoading ? "Creating Account..." : "Create Account"}
-          </button>
+          </Button>
         </form>
         <div className="border-t pt-5 text-center">
           <p className="text-sm text-muted-foreground">
