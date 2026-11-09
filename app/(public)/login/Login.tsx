@@ -55,7 +55,13 @@ export default function Login() {
 
       toast.success("Login Successfully");
 
-      router.replace(res.role === "admin" ? "/admin" : "/");
+      const dashboardPath =
+        res.role === "admin"
+          ? "/admin"
+          : res.role === "customer"
+            ? "/customer"
+            : "/";
+      router.replace(dashboardPath);
       router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Login Failed");

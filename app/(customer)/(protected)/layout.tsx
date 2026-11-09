@@ -3,5 +3,9 @@ export default function CustomerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <div>
+      <main>{children}</main>
+    </div>
+  );
 }
