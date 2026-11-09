@@ -33,11 +33,9 @@ export default function CustomerHeader() {
 
           <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-orange-500" />
         </button>
-
-        {/* Profile */}
         <button
           type="button"
-          className="flex items-center gap-2 rounded-xl p-1.5 hover:bg-gray-50"
+          className="flex items-center gap-2 rounded-xl p-1.6 hover:bg-gray-50"
         >
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-600">
             <span className="text-sm font-semibold">JD</span>
