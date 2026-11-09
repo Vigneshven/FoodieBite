@@ -19,15 +19,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { OrderInformationData } from "./types/deliveryFormTypes";
+import { FieldErrors } from "react-hook-form";
+import { DeliveryFormValues } from "./EditDeliveryForm";
 
 type OrderInformationProps = {
   value: OrderInformationData;
   onChange: (value: OrderInformationData) => void;
+  errors: FieldErrors<DeliveryFormValues>;
 };
 
 export default function OrderInformation({
   value,
   onChange,
+  errors,
 }: OrderInformationProps) {
   const handleChange = (
     field: keyof OrderInformationData,
@@ -90,6 +94,11 @@ export default function OrderInformation({
                 <SelectItem value="Healthy Bites">Healthy Bites</SelectItem>
               </SelectContent>
             </Select>
+            {errors.orderInfo?.restaurant && (
+              <p className="text-sm text-red-400">
+                {errors.orderInfo.restaurant.message}
+              </p>
+            )}
           </div>
         </div>
         <div className="grid  grid-cols-1 gap-4 sm:grid-cols-2">
@@ -115,6 +124,11 @@ export default function OrderInformation({
                 <SelectItem value="Delayed">Delayed</SelectItem>
               </SelectContent>
             </Select>
+            {errors.orderInfo?.status && (
+              <p className="text-sm text-red-400">
+                {errors.orderInfo.status.message}
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Delivery Priority</Label>
@@ -132,6 +146,11 @@ export default function OrderInformation({
                 <SelectItem value="Urgent">Urgent</SelectItem>
               </SelectContent>
             </Select>
+            {errors.orderInfo?.priority && (
+              <p className="text-sm text-red-400">
+                {errors.orderInfo.priority.message}
+              </p>
+            )}
           </div>
         </div>
         <div className="flex flex-wrap items-center justify-between">

@@ -20,22 +20,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const changeReasons = [
-  "Delivery partner reassignment",
-  "Customer address correction",
-  "Delivery time modification",
-  "Restaurant delay",
-  "Customer request",
-  "Other",
-];
+import { FieldErrors } from "react-hook-form";
+import { DeliveryFormValues } from "./EditDeliveryForm";
 
 type DeliveryNotesProps = {
   value: DeliveryNotesData;
   onChange: (value: DeliveryNotesData) => void;
+  errors: FieldErrors<DeliveryFormValues>;
 };
 
-export default function DeliveryNotes({ value, onChange }: DeliveryNotesProps) {
+export default function DeliveryNotes({
+  value,
+  onChange,
+  errors,
+}: DeliveryNotesProps) {
   const handleChange = (
     field: keyof DeliveryNotesData,
     newValue: string | null,
@@ -92,6 +90,11 @@ export default function DeliveryNotes({ value, onChange }: DeliveryNotesProps) {
               <SelectItem value="Other">Other</SelectItem>
             </SelectContent>
           </Select>
+          {errors.deliveryNotes?.reassignmentReason && (
+            <p className="text-sm text-red-400">
+              {errors.deliveryNotes?.reassignmentReason?.message}
+            </p>
+          )}
         </div>
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -109,6 +112,11 @@ export default function DeliveryNotes({ value, onChange }: DeliveryNotesProps) {
           <p className="text-xs text-muted-foreground">
             These notes are intended for administrative use only.
           </p>
+          {errors.deliveryNotes?.adminNotes && (
+            <p className="text-sm text-red-400">
+              {errors.deliveryNotes?.adminNotes?.message}
+            </p>
+          )}
         </div>
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -128,6 +136,11 @@ export default function DeliveryNotes({ value, onChange }: DeliveryNotesProps) {
           <p className="text-xs text-muted-foreground">
             Instructions for the assigned delivery partner.
           </p>
+          {errors.deliveryNotes?.partnerInstructions && (
+            <p className="text-sm text-red-400">
+              {errors.deliveryNotes?.partnerInstructions?.message}
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>

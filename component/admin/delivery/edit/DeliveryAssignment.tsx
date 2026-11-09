@@ -20,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FieldErrors } from "react-hook-form";
+import { DeliveryFormValues } from "./EditDeliveryForm";
 
 const deliveryPartners = [
   {
@@ -71,11 +73,13 @@ const deliveryPartners = [
 type DeliveryAssignmentProps = {
   value: DeliveryAssignmentData;
   onChange: (value: DeliveryAssignmentData) => void;
+  errors: FieldErrors<DeliveryFormValues>;
 };
 
 export default function DeliveryAssignment({
   value,
   onChange,
+  errors,
 }: DeliveryAssignmentProps) {
   const selectedPartner = deliveryPartners.find(
     (partner) => partner.id === value.partnerId,
@@ -134,6 +138,11 @@ export default function DeliveryAssignment({
               ))}
             </SelectContent>
           </Select>
+          {errors.deliveryAssignment?.partnerId && (
+            <p className="text-sm text-red-400">
+              {errors.deliveryAssignment?.partnerId?.message}
+            </p>
+          )}
         </div>
         {selectedPartner && (
           <div className="rounded-xl border bg-muted p-4">
@@ -204,6 +213,11 @@ export default function DeliveryAssignment({
                   <SelectItem value="Bicycle">Bicycle</SelectItem>
                 </SelectContent>
               </Select>
+              {errors.deliveryAssignment?.vehicleType && (
+                <p className="text-sm text-red-400">
+                  {errors.deliveryAssignment?.vehicleType?.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label>Vehicle Number</Label>
@@ -214,6 +228,11 @@ export default function DeliveryAssignment({
                   handleVehicleChange("vehicleNumber", e.target.value)
                 }
               />
+              {errors.deliveryAssignment?.vehicleNumber && (
+                <p className="text-sm text-red-400">
+                  {errors.deliveryAssignment?.vehicleNumber?.message}
+                </p>
+              )}
             </div>
           </div>
         </div>

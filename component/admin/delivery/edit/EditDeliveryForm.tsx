@@ -19,6 +19,8 @@ import {
 } from "./types/deliveryFormTypes";
 
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 export const deliverySchema = z.object({
   orderInfo: z.object({
@@ -118,17 +120,46 @@ export default function EditDeliveryForm({ orderId }: EditDeliveryFormProps) {
     paymentStatus: "Paid",
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("submitted");
-  };
+  const form = useForm<DeliveryFormValues>({
+    resolver: zodResolver(deliverySchema),
+    defaultValues: {
+      orderInfo: {
+        restaurant: "Pizza Palace",
+        status: "Out for Delivery",
+        priority: "Normal",
+      },
+      deliveryAssignment: {
+        partnerId: "RD-1",
+        vehicleType: "Motorcycle",
+        vehicleNumber: "TN 23 BB 1234",
+      },
+      deliveryAddress: {
+        street: "126, New Street",
+        apartment: "",
+        city: "Vellore",
+        state: "Tamil Nadu",
+        postalCode: "632001",
+        landmark: "Near Blue Cinema",
+        phone: "+91 98765 43210",
+        specialInstructions: "Please call before delivery.",
+      },
+      deliveryNotes: {
+        reassignmentReason: "Initial assignment",
+        adminNotes: "",
+        partnerInstructions: "Please call the customer before arriving.",
+      },
+    },
+  });
+  const handleSubmit = form.handleSubmit((values) => {
+    console.log("submitted", values);
+  });
 
   const handleCancel = () => {
     console.log("cancel");
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} noValidate className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <Button
@@ -169,19 +200,59 @@ export default function EditDeliveryForm({ orderId }: EditDeliveryFormProps) {
       <div>
         <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-3">
           <div className="space-y-6 xl:col-span-2">
-            <OrderInformation value={orderInfo} onChange={setOrderInfo} />
+            <OrderInformation
+              value={orderInfo}
+              onChange={(value) => {
+                setOrderInfo(value);
+
+                form.setValue(
+                  "orderInfo",
+                  {
+                    restaurant: value.restaurants,
+                    status: value.status,
+                    priority: value.priority,
+                  },
+                  { shouldValidate: true },
+                );
+              }}
+              errors={form.formState.errors}
+            />
 
             <DeliveryAssignment
               value={deliveryAssignment}
-              onChange={setDeliveryAssignment}
+              onChange={(value) => {
+                setDeliveryAssignment(value);
+
+                form.setValue("deliveryAssignment", value, {
+                  shouldValidate: true,
+                });
+              }}
+              errors={form.formState.errors}
             />
 
             <DeliveryAddress
               value={deliveryAddress}
-              onChange={setDeliveryAddress}
+              onChange={(value) => {
+                setDeliveryAddress(value);
+
+                form.setValue(
+                  "deliveryAddress",
+                  { ...value, apartment: "" },
+                  { shouldValidate: true },
+                );
+              }}
+              errors={form.formState.errors}
             />
 
-            <DeliveryNotes value={deliveryNotes} onChange={setDeliveryNotes} />
+            <DeliveryNotes
+              value={deliveryNotes}
+              onChange={(value) => {
+                setDeliveryNotes(value);
+
+                form.setValue("deliveryNotes", value, { shouldValidate: true });
+              }}
+              errors={form.formState.errors}
+            />
           </div>
           <div className="space-y-6 xl:sticky xl:top-6">
             <DeliverySummary summary={orderSummary} />
