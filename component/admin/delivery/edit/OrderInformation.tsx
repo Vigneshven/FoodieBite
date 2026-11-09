@@ -11,31 +11,33 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Package, ShoppingBag } from "lucide-react";
-import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { OrderInformationData } from "./types/deliveryFormTypes";
 
-type OrderStatus =
-  | "Pending"
-  | "Confirmed"
-  | "Preparing"
-  | "Picked Up"
-  | "Out for Delivery"
-  | "Delivered"
-  | "Delayed";
+type OrderInformationProps = {
+  value: OrderInformationData;
+  onChange: (value: OrderInformationData) => void;
+};
 
-type OrderPriority = "Normal" | "High" | "Urgent";
-
-export default function OrderInformation() {
-  const [status, setStatus] = useState<OrderStatus>("Out for Delivery");
-  const [priority, setPriority] = useState<OrderPriority>("Normal");
-  const [restaurant, setRestaurant] = useState("Pizza Palace");
-
-  const restaurants = [
-    "Pizza Palace",
-    "Burger House",
-    "Sushi World",
-    "Pasta House",
-    "Healthy Bites",
-  ];
+export default function OrderInformation({
+  value,
+  onChange,
+}: OrderInformationProps) {
+  const handleChange = (
+    field: keyof OrderInformationData,
+    newValue: string | null,
+  ) => {
+    onChange({
+      ...value,
+      [field]: newValue,
+    });
+  };
   return (
     <Card className="h-full">
       <CardHeader>
@@ -70,47 +72,66 @@ export default function OrderInformation() {
           <Label>Restaurant</Label>
           <div className="relative">
             <ShoppingBag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <select
-              value={restaurant}
-              onChange={(e) => setRestaurant(e.target.value)}
-              className="h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 text-sm outline-none"
+            <Select
+              value={value.restaurants}
+              onValueChange={(newValue) =>
+                handleChange("restaurants", newValue)
+              }
             >
-              {restaurants.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select restaurant" className="pl-5" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="Pizza Palace">Pizza Palace</SelectItem>
+                <SelectItem value="Burger House">Burger House</SelectItem>
+                <SelectItem value="Sushi World">Sushi World</SelectItem>
+                <SelectItem value="Pasta House">Pasta House</SelectItem>
+                <SelectItem value="Healthy Bites">Healthy Bites</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <div className="grid  grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>Order Status</Label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as OrderStatus)}
-              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none"
+            <Select
+              value={value.status}
+              onValueChange={(newValue) => handleChange("status", newValue)}
             >
-              <option value="Pending">Pending</option>
-              <option value="Confirmed">Confirmed</option>
-              <option value="Preparing">Preparing</option>
-              <option value="Picked Up">Picked Up</option>
-              <option value="Out for Delivery">Out for Delivery</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Delayed">Delayed</option>
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="Confirmed">Confirmed</SelectItem>
+                <SelectItem value="Preparing">Preparing</SelectItem>
+                <SelectItem value="Picked Up">Picked Up</SelectItem>
+                <SelectItem value="Out for Delivery">
+                  Out for Delivery
+                </SelectItem>
+                <SelectItem value="Delivered">Delivered</SelectItem>
+                <SelectItem value="Delayed">Delayed</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label>Delivery Priority</Label>
-            <select
-              value={priority}
-              onChange={(e) => e.target.value as OrderPriority}
-              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none"
+            <Select
+              value={value.priority}
+              onValueChange={(newValue) => handleChange("priority", newValue)}
             >
-              <option value="Normal">Normal</option>
-              <option value="High">High</option>
-              <option value="Urgent">Urgent</option>
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select priority" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="Normal">Normal</SelectItem>
+                <SelectItem value="High">High</SelectItem>
+                <SelectItem value="Urgent">Urgent</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <div className="flex flex-wrap items-center justify-between">
@@ -120,10 +141,9 @@ export default function OrderInformation() {
               Status selected for this order
             </p>
           </div>
-          <Badge variant="secondary">{status}</Badge>
+          <Badge variant="secondary">{value.status}</Badge>
         </div>
       </CardContent>
     </Card>
   );
 }
-

@@ -12,28 +12,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, MapPinned, Navigation, Phone } from "lucide-react";
+import { DeliveryAddressData } from "./types/deliveryFormTypes";
 
-export default function DeliveryAddress() {
-  const [address, setAddress] = useState({
-    street: "No. 126, New Street",
-    city: "Vellore",
-    state: "Tamil Nadu",
-    postalCode: "632001",
-    landmark: "Near blue cinema",
-    phone: "+91 98765 43210",
-  });
+type DeliveryAddressProps = {
+  value: DeliveryAddressData;
+  onChange: (value: DeliveryAddressData) => void;
+};
 
-  const [instructions, setInstructions] = useState(
-    "Please call before arriving. Leave the order at the main entrance if unavailable.",
-  );
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setAddress((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
+export default function DeliveryAddress({
+  value,
+  onChange,
+}: DeliveryAddressProps) {
+  const handleChange = (field: keyof DeliveryAddressData, newValue: string) => {
+    onChange({
+      ...value,
+      [field]: newValue,
+    });
   };
 
   return (
@@ -57,8 +51,8 @@ export default function DeliveryAddress() {
         <div className="space-y-2">
           <Label>Street Address</Label>
           <Input
-            value={address.street}
-            onChange={handleChange}
+            value={value.street}
+            onChange={(e) => handleChange("street", e.target.value)}
             placeholder="Enter street address"
           />
         </div>
@@ -66,8 +60,8 @@ export default function DeliveryAddress() {
           <div className="space-y-2">
             <Label>City</Label>
             <Input
-              value={address.city}
-              onChange={handleChange}
+              value={value.city}
+              onChange={(e) => handleChange("city", e.target.value)}
               placeholder="Enter city"
             />
           </div>
@@ -75,8 +69,8 @@ export default function DeliveryAddress() {
           <div className="space-y-2">
             <Label>State</Label>
             <Input
-              value={address.state}
-              onChange={handleChange}
+              value={value.state}
+              onChange={(e) => handleChange("state", e.target.value)}
               placeholder="Enter state"
             />
           </div>
@@ -85,8 +79,8 @@ export default function DeliveryAddress() {
           <div className="space-y-2">
             <Label>Postal Code</Label>
             <Input
-              value={address.postalCode}
-              onChange={handleChange}
+              value={value.postalCode}
+              onChange={(e) => handleChange("postalCode", e.target.value)}
               placeholder="Enter postal code"
             />
           </div>
@@ -94,8 +88,8 @@ export default function DeliveryAddress() {
           <div className="space-y-2">
             <Label>Nearby Landmark</Label>
             <Input
-              value={address.landmark}
-              onChange={handleChange}
+              value={value.landmark}
+              onChange={(e) => handleChange("landmark", e.target.value)}
               placeholder="Enter landmark"
             />
           </div>
@@ -107,8 +101,8 @@ export default function DeliveryAddress() {
             <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 
             <Input
-              value={address.phone}
-              onChange={handleChange}
+              value={value.phone}
+              onChange={(e) => handleChange("phone", e.target.value)}
               className="pl-10"
               placeholder="Enter contact number"
             />
@@ -119,8 +113,10 @@ export default function DeliveryAddress() {
           <Label>Special Delivery Instructions</Label>
 
           <Textarea
-            value={instructions}
-            onChange={(e) => setInstructions(e.target.value)}
+            value={value.specialInstructions}
+            onChange={(e) =>
+              handleChange("specialInstructions", e.target.value)
+            }
             placeholder="Enter special delivery instructions..."
             rows={4}
           />
@@ -140,8 +136,7 @@ export default function DeliveryAddress() {
             <Navigation className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
 
             <p className="text-sm text-muted-foreground">
-              {address.street}, {address.city}, {address.state} -{" "}
-              {address.postalCode}
+              {value.street}, {value.city}, {value.state} - {value.postalCode}
             </p>
           </div>
 

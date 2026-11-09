@@ -11,7 +11,15 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { FileText, MessageSquare, ShieldCheck, Info } from "lucide-react";
+import { FileText, MessageSquare, ShieldCheck, Info, Lock } from "lucide-react";
+import { DeliveryNotesData } from "./types/deliveryFormTypes";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const changeReasons = [
   "Delivery partner reassignment",
@@ -22,14 +30,21 @@ const changeReasons = [
   "Other",
 ];
 
-export default function DeliveryNotes() {
-  const [reason, setReason] = useState("Delivery partner reassignment");
-  const [adminNotes, setAdminNotes] = useState(
-    "Original delivery partner was unavailable. Reassigning to another partner.",
-  );
-  const [partnerInstructions, setPartnerInstructions] = useState(
-    "Please call the customer before reaching the delivery location.",
-  );
+type DeliveryNotesProps = {
+  value: DeliveryNotesData;
+  onChange: (value: DeliveryNotesData) => void;
+};
+
+export default function DeliveryNotes({ value, onChange }: DeliveryNotesProps) {
+  const handleChange = (
+    field: keyof DeliveryNotesData,
+    newValue: string | null,
+  ) => {
+    onChange({
+      ...value,
+      [field]: newValue,
+    });
+  };
 
   return (
     <Card>
@@ -50,38 +65,49 @@ export default function DeliveryNotes() {
 
       <CardContent className="space-y-5">
         <div className="space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <Label>Reason for Modification</Label>
-            <Badge variant="secondary">Required</Badge>
-          </div>
+          <Label>Reason for Delivery Assignment / Reassignment</Label>
 
-          <select
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            className="h-10 w-full rounded-md border border-input  px-3 text-sm outline-none"
+          <Select
+            value={value.reassignmentReason}
+            onValueChange={(newValue) =>
+              handleChange("reassignmentReason", newValue)
+            }
           >
-            {changeReasons.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a reason" />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectItem value="Initial assignment">
+                Initial assignment
+              </SelectItem>
+              <SelectItem value="Partner unavailable">
+                Partner unavailable
+              </SelectItem>
+              <SelectItem value="Partner requested reassignment">
+                Partner requested reassignment
+              </SelectItem>
+              <SelectItem value="Vehicle issue">Vehicle issue</SelectItem>
+              <SelectItem value="Customer request">Customer request</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-            <Label htmlFor="admin-notes">Internal Admin Notes</Label>
+            <Lock className="h-4 w-4 text-muted-foreground" />
+            <Label>Private Admin Notes</Label>
           </div>
 
           <Textarea
-            value={adminNotes}
-            onChange={(e) => setAdminNotes(e.target.value)}
-            placeholder="Explain why this delivery is being modified..."
-            rows={4}
+            value={value.adminNotes}
+            onChange={(e) => handleChange("adminNotes", e.target.value)}
+            placeholder="Add internal notes about this delivery..."
+            rows={3}
           />
 
           <p className="text-xs text-muted-foreground">
-            These notes are intended for administrators, not customers.
+            These notes are intended for administrative use only.
           </p>
         </div>
         <div className="space-y-2">
@@ -91,22 +117,16 @@ export default function DeliveryNotes() {
           </div>
 
           <Textarea
-            value={partnerInstructions}
-            onChange={(e) => setPartnerInstructions(e.target.value)}
-            placeholder="Add instructions for the delivery partner..."
-            rows={4}
+            value={value.partnerInstructions}
+            onChange={(e) =>
+              handleChange("partnerInstructions", e.target.value)
+            }
+            placeholder="Enter instructions for the delivery partner..."
+            rows={3}
           />
 
           <p className="text-xs text-muted-foreground">
-            These instructions can be shared with the assigned delivery partner.
-          </p>
-        </div>
-        <div className="flex items-start gap-3 rounded-lg border bg-muted p-3">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-
-          <p className="text-xs leading-5 text-muted-foreground">
-            Admin notes should remain private. Only delivery partner
-            instructions should be shared with the assigned rider.
+            Instructions for the assigned delivery partner.
           </p>
         </div>
       </CardContent>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save, RotateCcw } from "lucide-react";
 
@@ -10,13 +9,114 @@ import DeliveryAddress from "./DeliveryAddress";
 import DeliveryNotes from "./DeliveryNotes";
 import DeliverySummary from "./DeliverySummary";
 import Link from "next/link";
+import { useState } from "react";
+import {
+  DeliveryAddressData,
+  DeliveryAssignmentData,
+  DeliveryNotesData,
+  DeliverySummaryData,
+  OrderInformationData,
+} from "./types/deliveryFormTypes";
+
+import { z } from "zod";
+
+export const deliverySchema = z.object({
+  orderInfo: z.object({
+    restaurant: z.string().min(1, "Restaurant is required"),
+    status: z.enum([
+      "Pending",
+      "Confirmed",
+      "Preparing",
+      "Picked Up",
+      "Out for Delivery",
+      "Delivered",
+      "Delayed",
+    ]),
+    priority: z.enum(["Normal", "High", "Urgent"]),
+  }),
+
+  deliveryAssignment: z.object({
+    partnerId: z.string().min(1, "Select a delivery partner"),
+    vehicleType: z.string().min(1, "Vehicle type is required"),
+    vehicleNumber: z.string().trim().min(1, "Vehicle number is required"),
+  }),
+
+  deliveryAddress: z.object({
+    street: z.string().trim().min(1, "Street address is required"),
+    apartment: z.string(),
+    city: z.string().trim().min(1, "City is required"),
+    state: z.string().trim().min(1, "State is required"),
+    postalCode: z
+      .string()
+      .regex(/^[0-9]{6}$/, "Enter a valid 6-digit postal code"),
+    landmark: z.string(),
+    phone: z
+      .string()
+      .trim()
+      .regex(/^\+?[0-9\s()-]{7,20}$/, "Enter a valid phone number"),
+    specialInstructions: z.string(),
+  }),
+
+  deliveryNotes: z.object({
+    reassignmentReason: z.string().min(1, "Select a reassignment reason"),
+    adminNotes: z.string().max(1000, "Maximum 1000 characters"),
+    partnerInstructions: z.string().max(1000, "Maximum 1000 characters"),
+  }),
+});
+
+export type DeliveryFormValues = z.infer<typeof deliverySchema>;
 
 type EditDeliveryFormProps = {
   orderId: string;
 };
 
 export default function EditDeliveryForm({ orderId }: EditDeliveryFormProps) {
-  const router = useRouter();
+  const [orderInfo, setOrderInfo] = useState<OrderInformationData>({
+    restaurants: "Pizza Palace",
+    status: "Out for Delivery",
+    priority: "Normal",
+  });
+
+  const [deliveryAssignment, setDeliveryAssignment] =
+    useState<DeliveryAssignmentData>({
+      partnerId: "RD-1",
+      vehicleType: "Motorcycle",
+      vehicleNumber: "TN 23 BB 1234",
+    });
+
+  const [deliveryAddress, setDeliveryAddress] = useState<DeliveryAddressData>({
+    street: "126, New Street",
+    city: "Vellore",
+    state: "Tamil Nadu",
+    postalCode: "632001",
+    landmark: "Near Blue Cinema",
+    phone: "+91 98765 43210",
+    specialInstructions: "Please call before delivery.",
+  });
+
+  const [deliveryNotes, setDeliveryNotes] = useState<DeliveryNotesData>({
+    reassignmentReason: "Initial assignment",
+    adminNotes: "",
+    partnerInstructions: "Please call the customer before arriving.",
+  });
+
+  const [orderSummary] = useState<DeliverySummaryData>({
+    items: [
+      {
+        id: "1",
+        name: "Chicken Biryani",
+        description: "Bucket",
+        quantity: 1,
+        price: 150,
+      },
+    ],
+    subtotal: 690,
+    deliveryFee: 30,
+    discount: 50,
+    tax: 35,
+    paymentMethod: "UPI",
+    paymentStatus: "Paid",
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -69,16 +169,22 @@ export default function EditDeliveryForm({ orderId }: EditDeliveryFormProps) {
       <div>
         <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-3">
           <div className="space-y-6 xl:col-span-2">
-            <OrderInformation />
+            <OrderInformation value={orderInfo} onChange={setOrderInfo} />
 
-            <DeliveryAssignment />
+            <DeliveryAssignment
+              value={deliveryAssignment}
+              onChange={setDeliveryAssignment}
+            />
 
-            <DeliveryAddress />
+            <DeliveryAddress
+              value={deliveryAddress}
+              onChange={setDeliveryAddress}
+            />
 
-            <DeliveryNotes />
+            <DeliveryNotes value={deliveryNotes} onChange={setDeliveryNotes} />
           </div>
           <div className="space-y-6 xl:sticky xl:top-6">
-            <DeliverySummary />
+            <DeliverySummary summary={orderSummary} />
             <div className="rounded-xl border bg-muted p-4">
               <h3 className="text-sm font-semibold">Before updating</h3>
 

@@ -12,6 +12,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Bike, Mail, Phone, Star, User, UserRound } from "lucide-react";
 import { useState } from "react";
+import { DeliveryAssignmentData } from "./types/deliveryFormTypes";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const deliveryPartners = [
   {
@@ -60,24 +68,39 @@ const deliveryPartners = [
   },
 ];
 
-export default function DeliveryAssignment() {
-  const [selectedPartnerId, setSelectedPartnerId] = useState("RD-1");
-  const [vehicleType, setVehicleType] = useState("Motorcycle");
-  const [vehicleNumber, setVehicleNumber] = useState("TN 23 BB 1234");
+type DeliveryAssignmentProps = {
+  value: DeliveryAssignmentData;
+  onChange: (value: DeliveryAssignmentData) => void;
+};
 
+export default function DeliveryAssignment({
+  value,
+  onChange,
+}: DeliveryAssignmentProps) {
   const selectedPartner = deliveryPartners.find(
-    (partner) => partner.id === selectedPartnerId,
+    (partner) => partner.id === value.partnerId,
   );
 
-  const handlePartnerChange = (partnerId: string) => {
-    setSelectedPartnerId(partnerId);
-
+  const handlePartnerChange = (partnerId: string | null) => {
     const partner = deliveryPartners.find((item) => item.id === partnerId);
 
-    if (partner) {
-      setVehicleType(partner.vehicle);
-      setVehicleNumber(partner.vehicleNo);
-    }
+    if (!partner) return;
+
+    onChange({
+      partnerId,
+      vehicleType: partner.vehicle,
+      vehicleNumber: partner.vehicleNo,
+    });
+  };
+
+  const handleVehicleChange = (
+    field: "vehicleType" | "vehicleNumber",
+    newValue: string | null,
+  ) => {
+    onChange({
+      ...value,
+      [field]: newValue,
+    });
   };
 
   return (
@@ -98,17 +121,19 @@ export default function DeliveryAssignment() {
       <CardContent className="space-y-5">
         <div className="space-y-2">
           <Label>Select Delivery Partner</Label>
-          <select
-            value={selectedPartnerId}
-            onChange={(e) => handlePartnerChange(e.target.value)}
-            className="h-10 w-50 rounded-md border border-input bg-background pl-10 pr-3 text-sm outline-none"
-          >
-            {deliveryPartners.map((partner) => (
-              <option key={partner.id} value={partner.id}>
-                {partner.name} - {partner.status}
-              </option>
-            ))}
-          </select>
+          <Select value={value.partnerId} onValueChange={handlePartnerChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select delivery partner" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {deliveryPartners.map((partner) => (
+                <SelectItem key={partner.id} value={partner.id}>
+                  {partner.name} ({partner.status})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         {selectedPartner && (
           <div className="rounded-xl border bg-muted p-4">
@@ -163,22 +188,31 @@ export default function DeliveryAssignment() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>Vehicle Type</Label>
-              <select
-                value={vehicleType}
-                onChange={(e) => setVehicleType(e.target.value)}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none"
+              <Select
+                value={value.vehicleType}
+                onValueChange={(newValue) =>
+                  handleVehicleChange("vehicleType", newValue)
+                }
               >
-                <option value="Motorcycle">Motorcycle</option>
-                <option value="Bicycle">Bicycle</option>
-                <option value="Car">Car</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select vehicle" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="Motorcycle">Motorcycle</SelectItem>
+                  <SelectItem value="Scooter">Scooter</SelectItem>
+                  <SelectItem value="Bicycle">Bicycle</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label>Vehicle Number</Label>
               <Input
-                value={vehicleNumber}
+                value={value.vehicleNumber}
                 placeholder="Enter Vehicle Number"
-                onChange={(e) => setVehicleNumber(e.target.value)}
+                onChange={(e) =>
+                  handleVehicleChange("vehicleNumber", e.target.value)
+                }
               />
             </div>
           </div>
