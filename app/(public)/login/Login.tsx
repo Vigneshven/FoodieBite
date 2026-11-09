@@ -1,43 +1,28 @@
 "use client";
+
 import { login, LoginCustomer } from "@/api/api";
+import LoginLayout from "@/component/auth/login/LoginLayout";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z from "zod";
+import { z } from "zod";
 
 const loginSchema = z.object({
   email: z.string().trim().email("Enter a valid email"),
-  password: z.string().min(8, "Password is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
 
-function Login() {
+export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
-
-  const handleLogin = async (data: LoginCustomer) => {
-    try {
-      setIsLoading(true);
-      const res = await login(data);
-
-      reset({
-        email: "",
-        password: "",
-      });
-      toast.success("Login Successfully");
-      router.replace(res.role === "admin" ? "/admin" : "/");
-      router.refresh();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Login Failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const {
     register,
@@ -52,74 +37,134 @@ function Login() {
     },
   });
 
+  const handleLogin = async (data: LoginCustomer) => {
+    try {
+      setIsLoading(true);
+
+      const res = await login(data);
+
+      reset({
+        email: "",
+        password: "",
+      });
+
+      toast.success("Login Successfully");
+
+      router.replace(res.role === "admin" ? "/admin" : "/");
+      router.refresh();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Login Failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="bg-primary flex min-h-screen w-full items-center justify-center p-8">
-      <form
-        onSubmit={handleSubmit(handleLogin)}
-        className="flex w-full max-w-md flex-col gap-4 rounded-xl border bg-amber-50 bg-card-background p-8 shadow"
-        autoComplete="off"
-      >
-        <h4 className="mb-2 text-center text-2xl font-bold text-heading text-font-primary text-text-secondary">
-          Login
-        </h4>
+    <LoginLayout>
+      <div className="space-y-8">
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+            <LockKeyhole className="size-3.5" />
+            SECURE ACCOUNT ACCESS
+          </div>
 
-        <label
-          htmlFor="email"
-          className="text-sm font-medium text-heading text-font-primary text-text-secondary"
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Welcome back!
+          </h1>
+
+          <p className="text-sm leading-6 text-muted-foreground">
+            Sign in to your FoodieBite account and continue enjoying your
+            favourite food.
+          </p>
+        </div>
+        <form
+          onSubmit={handleSubmit(handleLogin)}
+          className="space-y-5"
+          noValidate
         >
-          Email
-        </label>
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-sm font-semibold">
+              Email Address
+            </label>
 
-        <input
-          id="email"
-          type="email"
-          autoComplete="email"
-          placeholder="Enter your email"
-          {...register("email")}
-          className="rounded border border-border bg-transparent p-2 outline-none focus:ring-2 focus:ring-blue-500 text-font-primary text-text-secondary"
-        />
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
 
-        {errors.email && (
-          <p className="text-sm text-red-500">{errors.email.message}</p>
-        )}
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                {...register("email")}
+                className="h-12 w-full rounded-lg border border-input bg-background pl-10 pr-4 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
 
-        <label
-          htmlFor="password"
-          className="text-sm font-medium text-heading text-font-primary text-text-secondary"
-        >
-          Password
-        </label>
+            {errors.email && (
+              <p className="text-sm text-destructive">{errors.email.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="password" className="text-sm font-semibold">
+              Password
+            </label>
 
-        <input
-          id="password"
-          type="password"
-          placeholder="Enter your password"
-          {...register("password")}
-          className="rounded border border-border bg-transparent p-2 outline-none focus:ring-2 focus:ring-blue-500 text-font-primary text-text-secondary"
-        />
+            <div className="relative">
+              <LockKeyhole className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
 
-        {errors.password && (
-          <p className="text-sm text-red-500">{errors.password.message}</p>
-        )}
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                placeholder="Enter your password"
+                {...register("password")}
+                className="h-12 w-full rounded-lg border border-input bg-background pl-10 pr-11 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+              />
 
-        <div className="flex justify-center items-center w-full">
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
+              </button>
+            </div>
+
+            {errors.password && (
+              <p className="text-sm text-destructive">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
           <button
             type="submit"
             disabled={isLoading}
-            className="text-font-primary text-text-secondary w-20 p-1 rounded bg-blue-300 hover:cursor-pointer"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isLoading ? "Logging in..." : "Log In"}
+            {isLoading ? "Signing in..." : "Sign In"}
           </button>
+        </form>
+        <div className="border-t pt-6 text-center">
+          <p className="text-sm text-muted-foreground">
+            Don't have an account yet?{" "}
+            <Link
+              href="/register"
+              className="font-semibold text-primary hover:underline"
+            >
+              Create an account
+            </Link>
+          </p>
         </div>
-        <p className="mt-2  font-bold text-center text-mb text-font-primary text-text-secondary">
-          Not a member yet?{" "}
-          <Link className="hover:underline text-primary" href={"/register"}>
-            Register
-          </Link>
-        </p>
-      </form>
-    </div>
+        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <LockKeyhole className="size-3.5" />
+          Your login information is securely protected.
+        </div>
+      </div>
+    </LoginLayout>
   );
 }
-
-export default Login;

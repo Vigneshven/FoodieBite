@@ -1,29 +1,60 @@
 "use client";
-import { registerCustomer, RegisterCustomer } from "@/api/api";
+
+import { registerCustomer } from "@/api/api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z from "zod";
+import { z } from "zod";
+import { Bike, Store, UserRound, Eye, EyeOff } from "lucide-react";
+import RegisterLayout from "@/component/auth/register/RegisterLayout";
 
 const registerSchema = z.object({
-  username: z.string().trim().min(3, "Username must be at least 3 character "),
+  username: z.string().trim().min(3, "Username must be at least 3 characters"),
+
   email: z.string().trim().email("Enter a valid email"),
-  password: z.string().min(8, "password must be at least 8 character"),
+
+  password: z.string().min(8, "Password must be at least 8 characters"),
+
   role: z.enum(["customer", "restaurant_owner", "delivery_partner"]),
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
-function Register() {
+const accountTypes = [
+  {
+    value: "customer",
+    label: "Customer",
+    description: "Order your favourite food",
+    icon: UserRound,
+  },
+  {
+    value: "restaurant_owner",
+    label: "Restaurant Owner",
+    description: "Manage your restaurant",
+    icon: Store,
+  },
+  {
+    value: "delivery_partner",
+    label: "Delivery Partner",
+    description: "Deliver orders and earn",
+    icon: Bike,
+  },
+] as const;
+
+export default function Register() {
   const router = useRouter();
+
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const {
     register,
-    reset,
     handleSubmit,
+    reset,
+    watch,
     formState: { errors },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -35,135 +66,204 @@ function Register() {
     },
   });
 
-  const handleRegister = async (data: RegisterCustomer) => {
+  const selectedRole = watch("role");
+
+  const handleRegister = async (data: RegisterForm) => {
     setIsLoading(true);
+
     try {
       await registerCustomer(data);
-      toast.success("Register Successfully");
+
+      toast.success("Registered successfully!");
       reset();
 
       router.replace("/login");
       router.refresh();
     } catch (error) {
-      console.log(error);
-      toast.error("Registration Failed");
+      console.error(error);
+      toast.error("Registration failed");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full min-h-screen bg-primary flex justify-center items-center">
-      <form
-        className="w-96 bg-amber-50 flex flex-col p-3 rounded-xl gap-4"
-        onSubmit={handleSubmit(handleRegister)}
-      >
-        <h4 className="text-center font-bold text-font-primary text-text-secondary">
-          Register
-        </h4>
-        <label className="font-bold text-font-primary text-text-secondary">
-          UserName
-        </label>
-        <input
-          type="text"
-          {...register("username")}
-          className="rounded-lg border border-border bg-input-background p-2 text-heading text-text-secondary"
-        />
-        {errors.username && (
-          <p className="text-red-500 text-sm">{errors.username.message}</p>
-        )}
-        <label className="font-bold text-font-primary text-text-secondary">
-          Email
-        </label>
-        <input
-          type="text"
-          {...register("email")}
-          className="rounded-lg border border-border bg-input-background p-2 text-heading text-text-secondary"
-        />
-        {errors.email && (
-          <p className="text-red-500 text-sm">{errors.email.message}</p>
-        )}
-        <label className="font-bold text-font-primary text-text-secondary">
-          Password
-        </label>
-        <input
-          type="text"
-          {...register("password")}
-          className="rounded-lg border border-border bg-input-background p-2 text-heading text-text-secondary"
-        />
-        {errors.password && (
-          <p className="text-red-500  text-sm">{errors.password.message}</p>
-        )}
-        <div className="flex gap-2">
-          <label className="font-bold text-font-primary text-text-secondary">
-            Select Your Account Type:
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="radio"
-              id="restaurant_owner"
-              value="restaurant_owner"
-              {...register("role")}
-            />
-            <label
-              className="font-bold text-font-primary text-text-secondary"
-              htmlFor="Restuarant"
-            >
-              Restuarant Owner
-            </label>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="radio"
-              id="customer"
-              value="customer"
-              {...register("role")}
-            />
-            <label
-              className="font-bold text-font-primary text-text-secondary"
-              htmlFor="customer"
-            >
-              customer
-            </label>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="radio"
-              id="delivery_partner"
-              value="delivery_partner"
-              {...register("role")}
-            />
-            <label
-              className="font-bold text-font-primary text-text-secondary"
-              htmlFor="delivery_partner"
-            >
-              Delivery Partner
-            </label>
-          </div>
-          {errors.role && (
-            <p className="text-red-500 text-sm">{errors.role.message}</p>
-          )}
+    <RegisterLayout>
+      <div className="space-y-7">
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-primary">GET STARTED</p>
+
+          <h2 className="text-3xl font-bold tracking-tight">
+            Create your account
+          </h2>
+
+          <p className="text-sm text-muted-foreground">
+            Join FoodieBite and get started today.
+          </p>
         </div>
-        <div className="flex justify-center items-center w-full">
+
+        <form
+          onSubmit={handleSubmit(handleRegister)}
+          className="space-y-5"
+          noValidate
+        >
+          <div className="space-y-3">
+            <div>
+              <h3 className="text-sm font-semibold">
+                Choose your account type
+              </h3>
+
+              <p className="text-xs text-muted-foreground">
+                Select how you want to use FoodieBite.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {accountTypes.map((account) => {
+                const Icon = account.icon;
+                const isSelected = selectedRole === account.value;
+
+                return (
+                  <label
+                    key={account.value}
+                    className={`relative flex cursor-pointer flex-col gap-3 rounded-xl border p-3 transition-all ${
+                      isSelected
+                        ? "border-primary bg-primary/5 ring-1 ring-primary"
+                        : "border-border hover:border-primary/50 hover:bg-muted/50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      value={account.value}
+                      {...register("role")}
+                      className="sr-only"
+                    />
+
+                    <div className="flex items-center justify-between">
+                      <div
+                        className={`flex size-9 items-center justify-center rounded-lg ${
+                          isSelected
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        <Icon className="size-5" />
+                      </div>
+
+                      <div
+                        className={`size-4 rounded-full border-2 ${
+                          isSelected
+                            ? "border-primary bg-primary ring-2 ring-primary/20"
+                            : "border-muted-foreground/40"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-semibold">{account.label}</p>
+
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {account.description}
+                      </p>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+
+            {errors.role && (
+              <p className="text-sm text-red-400">{errors.role.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="username" className="text-sm font-medium">
+              Username
+            </label>
+
+            <input
+              id="username"
+              type="text"
+              autoComplete="username"
+              placeholder="Enter your username"
+              {...register("username")}
+              className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+            />
+
+            {errors.username && (
+              <p className="text-sm text-red-400">{errors.username.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-sm font-medium">
+              Email Address
+            </label>
+
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder="test1@example.com"
+              {...register("email")}
+              className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition"
+            />
+
+            {errors.email && (
+              <p className="text-sm text-red-400">{errors.email.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Password</label>
+
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder="Create a strong password"
+                {...register("password")}
+                className="h-11 w-full rounded-lg border border-input bg-background px-3 pr-11 text-sm outline-none transition"
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
+              </button>
+            </div>
+
+            {errors.password && (
+              <p className="text-sm text-red-400">{errors.password.message}</p>
+            )}
+
+            <p className="text-xs text-muted-foreground">
+              Password must contain at least 8 characters.
+            </p>
+          </div>
           <button
+            type="submit"
             disabled={isLoading}
-            className="text-font-primary text-text-secondary w-20 p-1 rounded bg-blue-300 hover:cursor-pointer"
+            className="flex h-11 w-full items-center justify-center rounded-lg bg-primary font-semibold text-primary-foreground transition"
           >
-            {isLoading ? "Registering..." : "Register"}
+            {isLoading ? "Creating Account..." : "Create Account"}
           </button>
+        </form>
+        <div className="border-t pt-5 text-center">
+          <p className="text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <Link
+              href="/login"
+              className="font-semibold text-primary hover:underline"
+            >
+              Log in
+            </Link>
+          </p>
         </div>
-        <p className="text-center font-bold text-font-primary text-text-secondary">
-          Already a member?{" "}
-          <Link
-            className="hover:underline text-primary font-bold text-font-primary"
-            href={"/login"}
-          >
-            Login
-          </Link>
-        </p>
-      </form>
-    </div>
+      </div>
+    </RegisterLayout>
   );
 }
-
-export default Register;
