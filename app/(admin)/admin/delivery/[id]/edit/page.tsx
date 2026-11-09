@@ -1,12 +1,17 @@
-import DeliveryAssignment from "@/component/admin/delivery/edit/DeliveryAssignment";
-import OrderInformation from "@/component/admin/delivery/edit/OrderInformation";
+import EditDeliveryForm from "@/component/admin/delivery/edit/EditDeliveryForm";
 
-export default function EditDeliveryPage() {
+type EditDeliveryPageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function EditDeliveryPage({
+  params,
+}: EditDeliveryPageProps) {
+  const { id } = await params;
+
   return (
-    <div className="spce-y-6 p-4">
-      <h1 className="text-2xl font-bold tracking-tight">Edit Delivery</h1>
-      <OrderInformation />
-      <DeliveryAssignment />
+    <div className="p-4 md:p-6">
+      <EditDeliveryForm orderId={id} />
     </div>
   );
 }
