@@ -21,6 +21,11 @@ const nextConfig: NextConfig = {
         hostname: "content.jdmagicbox.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
     ],
   },
   turbopack: {

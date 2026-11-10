@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -10,7 +10,11 @@ import {
   UserRound,
   MapPin,
   UtensilsCrossed,
+  Settings,
+  LogOut,
 } from "lucide-react";
+import { logout } from "@/api/api";
+import { toast } from "sonner";
 
 const navigation = [
   {
@@ -47,6 +51,17 @@ const navigation = [
 
 export default function CustomerSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const handleLogOut = async () => {
+    try {
+      await logout();
+      router.push("/");
+      toast.success("Logout Successfully");
+    } catch (error) {
+      console.log(error);
+      toast.error("Logout Failed");
+    }
+  };
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-gray-200 bg-white lg:flex">
@@ -108,6 +123,23 @@ export default function CustomerSidebar() {
             Browse Restaurants →
           </Link>
         </div>
+      </div>
+      <div className="border-t p-4">
+        <Link
+          href="/customer/settings"
+          className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium tex-gray-500 transition-colors hover:bg-orange-50 hover:text-orange-500"
+        >
+          <Settings size={19} />
+          Settings
+        </Link>
+        <button
+          type="button"
+          className="mt-2 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-500 transition-colors hover:bg-red-50 hover:cursor-pointer"
+          onClick={handleLogOut}
+        >
+          <LogOut size={19} />
+          Logout
+        </button>
       </div>
     </aside>
   );

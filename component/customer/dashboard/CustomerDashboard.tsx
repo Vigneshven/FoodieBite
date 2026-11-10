@@ -3,12 +3,11 @@ import {
   ArrowRight,
   Clock,
   Heart,
-  MapPin,
   Package,
   ShoppingBag,
   Star,
-  Utensils,
 } from "lucide-react";
+import Image from "next/image";
 
 const stats = [
   {
@@ -66,48 +65,49 @@ const favoriteRestaurants = [
     name: "The Burger House",
     category: "Burgers • Fast Food",
     rating: "4.8",
-    emoji: "🍔",
+    image:
+      "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
     color: "bg-orange-100",
   },
   {
     name: "Pizza Paradise",
     category: "Pizza • Italian",
     rating: "4.6",
-    emoji: "🍕",
+    image: "https://images.pexels.com/photos/31596394/pexels-photo-31596394.jpeg",
     color: "bg-yellow-100",
   },
   {
     name: "Spicy Kitchen",
     category: "Indian • Biryani",
     rating: "4.7",
-    emoji: "🍛",
+    image: "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
     color: "bg-red-100",
   },
 ];
 
 const recommendedRestaurants = [
   {
-    name: "Green Bowl",
+    name: "Veg Soup",
     category: "Healthy Food",
     rating: "4.5",
     time: "20-30 min",
-    emoji: "🥗",
+    image: "https://images.pexels.com/photos/8738014/pexels-photo-8738014.jpeg",
     color: "bg-green-100",
   },
   {
-    name: "Sweet Treats",
+    name: "gulab jamun",
     category: "Desserts",
     rating: "4.9",
     time: "15-25 min",
-    emoji: "🍰",
+    image: "https://images.pexels.com/photos/29259167/pexels-photo-29259167.jpeg",
     color: "bg-pink-100",
   },
   {
-    name: "Taco Fiesta",
-    category: "Mexican",
+    name: "Chicken Biryani",
+    category: "indian",
     rating: "4.6",
     time: "25-35 min",
-    emoji: "🌮",
+    image: "https://images.pexels.com/photos/39536492/pexels-photo-39536492.jpeg",
     color: "bg-yellow-100",
   },
 ];
@@ -263,7 +263,13 @@ export default function CustomerDashboard() {
               <div
                 className={`flex h-36 items-center justify-center text-7xl ${restaurant.color}`}
               >
-                {restaurant.emoji}
+                <Image
+                  className="h-full w-full object-cover"
+                  src={restaurant.image}
+                  alt={restaurant.name}
+                  width={300}
+                  height={300}
+                />
               </div>
 
               <div className="p-4">
@@ -314,7 +320,13 @@ export default function CustomerDashboard() {
               <div
                 className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl text-3xl ${restaurant.color}`}
               >
-                {restaurant.emoji}
+                <Image
+                  className="h-full w-full object-cover"
+                  src={restaurant.image}
+                  alt={restaurant.name}
+                  width={300}
+                  height={300}
+                />
               </div>
 
               <div className="min-w-0 flex-1">
