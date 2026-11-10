@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export type DeliveryPaginationProps = {
   currentPage: number;
@@ -23,48 +22,49 @@ export default function DeliveryPagination({
   const endItem = Math.min(currentPage * pageSize, totalPages);
 
   return (
-    <div className="flex flex-col gap-4 border-t px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex flex-wrap items-center gap-3">
-        <p>
-          Showing{" "}
-          <span className="font-medium text-foreground">{startItem}</span> to{" "}
-          <span className="font-medium text-foreground">{endItem}</span> of{" "}
-          <span className="font-medium text-foreground">{totalPages}</span>{" "}
-          deliveries
-        </p>
-
-        <select
-          value={pageSize}
-          onChange={(e) => onPageSizeChange(Number(e.target.value))}
-          className="h-9 rounded-md border bg-background px-2 text-sm"
-        >
-          {[5, 10, 20].map((size) => (
-            <option value={size} key={size}>
-              {size} per page
-            </option>
-          ))}
-        </select>
+    <div className="flex flex-col gap-4 border-t px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="text-sm text-muted-foreground">
+        Showing{" "}
+        <span className="font-medium text-foreground">
+          {startItem}-{endItem}
+        </span>{" "}
+        of <span className="font-medium text-foreground">{totalItems}</span>{" "}
+        Customers
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Rows per page</span>
+          <select
+            value={pageSize}
+            onChange={(e) => onPageSizeChange(Number(e.target.value))}
+            className="h-9 rounded-md border bg-background px-2 text-sm outline-none"
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+          </select>
+        </div>
+        <div className="flex items-center gap-2">
         <p className="mr-2 text-sm text-muted-foreground font-bold">
           Page {currentPage} of {totalPages}
         </p>
         <Button
           variant="outline"
-          size="icon"
+          size="sm"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
         >
-          <ChevronLeft className="size-4" />
+          Previous
         </Button>
         <Button
           variant="outline"
-          size="icon"
+          size="sm"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
         >
-          <ChevronRight className="size-4" />
+          Next
         </Button>
+      </div>
       </div>
     </div>
   );

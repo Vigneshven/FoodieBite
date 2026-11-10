@@ -47,7 +47,7 @@ export default function RestaurantPagination({
             <option value={20}>20</option>
           </select>
         </div>
-        <Button
+        {/* <Button
           size="icon"
           className="h-9 w-9"
           disabled={currentPage <= 1}
@@ -72,7 +72,28 @@ export default function RestaurantPagination({
           onClick={() => onPageChange(currentPage + 1)}
         >
           <ChevronRight className="h-4 w-4" />
+        </Button> */}
+        <div className="flex items-center gap-2">
+        <p className="mr-2 text-sm text-muted-foreground font-bold">
+          Page {currentPage} of {totalPages}
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage <= 1}
+        >
+          Previous
         </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage >= totalPages}
+        >
+          Next
+        </Button>
+      </div>
       </div>
     </div>
   );

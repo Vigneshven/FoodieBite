@@ -12,6 +12,9 @@ export default function OrderPage() {
 
   const [search, setSearch] = useState("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
   return (
     <div className="space-y-2">
       <div>
@@ -25,11 +28,27 @@ export default function OrderPage() {
 
       <OrderFilters
         activeStatus={activeStatus}
-        onStatusChange={setActiveStatus}
+        onStatusChange={(status) => {
+          setActiveStatus(status);
+          setCurrentPage(1);
+        }}
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setCurrentPage(1);
+        }}
       />
-      <OrdersTable activeStatus={activeStatus} search={search} />
+      <OrdersTable
+        activeStatus={activeStatus}
+        search={search}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setCurrentPage(1);
+        }}
+      />
     </div>
   );
 }

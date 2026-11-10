@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import OrderPagination from "./OrderPagination";
 
 type OrderStatus =
   | "Pending"
@@ -101,11 +102,20 @@ const statusStyles: Record<OrderStatus, string> = {
 type OrdersTableProps = {
   activeStatus: OrderStatusFilter;
   search: string;
+
+  currentPage: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 };
 
 export default function OrdersTable({
   activeStatus,
   search,
+  currentPage,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
 }: OrdersTableProps) {
   const filteredOrders = orders.filter((order) => {
     const matchedStatus =
@@ -121,6 +131,13 @@ export default function OrdersTable({
 
     return matchedStatus && matchedSearch;
   });
+
+  const totalItems = filteredOrders.length;
+
+  const paginatedDeliveries = filteredOrders.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
   return (
     <div className="overflow-hidden rounded-xl border bg-card">
       <div className="border-b p-5">
@@ -145,7 +162,7 @@ export default function OrdersTable({
 
           <TableBody>
             {filteredOrders.length > 0 ? (
-              filteredOrders.map((order) => (
+              paginatedDeliveries.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell className="font-medium">{order.id}</TableCell>
                   <TableCell>
@@ -164,7 +181,9 @@ export default function OrdersTable({
                       {order.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-muted-foreground font-bold">{order.date}</TableCell>
+                  <TableCell className="text-muted-foreground font-bold">
+                    {order.date}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -175,6 +194,13 @@ export default function OrdersTable({
           </TableBody>
         </Table>
       </div>
+      <OrderPagination
+        currentPage={currentPage}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 }

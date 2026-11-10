@@ -1,6 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
 type CustomerPaginationProps = {
   currentPage: number;
   totalItems: number;
@@ -47,35 +45,27 @@ export default function CustomerPagination({
             <option value={20}>20</option>
           </select>
         </div>
+        <div className="flex items-center gap-2">
+        <p className="mr-2 text-sm text-muted-foreground font-bold">
+          Page {currentPage} of {totalPages}
+        </p>
         <Button
-          size="icon"
-          className="h-9 w-9 hover:cursor-pointer"
-          disabled={currentPage <= 1}
+          variant="outline"
+          size="sm"
           onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage <= 1}
         >
-          <ChevronLeft className="h-4 w-4" />
+          Previous
         </Button>
-
-        <div className="flex items-center gap-1">
-          {pages.map((page) => (
-            <Button
-              key={page}
-              onClick={() => onPageChange(page)}
-              className="h-9 w-9"
-            >
-              {page}
-            </Button>
-          ))}
-        </div>
-
         <Button
-          size="icon"
-          className="h-9 w-9"
-          disabled={currentPage >= totalPages || totalPages === 0}
+          variant="outline"
+          size="sm"
           onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage >= totalPages}
         >
-          <ChevronRight className="h-4 w-4" />
+          Next
         </Button>
+      </div>
       </div>
     </div>
   );
