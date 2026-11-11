@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model customers {
+  id       Int              @id @default(autoincrement())
+  username String           @db.VarChar(100)
+  email    String           @unique(map: "email") @db.VarChar(255)
+  password String           @db.VarChar(255)
+  role     customers_role   @default(customer)
+  status   customers_status @default(active)
+}
+
+model restaurants {
+  id       Int    @id @default(autoincrement())
+  image    String @db.Text
+  name     String @db.VarChar(255)
+  category String @db.VarChar(300)
+}
+
+enum customers_role {
+  customer
+  restaurant_owner
+  delivery_partner
+  admin
+}
+
+enum customers_status {
+  active
+  inactive
+}

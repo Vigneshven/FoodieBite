@@ -1,14 +1,4 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2";
-import pool from "@/backend/config/db";
-
-export type User = RowDataPacket & {
-  id: number;
-  username: string;
-  email: string;
-  password: string;
-  role: UserRole;
-  status: UserStatus;
-};
+import { prisma } from "@/backend/lib/prisma";
 
 export type UserRole =
   | "customer"
@@ -18,35 +8,64 @@ export type UserRole =
 export type UserStatus = "active" | "inactive";
 
 export async function findCustomerByEmail(email: string) {
-  const [row] = await pool.execute<User[]>(
-    `select id,username,email,password,role,status from customers where email=?`,
-    [email],
-  );
+  // const [row] = await pool.execute<User[]>(
+  //   `select id,username,email,password,role,status from customers where email=?`,
+  //   [email],
+  // );
 
-  return row[0] ?? null;
+  // return row[0] ?? null;
+
+  return await prisma.customers.findUnique({
+    where: {
+      email,
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      password: true,
+      role: true,
+      status: true,
+    },
+  });
 }
 
 export async function findCustomerById(id: number) {
-  const [row] = await pool.execute<
-    (RowDataPacket & {
-      id: number;
-      username: string;
-      role: UserRole;
-      status: UserStatus;
-    })[]
-  >(`select id, username, role, status from customers where id = ?`, [id]);
+  // const [row] = await pool.execute<
+  //   (RowDataPacket & {
+  //     id: number;
+  //     username: string;
+  //     role: UserRole;
+  //     status: UserStatus;
+  //   })[]
+  // >(`select id, username, role, status from customers where id = ?`, [id]);
 
-  return row[0] ?? null;
+  // return row[0] ?? null;
+
+  return await prisma.customers.findUnique({
+    where: {
+      id: id,
+    },
+  });
 }
 
 export async function updatePasswordByHash(
   id: number,
   password: string,
 ): Promise<void> {
-  await pool.execute(`update customers set password=? where id=?`, [
-    id,
-    password,
-  ]);
+  // await pool.execute(`update customers set password=? where id=?`, [
+  //   id,
+  //   password,
+  // ]);
+
+  await prisma.customers.update({
+    where: {
+      id: id,
+    },
+    data: {
+      password: password,
+    },
+  });
 }
 
 export async function createCustomer(
@@ -55,10 +74,24 @@ export async function createCustomer(
   passwordHash: string,
   role: Exclude<UserRole, "admin">,
 ) {
-  const [row] = await pool.execute<ResultSetHeader>(
-    `insert into customers (username,email,password,role,status) values(?,?,?,?,?)`,
-    [username, email, passwordHash, role, "active"],
-  );
+  // const [row] = await pool.execute<ResultSetHeader>(
+  //   `insert into customers (username,email,password,role,status) values(?,?,?,?,?)`,
+  //   [username, email, passwordHash, role, "active"],
+  // );
 
-  return row.insertId;
+  // return row.insertId;
+
+  const customer = await prisma.customers.create({
+    data: {
+      username,
+      email,
+      password: passwordHash,
+      role,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return customer.id;
 }
