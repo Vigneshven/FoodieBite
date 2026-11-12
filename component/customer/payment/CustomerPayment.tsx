@@ -10,6 +10,7 @@ import PaymentTable, {
   CustomerPayment as CustomerPayments,
 } from "./PaymentTable";
 import CustomerPaymentPagination from "./CustomerPaymentPagination";
+import SavedPaymentMethods from "./SavedPaymentMethods";
 
 const payments: CustomerPayments[] = [
   {
@@ -197,6 +198,7 @@ export default function CustomerPayment() {
           onPageChange={setCurrentPage}
           onPageSizeChange={handlePageSizeChange}
         />
+        <SavedPaymentMethods />
       </div>
     </div>
   );
