@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export type CustomerPayment = {
   id: string;
@@ -75,6 +76,9 @@ export default function PaymentTable({
                 {payments.map((payment) => (
                   <TableRow key={payment.id}>
                     <TableCell className="font-medium text-sm">
+                      {payment.id}
+                    </TableCell>
+                    <TableCell className="font-medium text-sm">
                       {payment.orderId}
                     </TableCell>
                     <TableCell className="font-medium text-sm">
@@ -102,7 +106,9 @@ export default function PaymentTable({
                         <DropdownMenuContent>
                           <DropdownMenuItem align="end">
                             <Eye className="mr-2 h-4 w-4" />
-                            View Details
+                            <Link href={`/customer/payments/${payment.id}`}>
+                              View Details
+                            </Link>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
