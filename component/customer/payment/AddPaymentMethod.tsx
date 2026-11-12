@@ -12,21 +12,53 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldPath } from "react-hook-form";
 import z from "zod";
 
 const addPaymentMethodSchema = z.object({
   type: z.enum(["upi", "card", "netbanking", "wallet"], {
     error: "Please select a valid type",
   }),
-  upiId: z.string().min(8, "Enter at least 8 character"),
-  cardHolderName: z.string().min(3, "Enter at least 3 character"),
-  cardNumber: z.string().min(12, "Enter at least 12 character"),
-  expiry: z.string().min(5, "Enter atleast 5 character"),
-  cvv: z.string().max(3, "Enter a valid cvv"),
-  bank: z.string().min(3, "Choose the valid option"),
-  wallet: z.string().min(3, "Choose the valid option"),
+  upiId: z.string(),
+  cardHolderName: z.string(),
+  cardNumber: z.string(),
+  expiry: z.string(),
+  cvv: z.string(),
+  bank: z.string(),
+  wallet: z.string(),
   isDefault: z.boolean(),
+}).superRefine((values, ctx) => {
+  const validateText = (
+    field: FieldPath<PaymentMethodFormValues>,
+    value: string,
+    minimum: number,
+    message: string,
+  ) => {
+    if (value.trim().length < minimum) {
+      ctx.addIssue({ code: "custom", path: [field], message });
+    }
+  };
+
+  switch (values.type) {
+    case "upi":
+      validateText("upiId", values.upiId, 8, "Enter at least 8 characters");
+      break;
+    case "card":
+      validateText("cardHolderName", values.cardHolderName, 3, "Enter at least 3 characters");
+      validateText("cardNumber", values.cardNumber, 12, "Enter at least 12 characters");
+      validateText("expiry", values.expiry, 5, "Enter at least 5 characters");
+      validateText("cvv", values.cvv, 3, "Enter a valid CVV");
+      if (values.cvv.length > 3) {
+        ctx.addIssue({ code: "custom", path: ["cvv"], message: "Enter a valid CVV" });
+      }
+      break;
+    case "netbanking":
+      validateText("bank", values.bank, 3, "Choose a valid option");
+      break;
+    case "wallet":
+      validateText("wallet", values.wallet, 3, "Choose a valid option");
+      break;
+  }
 });
 
 type PaymentMethodFormValues = z.infer<typeof addPaymentMethodSchema>;
@@ -36,7 +68,7 @@ const methods = [
   { value: "card", label: "Card", icon: CreditCard },
   { value: "netbanking", label: "NetBanking", icon: Landmark },
   { value: "wallet", label: "Wallet", icon: Wallet },
-];
+] satisfies { value: PaymentMethodFormValues["type"]; label: string; icon: typeof Smartphone }[];
 
 export default function AddPaymentMethod() {
   const router = useRouter();
@@ -47,6 +79,7 @@ export default function AddPaymentMethod() {
     handleSubmit,
     watch,
     setValue,
+    clearErrors,
     formState: { errors },
   } = useForm<PaymentMethodFormValues>({
     resolver: zodResolver(addPaymentMethodSchema),
@@ -68,6 +101,7 @@ export default function AddPaymentMethod() {
   const onSubmit = (data: PaymentMethodFormValues) => {};
 
   const changeMethod = (type: PaymentMethodFormValues["type"]) => {
+    clearErrors();
     setValue("type", type);
   };
 
@@ -99,6 +133,7 @@ export default function AddPaymentMethod() {
               return (
                 <Button
                   key={method.value}
+                  type="button"
                   variant="secondary"
                   className={`h-11 flex flex-col items-center gap-2 rounded-lg border p-4 text-sm font-medium transition ${active ? "border-orange-500 bg-orange-50 text-orange-600" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
                   onClick={() => changeMethod(method.value)}
@@ -206,6 +241,7 @@ export default function AddPaymentMethod() {
                 </div>
                 <div className="flex justify-center ml-30">
                   <Button
+                    type="button"
                     variant="outline"
                     onClick={() => setShowCardDetails(!showCardDetails)}
                     className="mt-1 text-xs text-gray-500 transition hover:text-gray-800"
@@ -281,7 +317,7 @@ export default function AddPaymentMethod() {
         </section>
         <div className="flex justify-end gap-3">
           <Button
-            type="submit"
+            type="button"
             variant="outline"
             className="rounded-lg border border-gray-400 transition hover:cursor-pointer"
             onClick={() => router.push(`/customer/payments`)}
