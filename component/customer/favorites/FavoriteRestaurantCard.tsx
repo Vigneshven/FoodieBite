@@ -88,7 +88,9 @@ export default function FavoriteRestaurantCard({
                 {restaurant.isAvailable ? "Available" : "UnAvailable"}
               </span>
             </div>
-            <div className="flex gap-2 border-t border-gray-100 pt-3">
+          </div>
+          <div className="flex justify-end gap-2">
+            <div className="flex gap-2  border-gray-100 pt-3">
               <Button
                 type="button"
                 disabled={!restaurant.isAvailable}
@@ -99,6 +101,7 @@ export default function FavoriteRestaurantCard({
               </Button>
               <Button
                 type="button"
+                variant="secondary"
                 onClick={() => onRemove(restaurant.id)}
                 className="flex items-center justify-center rounded-lg border border-gray-200 px-3 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500"
               >

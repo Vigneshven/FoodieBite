@@ -87,12 +87,21 @@ const initialDishes: FavoriteDish[] = [
   },
 ];
 
+type TabFilters = {
+  search: string;
+  sortBy: FavoriteSortOption;
+  availability: FavoritesAvailability;
+};
+
 export default function FavoritesPage() {
   const [activeTab, setActiveTab] = useState<FavoriteTab>("all");
-  const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<FavoriteSortOption>("recent");
-  const [availability, setAvailability] =
-    useState<FavoritesAvailability>("all");
+  const [tabFilters, setTabFilters] = useState<Record<FavoriteTab, TabFilters>>(
+    {
+      all: { search: "", sortBy: "recent", availability: "all" },
+      restaurants: { search: "", sortBy: "recent", availability: "all" },
+      dishes: { search: "", sortBy: "recent", availability: "all" },
+    },
+  );
 
   const router = useRouter();
 
@@ -121,9 +130,32 @@ export default function FavoritesPage() {
     toast.success(`${id} is added to cart`);
   };
 
+  const currentFilters = tabFilters[activeTab];
+
+  const setSearch = (search: string) => {
+    setTabFilters((prev) => ({
+      ...prev,
+      [activeTab]: { ...prev[activeTab], search },
+    }));
+  };
+
+  const setSortBy = (sortBy: FavoriteSortOption) => {
+    setTabFilters((prev) => ({
+      ...prev,
+      [activeTab]: { ...prev[activeTab], sortBy },
+    }));
+  };
+
+  const setAvailability = (availability: FavoritesAvailability) => {
+    setTabFilters((prev) => ({
+      ...prev,
+      [activeTab]: { ...prev[activeTab], availability },
+    }));
+  };
+
   const filteredRestaurant = restaurant
     .filter((rest) => {
-      const searchValue = search.toLowerCase().trim();
+      const searchValue = currentFilters.search.toLowerCase().trim();
 
       const matchedSearch =
         rest.name.toLowerCase().includes(searchValue) ||
@@ -131,25 +163,25 @@ export default function FavoritesPage() {
         rest.location.toLowerCase().includes(searchValue);
 
       const matchedAvailability =
-        availability === "all" ||
-        (availability === "available" && rest.isAvailable) ||
-        (availability === "unavailable" && !rest.isAvailable);
+        currentFilters.availability === "all" ||
+        (currentFilters.availability === "available" && rest.isAvailable) ||
+        (currentFilters.availability === "unavailable" && !rest.isAvailable);
 
       return matchedSearch && matchedAvailability;
     })
     .sort((a, b) => {
-      if (sortBy === "name(a-z)") {
+      if (currentFilters.sortBy === "name(a-z)") {
         return a.name.localeCompare(b.name);
       }
-      if (sortBy === "name(z-a)") {
+      if (currentFilters.sortBy === "name(z-a)") {
         return b.name.localeCompare(a.name);
       }
 
-      if (sortBy === "price(low-high)") {
+      if (currentFilters.sortBy === "price(low-high)") {
         return a.startingPrice - b.startingPrice;
       }
 
-      if (sortBy === "price(high-low)") {
+      if (currentFilters.sortBy === "price(high-low)") {
         return b.startingPrice - a.startingPrice;
       }
 
@@ -158,7 +190,7 @@ export default function FavoritesPage() {
 
   const filteredDishes = dishes
     .filter((dish) => {
-      const searchValue = search.toLowerCase().trim();
+      const searchValue = currentFilters.search.toLowerCase().trim();
 
       const matchedSearch =
         dish.name.toLowerCase().includes(searchValue) ||
@@ -166,23 +198,23 @@ export default function FavoritesPage() {
         dish.category.toLowerCase().includes(searchValue);
 
       const matchedAvailability =
-        availability === "all" ||
-        (availability === "available" && dish.isAvailable) ||
-        (availability === "unavailable" && !dish.isAvailable);
+        currentFilters.availability === "all" ||
+        (currentFilters.availability === "available" && dish.isAvailable) ||
+        (currentFilters.availability === "unavailable" && !dish.isAvailable);
 
       return matchedSearch && matchedAvailability;
     })
     .sort((a, b) => {
-      if (sortBy === "name(a-z)") {
+      if (currentFilters.sortBy === "name(a-z)") {
         return a.name.localeCompare(b.name);
       }
-      if (sortBy === "name(z-a)") {
+      if (currentFilters.sortBy === "name(z-a)") {
         return b.name.localeCompare(a.name);
       }
-      if (sortBy === "price(low-high)") {
+      if (currentFilters.sortBy === "price(low-high)") {
         return a.price - b.price;
       }
-      if (sortBy === "price(high-low)") {
+      if (currentFilters.sortBy === "price(high-low)") {
         return b.price - a.price;
       }
 
@@ -211,11 +243,11 @@ export default function FavoritesPage() {
         totalDishes={dishes.length}
       />
       <FavoritesFilters
-        search={search}
+        search={currentFilters.search}
         onSearchChange={setSearch}
-        sortBy={sortBy}
+        sortBy={currentFilters.sortBy}
         onSortChange={setSortBy}
-        availability={availability}
+        availability={currentFilters.availability}
         onAvailabilityChange={setAvailability}
         resultCount={resultCount}
       />
@@ -274,17 +306,22 @@ export default function FavoritesPage() {
           <h3 className="text-lg font-semibold">No favorites found</h3>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            {search && `No results found for "${search}". Try another search.`}
+            {currentFilters.search &&
+              `No results found for "${currentFilters.search}". Try another search.`}
           </p>
 
           <Button
             type="button"
             variant="secondary"
             onClick={() => {
-              setSearch("");
-              setAvailability("all");
-              setSortBy("recent");
-              setActiveTab("all");
+              setTabFilters((prev) => ({
+                ...prev,
+                [activeTab]: {
+                  search: "",
+                  sortBy: "recent",
+                  availability: "all",
+                },
+              }));
             }}
             className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground transition hover:bg-orange-400 hover:text-white"
           >
