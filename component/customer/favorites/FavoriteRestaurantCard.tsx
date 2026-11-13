@@ -8,6 +8,7 @@ export type FavoriteRestaurant = {
   imageUrl: string;
   cuisine: string;
   location: string;
+  startingPrice: number;
   rating: number;
   reviewCount: number;
   deliveryTime: string;
@@ -26,7 +27,7 @@ export default function FavoriteRestaurantCard({
   onRemove,
 }: FavoriteRestaurantCardProps) {
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+    <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md">
       <div className="relative h-48 overflow-hidden bg-gray-100">
         <Image
           src={restaurant.imageUrl}

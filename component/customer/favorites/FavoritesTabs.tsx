@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Store, Utensils } from "lucide-react";
 
-export type FavoriteTabs = "all" | "restaurants" | "dishes";
+export type FavoriteTab = "all" | "restaurants" | "dishes";
 
 type FavoritesTabsProps = {
-  activeTab: FavoriteTabs;
-  onTabChange: (tab: FavoriteTabs) => void;
+  activeTab: FavoriteTab;
+  onTabChange: (tab: FavoriteTab) => void;
   totalFavorites: number;
   totalRestaurants: number;
   totalDishes: number;
@@ -48,7 +48,7 @@ export default function FavoritesTabs({
           <Button
             key={tab.id}
             variant="secondary"
-            onClick={() => onTabChange(tab.id as FavoriteTabs)}
+            onClick={() => onTabChange(tab.id as FavoriteTab)}
             className={`w-80 h-10 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${
               isActive
                 ? "border-orange-500 bg-orange-50 text-orange-600"
