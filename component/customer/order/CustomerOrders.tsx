@@ -161,10 +161,7 @@ export default function CustomerOrders() {
   const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
   const startIndex = (currentPage - 1) * pageSize;
 
-  const pageOrder = filteredOrders.slice(
-    startIndex,
-    startIndex + pageSize,
-  );
+  const pageOrder = filteredOrders.slice(startIndex, startIndex + pageSize);
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
@@ -200,7 +197,7 @@ export default function CustomerOrders() {
           return (
             <div
               key={card.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5"
+              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-2 hover:shadow-xl"
             >
               <div className="flex items-center justify-between">
                 <div>

@@ -38,7 +38,10 @@ export default function PaymentStats() {
       {stats.map((stat) => {
         const Icon = stat.icons;
         return (
-          <Card key={stat.title} className="border shadow-sm">
+          <Card
+            key={stat.title}
+            className="border shadow-sm transition hover:-translate-y-2 hover:shadow-xl"
+          >
             <CardContent className="p-5">
               <div className="flex flex-col items-start justify-between gap-3">
                 <div
@@ -50,7 +53,9 @@ export default function PaymentStats() {
                   <h2 className="text-2xl font-bold text-muted-foreground">
                     {stat.value}
                   </h2>
-                  <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {stat.title}
+                  </p>
                 </div>
               </div>
             </CardContent>

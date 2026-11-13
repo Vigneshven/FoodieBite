@@ -36,7 +36,7 @@ export default function PaymentFilters({
   onDateChange,
 }: PaymentFilterProps) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:-translate-y-1 hover:shadow-xl">
       <div className="mb-1 flex items-center gap-2">
         <SlidersHorizontal size={18} className="text-orange-600" />
         <h3 className="text-muted-foreground font-bold text-sm">

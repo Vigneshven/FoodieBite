@@ -42,7 +42,7 @@ export default function OrderTable({
   totalOrders = orders.length,
 }: OrderTableProps) {
   return (
-    <div className="border rounded">
+    <div className="border rounded-lg shadow-sm bg-white transition hover:-translate-y-1 hover:shadow-xl">
       <div className="flex items-center justify-between border p-5">
         <div>
           <h2 className="text-lg font-bold  text-gray-400">Order History</h2>

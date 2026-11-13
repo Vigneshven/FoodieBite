@@ -63,7 +63,7 @@ const recentOrders = [
 const favoriteRestaurants = [
   {
     name: "The Burger House",
-    category: "Burgers • Fast Food",
+    category: "Burgers - Fast Food",
     rating: "4.8",
     image:
       "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
@@ -71,16 +71,18 @@ const favoriteRestaurants = [
   },
   {
     name: "Pizza Paradise",
-    category: "Pizza • Italian",
+    category: "Pizza - Italian",
     rating: "4.6",
-    image: "https://images.pexels.com/photos/31596394/pexels-photo-31596394.jpeg",
+    image:
+      "https://images.pexels.com/photos/31596394/pexels-photo-31596394.jpeg",
     color: "bg-yellow-100",
   },
   {
     name: "Spicy Kitchen",
-    category: "Indian • Biryani",
+    category: "Indian - Biryani",
     rating: "4.7",
-    image: "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
+    image:
+      "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
     color: "bg-red-100",
   },
 ];
@@ -99,7 +101,8 @@ const recommendedRestaurants = [
     category: "Desserts",
     rating: "4.9",
     time: "15-25 min",
-    image: "https://images.pexels.com/photos/29259167/pexels-photo-29259167.jpeg",
+    image:
+      "https://images.pexels.com/photos/29259167/pexels-photo-29259167.jpeg",
     color: "bg-pink-100",
   },
   {
@@ -107,7 +110,8 @@ const recommendedRestaurants = [
     category: "indian",
     rating: "4.6",
     time: "25-35 min",
-    image: "https://images.pexels.com/photos/39536492/pexels-photo-39536492.jpeg",
+    image:
+      "https://images.pexels.com/photos/39536492/pexels-photo-39536492.jpeg",
     color: "bg-yellow-100",
   },
 ];
@@ -156,7 +160,7 @@ export default function CustomerDashboard() {
             return (
               <div
                 key={stat.title}
-                className="rounded-2xl border border-gray-200 bg-white p-5"
+                className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-2 hover:shadow-xl"
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -181,7 +185,7 @@ export default function CustomerDashboard() {
           })}
         </div>
       </section>
-      <section className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+      <section className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm transition hover:-translate-y-2 hover:shadow-xl">
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-gray-900">Recent Orders</h2>
@@ -213,7 +217,7 @@ export default function CustomerDashboard() {
                 <p className="mt-1 text-sm text-gray-500">{order.items}</p>
 
                 <p className="mt-1 text-xs text-gray-400">
-                  {order.id} • {order.date}
+                  {order.id} - {order.date}
                 </p>
               </div>
 
