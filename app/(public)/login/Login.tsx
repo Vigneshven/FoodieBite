@@ -60,7 +60,11 @@ export default function Login() {
           ? "/admin"
           : res.role === "customer"
             ? "/customer"
-            : "/";
+            : res.role === "restaurant_owner"
+              ? "/restaurant"
+              : res.role === "delivery_partner"
+                ? "/deliverypartner"
+                : "/";
       router.replace(dashboardPath);
       router.refresh();
     } catch (error) {
