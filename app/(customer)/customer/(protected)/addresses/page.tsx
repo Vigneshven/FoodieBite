@@ -1,11 +1,13 @@
 "use client";
 
+import AddAddress from "@/component/customer/address/AddAddress";
 import { type CustomerAddress } from "@/component/customer/address/AddressCard";
 import AddressList from "@/component/customer/address/AddressList";
 import AddressStats from "@/component/customer/address/AddressStats";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const initialAddresses: CustomerAddress[] = [
+export const initialAddresses: CustomerAddress[] = [
   {
     id: "address-1",
     fullName: "Vignesh",
@@ -34,6 +36,7 @@ const initialAddresses: CustomerAddress[] = [
 ];
 
 export default function AddressPage() {
+  const router = useRouter();
   const [addresses, setAddressess] =
     useState<CustomerAddress[]>(initialAddresses);
 
@@ -63,6 +66,10 @@ export default function AddressPage() {
     });
   };
 
+  const handleEdit = (addressId: string) => {
+    router.push(`/customer/addresses/${addressId}/edit`);
+  };
+
   const totalAddresses = addresses.length;
   const defaultAddresses = addresses.filter((addr) => addr.isDefault).length;
   const otherAddresses = totalAddresses - defaultAddresses;
@@ -74,9 +81,10 @@ export default function AddressPage() {
         defaultAddresses={defaultAddresses}
         otherAddresses={otherAddresses}
       />
+      <AddAddress />
       <AddressList
         addresses={addresses}
-        onEdit={(id) => console.log("Edit:", id)}
+        onEdit={handleEdit}
         onDelete={handleRemove}
         onSetDefault={handleSetDefault}
       />

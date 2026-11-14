@@ -82,6 +82,7 @@ export default function AddressCard({
             type="button"
             variant="secondary"
             className="rounded-lg p-2 text-muted-foreground font-bold transition hover:bg-muted hover:text-foreground"
+            onClick={() => onEdit(address.id)}
           >
             <Pencil size={17} />
           </Button>
