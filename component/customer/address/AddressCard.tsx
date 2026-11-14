@@ -57,7 +57,7 @@ export default function AddressCard({
   const TypeIcon = typeConfig.icon;
 
   return (
-    <div className="rounded-xl border bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+    <div className="rounded-xl border bg-white p-5 shadow-sm transition duration-1000 hover:-translate-y-1 hover:shadow-xl">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-lg">

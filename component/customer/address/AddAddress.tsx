@@ -6,7 +6,7 @@ export default function AddAddress() {
   const router = useRouter();
 
   return (
-    <div className="space-y-5 border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+    <div className="space-y-5 border border-gray-100 bg-white shadow-sm transition duration-1000 hover:-translate-y-1 hover:shadow-md">
       <div className="flex items-center p-5 justify-between">
         <div>
           <h2 className="text-sm font-bold text-gray-900">

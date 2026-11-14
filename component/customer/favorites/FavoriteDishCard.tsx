@@ -28,7 +28,7 @@ export default function FavoriteDishCard({
   onRemove,
 }: FavoriteDishCardProps) {
   return (
-    <div className="rounded-xl border bg-white border-gray-200 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+    <div className="rounded-xl border bg-white border-gray-200 shadow-sm transition duration-1000 hover:-translate-y-1 hover:shadow-md">
       <div className="flex gap-4">
         <div className="relative h-28 w-28 shrink-0 rounded-lg">
           <Image

@@ -43,7 +43,7 @@ export default function FavoritesStats({
         return (
           <Card
             key={stat.title}
-            className="border shadow-sm transition hover:shadow-xl"
+            className="border shadow-sm transition duration-1000 hover:shadow-xl"
           >
             <CardContent className="p-3 space-y-4">
               <div className="space-y-4">

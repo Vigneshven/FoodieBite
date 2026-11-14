@@ -27,14 +27,14 @@ export default function FavoriteRestaurantCard({
   onRemove,
 }: FavoriteRestaurantCardProps) {
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+    <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-1000 hover:-translate-y-1 hover:shadow-md">
       <div className="relative h-48 overflow-hidden bg-gray-100">
         <Image
           src={restaurant.imageUrl}
           alt={restaurant.name}
           width={300}
           height={300}
-          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          className="h-full w-full object-cover transition duration-1000 group-hover:scale-105"
         />
         <div className="absolute left-3 top-3">
           <span
@@ -48,7 +48,7 @@ export default function FavoriteRestaurantCard({
           variant="secondary"
           onClick={() => onRemove(restaurant.id)}
           className={
-            "absolute right-3 top-3 flex size-9 items-center justify-center bg-white rounded-full shadow-md transition hover:bg-red-50"
+            "absolute right-3 top-3 flex size-9 items-center justify-center bg-white rounded-full shadow-md transition duration-1000 hover:bg-red-50"
           }
         >
           <Heart size={19} className="fill-red-500 text-red-500" />
@@ -95,7 +95,7 @@ export default function FavoriteRestaurantCard({
                 type="button"
                 disabled={!restaurant.isAvailable}
                 onClick={() => onViewRestaurant(restaurant.id)}
-                className="flex-1 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+                className="flex-1 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition duration-1000 hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-gray-300"
               >
                 View Restaurant
               </Button>
@@ -103,7 +103,7 @@ export default function FavoriteRestaurantCard({
                 type="button"
                 variant="secondary"
                 onClick={() => onRemove(restaurant.id)}
-                className="flex items-center justify-center rounded-lg border border-gray-200 px-3 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500"
+                className="flex items-center justify-center rounded-lg border border-gray-200 px-3 text-gray-500 transition duration-1000 hover:border-red-200 hover:bg-red-50 hover:text-red-500"
               >
                 <HeartOff />
               </Button>

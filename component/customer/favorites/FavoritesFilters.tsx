@@ -41,7 +41,7 @@ export default function FavoritesFilters({
   const hasActiveFilters =
     search !== "" || sortBy !== "recent" || availability !== "all";
   return (
-    <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-xl">
+    <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition duration-1000 hover:shadow-xl">
       <div>
         <h2 className="text-sm font-semibold text-gray-900">
           Find Your Favorites
@@ -109,7 +109,7 @@ export default function FavoritesFilters({
           type="button"
           onClick={handleClearFilters}
           disabled={!hasActiveFilters}
-          className="flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex items-center gap-2 text-sm font-medium text-gray-500 transition duration-1000 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <RotateCcw size={15} />
           Clear filters

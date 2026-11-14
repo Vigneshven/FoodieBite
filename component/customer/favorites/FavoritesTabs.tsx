@@ -49,7 +49,7 @@ export default function FavoritesTabs({
             key={tab.id}
             variant="secondary"
             onClick={() => onTabChange(tab.id as FavoriteTab)}
-            className={`w-80 h-10 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${
+            className={`w-80 h-10 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors duration-1000 ${
               isActive
                 ? "border-orange-500 bg-orange-50 text-orange-600"
                 : "border-gray-200 bg-white text-gray-600 hover:border-orange-300 hover:text-orange-600"

@@ -39,7 +39,7 @@ export default function AddressStats({
         return (
           <div
             key={stat.title}
-            className="rounded-xl border bg-card p-5 transition shadow-sm hover:-translate-y-1"
+            className="rounded-xl border bg-card p-5 transition  duration-1000 shadow-sm hover:-translate-y-1"
           >
             <div>
               <div className="h-4 w-4 rounded-lg">

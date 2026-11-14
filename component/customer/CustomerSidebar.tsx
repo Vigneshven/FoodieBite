@@ -12,6 +12,7 @@ import {
   UtensilsCrossed,
   Settings,
   LogOut,
+  ShoppingCart,
 } from "lucide-react";
 import { logout } from "@/api/api";
 import { toast } from "sonner";
@@ -26,6 +27,11 @@ const navigation = [
     title: "My Orders",
     href: "/customer/orders",
     icon: ShoppingBag,
+  },
+  {
+    title: "My Cart",
+    href: "/customer/cart",
+    icon: ShoppingCart,
   },
   {
     title: "Payments",
