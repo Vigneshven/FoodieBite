@@ -8,7 +8,7 @@ import AddressForm, {
 const initialAddress: CustomerAddress = {
   id: "address-1",
   fullName: "Vignesh",
-  phone: "+91 98765 43210",
+  phone: "9876543210",
   type: "home",
   addressLine: "12, New Street",
   area: "Near Blue Cinema",

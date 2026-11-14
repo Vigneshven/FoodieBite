@@ -14,11 +14,11 @@ export const initialAddresses: CustomerAddress[] = [
     phone: "+91 98765 43210",
     type: "home",
     addressLine: "12, New Street",
-    area: "Near Blue Cinema",
+    area: "Vellore",
     city: "Vellore",
     state: "Tamil Nadu",
     postalCode: "632001",
-    landmark: "City Hospital",
+    landmark: "Near Blue Cinema",
     isDefault: true,
   },
   {

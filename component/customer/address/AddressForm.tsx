@@ -1,7 +1,7 @@
 "use client";
 
 import z from "zod";
-import { CustomerAddress } from "./AddressCard";
+import type { CustomerAddress } from "./AddressCard";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
@@ -10,13 +10,13 @@ import { Button } from "@/components/ui/button";
 
 const addressSchema = z.object({
   fullName: z.string().min(2, "Enter at least 2 character"),
-  phone: z.string().length(10, "Enter a valid 10 digit number"),
+  phone: z.string().regex(/^\d{10}$/, "Enter a valid 10 digit number"),
   type: z.enum(["home", "work", "others"]),
   addressLine: z.string().min(5, "Enter at least 5 character"),
   area: z.string().min(2, "Enter at least 2 characters"),
   city: z.string().min(2, "Enter at least 2 character"),
   state: z.string().min(4, "Enter at least 4 character"),
-  postalCode: z.string().length(6, "Enter a vaid 6 digit pincode"),
+  postalCode: z.string().regex(/^\d{6}$/, "Enter a valid 6 digit pincode"),
   landmark: z.string().optional(),
   isDefault: z.boolean(),
 });
@@ -39,7 +39,6 @@ export default function AddressForm({
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
@@ -58,7 +57,7 @@ export default function AddressForm({
   });
 
   return (
-    <form onSubmit={onSubmit(handleSubmit)} className="space-y-3">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <section className="space-y-4">
         <div>
           <h2>Contact Information</h2>
@@ -78,7 +77,10 @@ export default function AddressForm({
           <div>
             <Label className="mb-2 text-sm font-medium">Phone</Label>
             <Input
-              placeholder="+91 12345 1233"
+              type="tel"
+              inputMode="numeric"
+              maxLength={10}
+              placeholder="9876543210"
               {...register("phone")}
               className="w-full rounded-lg border bg-background p-5 text-sm outline-none placeholder:text-muted-foreground"
             />
@@ -133,7 +135,8 @@ export default function AddressForm({
             <Label className="mb-2 text-sm font-medium">PostalCode</Label>
             <Input
               placeholder="Enter 6 digit pincode"
-              type="number"
+              type="text"
+              inputMode="numeric"
               maxLength={6}
               {...register("postalCode")}
               className="w-full rounded-lg border bg-background p-5 text-sm outline-none placeholder:text-muted-foreground"
