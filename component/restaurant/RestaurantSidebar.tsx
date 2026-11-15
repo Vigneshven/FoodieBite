@@ -53,11 +53,6 @@ const navigation = [
     href: "/restaurant/reviews",
     icon: Star,
   },
-  {
-    title: "Settings",
-    href: "/restaurant/settings",
-    icon: Settings,
-  },
 ];
 
 export default function RestaurantSidebar() {
