@@ -11,15 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Bike, Mail, Phone, Star, User, UserRound } from "lucide-react";
-import { useState } from "react";
 import { DeliveryAssignmentData } from "./types/deliveryFormTypes";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { FieldErrors } from "react-hook-form";
 import { DeliveryFormValues } from "./EditDeliveryForm";
 
@@ -85,7 +77,7 @@ export default function DeliveryAssignment({
     (partner) => partner.id === value.partnerId,
   );
 
-  const handlePartnerChange = (partnerId: string | null) => {
+  const handlePartnerChange = (partnerId: string) => {
     const partner = deliveryPartners.find((item) => item.id === partnerId);
 
     if (!partner) return;
@@ -99,7 +91,7 @@ export default function DeliveryAssignment({
 
   const handleVehicleChange = (
     field: "vehicleType" | "vehicleNumber",
-    newValue: string | null,
+    newValue: string,
   ) => {
     onChange({
       ...value,
@@ -125,19 +117,21 @@ export default function DeliveryAssignment({
       <CardContent className="space-y-5">
         <div className="space-y-2">
           <Label>Select Delivery Partner</Label>
-          <Select value={value.partnerId} onValueChange={handlePartnerChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select delivery partner" />
-            </SelectTrigger>
-
-            <SelectContent>
-              {deliveryPartners.map((partner) => (
-                <SelectItem key={partner.id} value={partner.id}>
-                  {partner.name} ({partner.status})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <select
+            value={value.partnerId ?? ""}
+            onChange={(event) => handlePartnerChange(event.target.value)}
+            aria-label="Select delivery partner"
+            className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs"
+          >
+            <option value="" disabled>
+              Select delivery partner
+            </option>
+            {deliveryPartners.map((partner) => (
+              <option key={partner.id} value={partner.id}>
+                {partner.name} ({partner.status})
+              </option>
+            ))}
+          </select>
           {errors.deliveryAssignment?.partnerId && (
             <p className="text-sm text-red-400">
               {errors.deliveryAssignment?.partnerId?.message}
@@ -197,22 +191,18 @@ export default function DeliveryAssignment({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>Vehicle Type</Label>
-              <Select
+              <select
                 value={value.vehicleType}
-                onValueChange={(newValue) =>
-                  handleVehicleChange("vehicleType", newValue)
+                onChange={(event) =>
+                  handleVehicleChange("vehicleType", event.target.value)
                 }
+                className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs"
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select vehicle" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="Motorcycle">Motorcycle</SelectItem>
-                  <SelectItem value="Scooter">Scooter</SelectItem>
-                  <SelectItem value="Bicycle">Bicycle</SelectItem>
-                </SelectContent>
-              </Select>
+                <option value="">Select vehicle</option>
+                <option value="Motorcycle">Motorcycle</option>
+                <option value="Scooter">Scooter</option>
+                <option value="Bicycle">Bicycle</option>
+              </select>
               {errors.deliveryAssignment?.vehicleType && (
                 <p className="text-sm text-red-400">
                   {errors.deliveryAssignment?.vehicleType?.message}

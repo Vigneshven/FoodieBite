@@ -5,14 +5,6 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
 export const queryStatuses = [
   "All",
   "Open",
@@ -102,58 +94,53 @@ export default function QueryFilters({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Select
+          <select
             value={category}
-            onValueChange={(value) => onCategoryChange(value as QueryCategory)}
-          >
-            <SelectTrigger className="w-full sm:w-37">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-
-            <SelectContent>
-              {queryCategories.map((item) => (
-                <SelectItem key={item} value={item}>
-                  {item === "All" ? "All Categories" : item}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={priority}
-            onValueChange={(value) => onPriorityChange(value as QueryPriority)}
-          >
-            <SelectTrigger className="w-full sm:w-35">
-              <SelectValue placeholder="Priority" />
-            </SelectTrigger>
-
-            <SelectContent>
-              {queryPriorities.map((item) => (
-                <SelectItem key={item} value={item}>
-                  {item === "All" ? "All Priorities" : item}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={dateRange}
-            onValueChange={(value) =>
-              onDateRangeChange(value as QueryDateRange)
+            onChange={(event) =>
+              onCategoryChange(event.target.value as QueryCategory)
+            }
+            className={
+              "h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs w-full sm:w-37"
             }
           >
-            <SelectTrigger className="w-full sm:w-37">
-              <SelectValue placeholder="Date range" />
-            </SelectTrigger>
+            {queryCategories.map((item) => (
+              <option key={item} value={item}>
+                {item === "All" ? "All Categories" : item}
+              </option>
+            ))}
+          </select>
 
-            <SelectContent>
-              <SelectItem value="all">All Time</SelectItem>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="7">Last 7 Days</SelectItem>
-              <SelectItem value="30">Last 30 Days</SelectItem>
-              <SelectItem value="90">Last 90 Days</SelectItem>
-            </SelectContent>
-          </Select>
+          <select
+            value={priority}
+            onChange={(event) =>
+              onPriorityChange(event.target.value as QueryPriority)
+            }
+            className={
+              "h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs w-full sm:w-37"
+            }
+          >
+            {queryPriorities.map((item) => (
+              <option key={item} value={item}>
+                {item === "All" ? "All Priorities" : item}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={dateRange}
+            onChange={(event) =>
+              onDateRangeChange(event.target.value as QueryDateRange)
+            }
+            className={
+              "h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs w-full sm:w-37"
+            }
+          >
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="7">Last 7 Days</option>
+            <option value="30">Last 30 Days</option>
+            <option value="90">Last 90 Days</option>
+          </select>
 
           {hasActiveFilters && (
             <Button

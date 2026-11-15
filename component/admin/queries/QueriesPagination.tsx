@@ -1,13 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 type QueryPaginationProps = {
   currentPage: number;
@@ -46,20 +39,18 @@ export default function QueryPagination({
       <div className="flex items-center justify-end gap-2">
         <span className="text-sm text-muted-foreground">Rows per page</span>
 
-        <Select
-          value={String(pageSize)}
-          onValueChange={(value) => onPageSizeChange(Number(value))}
-        >
-          <SelectTrigger className="h-8 w-18">
-            <SelectValue />
-          </SelectTrigger>
+          <select
+            value={String(pageSize)}
+            className="h-8 w-18 rounded-md border border-input bg-background px-2 text-sm"
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+      </div>
 
-          <SelectContent>
-            <SelectItem value="5">5</SelectItem>
-            <SelectItem value="10">10</SelectItem>
-            <SelectItem value="20">20</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="flex items-center justify-end gap-2">
         <span className="mr-2 text-sm text-muted-foreground">
           Page {currentPage} of {totalPages}
         </span>

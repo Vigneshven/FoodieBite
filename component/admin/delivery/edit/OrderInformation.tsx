@@ -11,13 +11,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Package, ShoppingBag } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { OrderInformationData } from "./types/deliveryFormTypes";
 import { FieldErrors } from "react-hook-form";
 import { DeliveryFormValues } from "./EditDeliveryForm";
@@ -33,9 +26,9 @@ export default function OrderInformation({
   onChange,
   errors,
 }: OrderInformationProps) {
-  const handleChange = (
-    field: keyof OrderInformationData,
-    newValue: string | null,
+  const handleChange = <K extends keyof OrderInformationData>(
+    field: K,
+    newValue: OrderInformationData[K],
   ) => {
     onChange({
       ...value,
@@ -76,24 +69,22 @@ export default function OrderInformation({
           <Label>Restaurant</Label>
           <div className="relative">
             <ShoppingBag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Select
+            <select
               value={value.restaurants}
-              onValueChange={(newValue) =>
-                handleChange("restaurants", newValue)
+              onChange={(event) =>
+                handleChange("restaurants", event.target.value)
               }
+              className="h-9 w-full rounded-md border border-input bg-background py-1 pr-3 pl-9 text-sm shadow-xs"
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Select restaurant" className="pl-5" />
-              </SelectTrigger>
-
-              <SelectContent>
-                <SelectItem value="Pizza Palace">Pizza Palace</SelectItem>
-                <SelectItem value="Burger House">Burger House</SelectItem>
-                <SelectItem value="Sushi World">Sushi World</SelectItem>
-                <SelectItem value="Pasta House">Pasta House</SelectItem>
-                <SelectItem value="Healthy Bites">Healthy Bites</SelectItem>
-              </SelectContent>
-            </Select>
+              <option value="" disabled>
+                Select restaurant
+              </option>
+              <option value="Pizza Palace">Pizza Palace</option>
+              <option value="Burger House">Burger House</option>
+              <option value="Sushi World">Sushi World</option>
+              <option value="Pasta House">Pasta House</option>
+              <option value="Healthy Bites">Healthy Bites</option>
+            </select>
             {errors.orderInfo?.restaurant && (
               <p className="text-sm text-red-400">
                 {errors.orderInfo.restaurant.message}
@@ -104,26 +95,24 @@ export default function OrderInformation({
         <div className="grid  grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>Order Status</Label>
-            <Select
+            <select
               value={value.status}
-              onValueChange={(newValue) => handleChange("status", newValue)}
+              onChange={(event) =>
+                handleChange(
+                  "status",
+                  event.target.value as OrderInformationData["status"],
+                )
+              }
+              className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs"
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-
-              <SelectContent>
-                <SelectItem value="Pending">Pending</SelectItem>
-                <SelectItem value="Confirmed">Confirmed</SelectItem>
-                <SelectItem value="Preparing">Preparing</SelectItem>
-                <SelectItem value="Picked Up">Picked Up</SelectItem>
-                <SelectItem value="Out for Delivery">
-                  Out for Delivery
-                </SelectItem>
-                <SelectItem value="Delivered">Delivered</SelectItem>
-                <SelectItem value="Delayed">Delayed</SelectItem>
-              </SelectContent>
-            </Select>
+              <option value="Pending">Pending</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Preparing">Preparing</option>
+              <option value="Picked Up">Picked Up</option>
+              <option value="Out for Delivery">Out for Delivery</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Delayed">Delayed</option>
+            </select>
             {errors.orderInfo?.status && (
               <p className="text-sm text-red-400">
                 {errors.orderInfo.status.message}
@@ -132,20 +121,20 @@ export default function OrderInformation({
           </div>
           <div className="space-y-2">
             <Label>Delivery Priority</Label>
-            <Select
+            <select
               value={value.priority}
-              onValueChange={(newValue) => handleChange("priority", newValue)}
+              onChange={(event) =>
+                handleChange(
+                  "priority",
+                  event.target.value as OrderInformationData["priority"],
+                )
+              }
+              className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs"
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Select priority" />
-              </SelectTrigger>
-
-              <SelectContent>
-                <SelectItem value="Normal">Normal</SelectItem>
-                <SelectItem value="High">High</SelectItem>
-                <SelectItem value="Urgent">Urgent</SelectItem>
-              </SelectContent>
-            </Select>
+              <option value="Normal">Normal</option>
+              <option value="High">High</option>
+              <option value="Urgent">Urgent</option>
+            </select>
             {errors.orderInfo?.priority && (
               <p className="text-sm text-red-400">
                 {errors.orderInfo.priority.message}

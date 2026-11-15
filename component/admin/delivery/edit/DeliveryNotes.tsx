@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -10,16 +9,8 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { FileText, MessageSquare, ShieldCheck, Info, Lock } from "lucide-react";
+import { FileText, Lock, MessageSquare } from "lucide-react";
 import { DeliveryNotesData } from "./types/deliveryFormTypes";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { FieldErrors } from "react-hook-form";
 import { DeliveryFormValues } from "./EditDeliveryForm";
 
@@ -34,10 +25,7 @@ export default function DeliveryNotes({
   onChange,
   errors,
 }: DeliveryNotesProps) {
-  const handleChange = (
-    field: keyof DeliveryNotesData,
-    newValue: string | null,
-  ) => {
+  const handleChange = (field: keyof DeliveryNotesData, newValue: string) => {
     onChange({
       ...value,
       [field]: newValue,
@@ -65,31 +53,23 @@ export default function DeliveryNotes({
         <div className="space-y-2">
           <Label>Reason for Delivery Assignment / Reassignment</Label>
 
-          <Select
+          <select
             value={value.reassignmentReason}
-            onValueChange={(newValue) =>
-              handleChange("reassignmentReason", newValue)
+            onChange={(event) =>
+              handleChange("reassignmentReason", event.target.value)
             }
+            className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs "
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a reason" />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectItem value="Initial assignment">
-                Initial assignment
-              </SelectItem>
-              <SelectItem value="Partner unavailable">
-                Partner unavailable
-              </SelectItem>
-              <SelectItem value="Partner requested reassignment">
-                Partner requested reassignment
-              </SelectItem>
-              <SelectItem value="Vehicle issue">Vehicle issue</SelectItem>
-              <SelectItem value="Customer request">Customer request</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
-            </SelectContent>
-          </Select>
+            <option value="">Select a reason</option>
+            <option value="Initial assignment">Initial assignment</option>
+            <option value="Partner unavailable">Partner unavailable</option>
+            <option value="Partner requested reassignment">
+              Partner requested reassignment
+            </option>
+            <option value="Vehicle issue">Vehicle issue</option>
+            <option value="Customer request">Customer request</option>
+            <option value="Other">Other</option>
+          </select>
           {errors.deliveryNotes?.reassignmentReason && (
             <p className="text-sm text-red-400">
               {errors.deliveryNotes?.reassignmentReason?.message}
