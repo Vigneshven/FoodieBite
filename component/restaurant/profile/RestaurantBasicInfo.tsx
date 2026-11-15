@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 export const restaurantType = ["Restaurant", "Cafe", "Fast Food", "Bakery"];
@@ -17,6 +17,24 @@ export const cuisineType = [
   "Chinese",
   "Mexican",
 ];
+
+const daysOfWeek = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+const openingHoursSchema = z.object({
+  day: z.enum(daysOfWeek),
+  isClosed: z.boolean(),
+  is24Hours: z.boolean(),
+  openTime: z.string(),
+  closeTime: z.string(),
+});
 
 const restaurantSchema = z.object({
   name: z
@@ -40,6 +58,9 @@ const restaurantSchema = z.object({
   state: z.string().min(2, "Enter your state"),
   postalCode: z.string().regex(/^\d{6}$/, "Enter a valid 6-digit PIN code"),
   country: z.string().min(2, "Enter your country"),
+  logo: z.string().url("Enter a valid logo image URL"),
+  image: z.string().url("Enter a valid cover image URL"),
+  openingHours: z.array(openingHoursSchema).length(7),
 });
 
 type RestaurantForm = z.infer<typeof restaurantSchema>;
@@ -47,6 +68,7 @@ type RestaurantForm = z.infer<typeof restaurantSchema>;
 export default function RestaurantBasicInfo() {
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<RestaurantForm>({
@@ -64,12 +86,75 @@ export default function RestaurantBasicInfo() {
       state: "",
       postalCode: "",
       country: "India",
+      logo: "",
+      image: "",
+      openingHours: [
+        {
+          day: "Monday",
+          isClosed: false,
+          is24Hours: false,
+          openTime: "09:00",
+          closeTime: "22:00",
+        },
+        {
+          day: "Tuesday",
+          isClosed: false,
+          is24Hours: false,
+          openTime: "09:00",
+          closeTime: "22:00",
+        },
+        {
+          day: "Wednesday",
+          isClosed: false,
+          is24Hours: false,
+          openTime: "09:00",
+          closeTime: "22:00",
+        },
+        {
+          day: "Thursday",
+          isClosed: false,
+          is24Hours: false,
+          openTime: "09:00",
+          closeTime: "22:00",
+        },
+        {
+          day: "Friday",
+          isClosed: false,
+          is24Hours: false,
+          openTime: "09:00",
+          closeTime: "22:00",
+        },
+        {
+          day: "Saturday",
+          isClosed: false,
+          is24Hours: false,
+          openTime: "09:00",
+          closeTime: "22:00",
+        },
+        {
+          day: "Sunday",
+          isClosed: false,
+          is24Hours: false,
+          openTime: "09:00",
+          closeTime: "22:00",
+        },
+      ],
     },
   });
 
   const onSubmit = (data: RestaurantForm) => {
     console.log("Restaurant information:", data);
   };
+
+  const logoUrl = useWatch({
+    control,
+    name: "logo",
+  });
+
+  const imageUrl = useWatch({
+    control,
+    name: "image",
+  });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -211,6 +296,105 @@ export default function RestaurantBasicInfo() {
           {errors.country && (
             <p className="text-sm text-red-500">{errors.country.message}</p>
           )}
+        </div>
+      </div>
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="space-y-3">
+          <Label>Restaurant Logo URL</Label>
+
+          <Input
+            type="url"
+            placeholder="Enter a valid url"
+            {...register("logo")}
+          />
+
+          {errors.logo && (
+            <p className="text-sm text-red-500">{errors.logo.message}</p>
+          )}
+
+          <div className="flex h-40 items-center justify-center rounded-lg border bg-muted/30 p-4">
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Restaurant logo preview"
+                className="h-full max-w-full object-contain"
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground">Logo preview</p>
+            )}
+          </div>
+        </div>
+        <div className="space-y-3">
+          <Label>Image URL</Label>
+
+          <Input
+            type="url"
+            placeholder="enter a valid url"
+            {...register("image")}
+          />
+
+          {errors.image && (
+            <p className="text-sm text-red-500">{errors.image.message}</p>
+          )}
+
+          <div className="flex h-40 items-center justify-center overflow-hidden rounded-lg border bg-muted/30">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt="Restaurant cover preview"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground">Image preview</p>
+            )}
+          </div>
+        </div>
+        <div>
+          <div>
+            <h2 className="text-lg font-semibold">Restaurant Opening Hours</h2>
+            <p className="text-sm text-muted-foreground">
+              Set the operating hours for each day of the week.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            {daysOfWeek.map((day, index) => (
+              <div key={day} className="flex items-center gap-4">
+                <div className="w-28">
+                  <p className="font-medium">{day}</p>
+                </div>
+
+                <Input
+                  type="time"
+                  className="w-32"
+                  {...register(`openingHours.${index}.openTime`)}
+                />
+
+                <Input
+                  type="time"
+                  className="w-32"
+                  {...register(`openingHours.${index}.closeTime`)}
+                />
+
+                <Label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <Input
+                    type="checkbox"
+                    className="h-4 w-4"
+                    {...register(`openingHours.${index}.isClosed`)}
+                  />
+                  Closed
+                </Label>
+
+                <Label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <Input
+                    type="checkbox"
+                    className="h-4 w-4"
+                    {...register(`openingHours.${index}.is24Hours`)}
+                  />
+                  Open 24 hours
+                </Label>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       <div className="flex justify-end">
