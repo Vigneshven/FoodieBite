@@ -63,6 +63,14 @@ const navigation = [
 export default function RestaurantSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const activeHref = navigation
+    .filter(
+      (nav) => pathname === nav.href || pathname.startsWith(`${nav.href}/`),
+    )
+    .reduce(
+      (longest, nav) => (nav.href.length > longest.length ? nav.href : longest),
+      "",
+    );
   const handleLogOut = async () => {
     try {
       await logout();
@@ -96,11 +104,7 @@ export default function RestaurantSidebar() {
           {navigation.map((item) => {
             const Icon = item.icon;
 
-            const isActive =
-              item.href === "/restaurant"
-                ? pathname === "/restaurant"
-                : pathname === item.href ||
-                  pathname.startsWith(`${item.href}/`);
+            const isActive = item.href === activeHref;
 
             return (
               <Link
