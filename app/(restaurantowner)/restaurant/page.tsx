@@ -1,21 +1,25 @@
+import PopularDishes from "@/component/restaurant/dashboard/PopularDishes";
+import RecentOrders from "@/component/restaurant/dashboard/RecentOrders";
+import RecentReviews from "@/component/restaurant/dashboard/RecentReviews";
+import RestaurantOverviewStats from "@/component/restaurant/dashboard/RestaurantOverviewStats";
+import RevenueAnalytics from "@/component/restaurant/dashboard/RevenueAnalytics";
+
 export default function RestaurantDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Restaurant Dashboard
-        </h1>
-        <p className="mt-1 text-sm text-gray-600">
-          Manage your restaurant, menu, and orders.
+        <h1 className="text-2xl font-semibold">Dashboard</h1>
+
+        <p className="text-sm text-muted-foreground">
+          Welcome back! Here's your restaurant's performance.
         </p>
       </div>
 
-      <section className="rounded-xl border bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">Get started</h2>
-        <p className="mt-2 text-sm text-gray-600">
-          Add your restaurant profile to start setting up your FoodieBite page.
-        </p>
-      </section>
+      <RestaurantOverviewStats />
+      <RevenueAnalytics />
+      <RecentOrders />
+      <PopularDishes />
+      <RecentReviews />
     </div>
   );
 }
