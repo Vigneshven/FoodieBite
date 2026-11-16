@@ -1,6 +1,7 @@
 "use client";
 
 import CustomerInformation from "@/component/restaurant/orders/details/CustomerInformation";
+import DeliveryInformation from "@/component/restaurant/orders/details/DeliveryInformation";
 import OrderActions from "@/component/restaurant/orders/details/OrderActions";
 import OrderDetailsHeader from "@/component/restaurant/orders/details/OrderDetailsHeader";
 import OrderItems from "@/component/restaurant/orders/details/OrderItems";
@@ -12,7 +13,7 @@ import { useParams } from "next/navigation";
 
 const restaurantOrders: RestaurantOrder[] = [
   {
-    id: "ORD-101",
+    id: "ORD-1",
     customer: "Viki",
     amount: 650,
     totalItems: 4,
@@ -101,6 +102,14 @@ export default function OrderDetailsPage() {
         <OrderStatusTimeline
           currentStatus={order.status}
           timestamps={order.timestamps}
+        />
+        <DeliveryInformation
+          partnerName="VigneshViki"
+          partnerId="DP-102"
+          phone="+919876543210"
+          rating={4.8}
+          vehicle="Two Wheeler"
+          status="Out for Delivery"
         />
         <OrderActions
           status={order.status}
