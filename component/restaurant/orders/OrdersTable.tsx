@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { OrderStatus, PaymentStatus } from "./OrderFilters";
+import type { RestaurantOrderListItem } from "./types";
 import {
   Table,
   TableBody,
@@ -24,17 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
-export type RestaurantOrder = {
-  id: string;
-  customer: string;
-  items: string[];
-  totalItems: number;
-  amount: number;
-  paymentMethod: "Online" | "Cash on Delivery";
-  paymentStatus: PaymentStatus;
-  status: OrderStatus;
-  date: string;
-};
+export type RestaurantOrder = RestaurantOrderListItem;
 
 type OrdersTableProps = {
   orders: RestaurantOrder[];

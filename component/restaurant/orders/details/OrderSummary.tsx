@@ -1,12 +1,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreditCard, IndianRupee, ShoppingBag, Wallet } from "lucide-react";
+import type { PaymentStatus } from "../OrderFilters";
+import type { RestaurantPaymentMethod } from "../types";
 
 export type OrderSummaryProps = {
   totalAmount: number;
   totalItems: number;
-  paymentMethod: "Online" | "Cash on Delivery";
-  paymentStatus: "Paid" | "Pending" | "Failed";
+  paymentMethod: RestaurantPaymentMethod;
+  paymentStatus: PaymentStatus;
 };
 
 const paymentStatusStyles = {

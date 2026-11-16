@@ -1,21 +1,14 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import type { RestaurantOrder, RestaurantOrderStatus } from "../types";
 
-export type RestaurantOrderStatus =
-  | "New"
-  | "Confirmed"
-  | "Preparing"
-  | "Ready"
-  | "Completed"
-  | "Cancelled";
+export type { RestaurantOrderStatus } from "../types";
 
-type OrderDetailsHeaderProps = {
-  orderId: string;
-  date: string;
-  status: RestaurantOrderStatus;
-};
+type OrderDetailsHeaderProps = Pick<RestaurantOrder, "id" | "date" | "status">;
 
 const statusStyles: Record<RestaurantOrderStatus, string> = {
   New: "bg-blue-100 text-blue-700",
@@ -27,7 +20,7 @@ const statusStyles: Record<RestaurantOrderStatus, string> = {
 };
 
 export default function OrderDetailsHeader({
-  orderId,
+  id,
   date,
   status,
 }: OrderDetailsHeaderProps) {
@@ -40,7 +33,7 @@ export default function OrderDetailsHeader({
           <ArrowLeft className="size-4" />
         </Button>
         <div>
-          <h1 className="text-2xl font-semibold">Order #{orderId}</h1>
+          <h1 className="text-2xl font-semibold">Order #{id}</h1>
           <p className="text-sm text-muted-foreground">Placed on {date}</p>
         </div>
       </div>

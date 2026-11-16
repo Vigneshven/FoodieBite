@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const sampleOrders: RestaurantOrder[] = [
   {
@@ -118,6 +119,8 @@ export default function OrdersPage() {
     null,
   );
 
+  const router = useRouter();
+
   const updateSearch = (value: string) => {
     setSearch(value);
     setCurrentPage(1);
@@ -215,6 +218,10 @@ export default function OrdersPage() {
     setCurrentPage(1);
   };
 
+  const handleViewDetails = (order: RestaurantOrder) => {
+    router.push(`/restaurant/orders/${order.id}`);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -239,7 +246,7 @@ export default function OrdersPage() {
       <OrdersTable
         orders={paginatedOrders}
         totalOrders={totalOrders}
-        onViewDetails={setSelectedOrder}
+        onViewDetails={handleViewDetails}
       />
       <OrderPagination
         currentPage={currentPage}

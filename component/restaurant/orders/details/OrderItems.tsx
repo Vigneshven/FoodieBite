@@ -1,19 +1,10 @@
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-
-export type OrderItem = {
-  id: string;
-  name: string;
-  image: string;
-  category: string;
-  price: number;
-  quantity: number;
-  specialInstructions?: string;
-};
+import type { RestaurantOrderItem } from "../types";
 
 type OrderItemsProps = {
-  items: OrderItem[];
+  items: RestaurantOrderItem[];
 };
 
 export default function OrderItems({ items }: OrderItemsProps) {
@@ -45,7 +36,7 @@ export default function OrderItems({ items }: OrderItemsProps) {
                 />
               </div>
 
-              <div className="min-w-0 flex-1 space-y-1">
+              <div className="flex-1 space-y-1">
                 <h3 className="font-medium">{item.name}</h3>
 
                 <p className="text-sm text-muted-foreground">{item.category}</p>
@@ -53,14 +44,6 @@ export default function OrderItems({ items }: OrderItemsProps) {
                 <p className="text-sm text-muted-foreground">
                   ₹{item.price} x {item.quantity}
                 </p>
-                {item.specialInstructions && (
-                  <p className="text-sm text-muted-foreground">
-                    <span className="font-medium text-foreground">
-                      Instructions:
-                    </span>{" "}
-                    {item.specialInstructions}
-                  </p>
-                )}
               </div>
               <p className="font-semibold sm:text-right">
                 ₹{(item.price * item.quantity).toFixed(2)}
