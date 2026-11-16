@@ -6,7 +6,6 @@ import {
   LogOut,
   Package,
   Settings,
-  UserRound,
   UtensilsCrossed,
   Wallet,
 } from "lucide-react";
@@ -34,11 +33,6 @@ const navigation = [
     title: "Earnings",
     href: "/deliverypartner/earnings",
     icon: Wallet,
-  },
-  {
-    title: "My Profile",
-    href: "/deliverypartner/profile",
-    icon: UserRound,
   },
 ];
 
