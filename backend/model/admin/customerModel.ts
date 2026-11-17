@@ -1,108 +1,83 @@
 import { prisma } from "@/backend/lib/prisma";
 
-export type CustomerStatus = "active" | "inactive";
+export type CustomerStatus = "All" | "active" | "inactive";
 
-export async function getAllCustomer() {
-  // const [rows] = await pool.query<RowDataPacket[]>(
-  //   `select id,username,email,role,status
-  //   from customers`,
-  // );
+export type CustomerSortBy = "newest" | "name";
 
-  // return rows;
+type GetCustomersParams = {
+  page: number;
+  limit: number;
+  search: string;
+  status?: CustomerStatus;
+  sortBy: CustomerSortBy;
+};
 
-  return await prisma.customers.findMany({
+export async function getAllCustomer({
+  page,
+  limit,
+  search,
+  status,
+  sortBy,
+}: GetCustomersParams) {
+  const skip = (page - 1) * limit;
+  const customers = await prisma.customers.findMany({
+    where: {
+      role: "customer",
+
+      ...(status !== "All" && {
+        status: status as "active" | "inactive",
+      }),
+      ...(search && {
+        OR: [
+          { username: { contains: search } },
+          { email: { contains: search } },
+        ],
+      }),
+    },
+    skip: skip,
+    take: limit,
+    orderBy:
+      sortBy === "name"
+        ? { username: "asc" }
+        : sortBy === "newest"
+          ? { createdAt: "desc" }
+          : { username: "desc" },
     select: {
       id: true,
       username: true,
       email: true,
-      role: true,
       status: true,
-    },
-    orderBy: {
-      id: "asc",
+      createdAt: true,
     },
   });
-}
 
-export async function getCustomerByEmail(email: string) {
-  // const [rows] = await pool.query<CustomerRow[]>(
-  //   `select * from customers where email=?`,
-  //   [email],
-  // );
-
-  // return rows[0] ?? null;
-
-  return await prisma.customers.findUnique({
+  const totalCustomers = await prisma.customers.count({
     where: {
-      email: email,
-    },
-  });
-}
-
-export async function deleteCustomer(email: string) {
-  // const [row] = await pool.query<ResultSetHeader>(
-  //   `delete from customers
-  //   where email=?`,
-  //   [email],
-  // );
-
-  // return row;
-
-  await prisma.customers.delete({
-    where: {
-      email: email,
+      role: "customer",
+      ...(status !== "All" && {
+        status: status as "active" | "inactive",
+      }),
+      ...(search && {
+        OR: [
+          { username: { contains: search } },
+          { email: { contains: search } },
+        ],
+      }),
     },
   });
 
   return {
-    affectedRow: 1,
+    customers: customers.map((customer) => ({
+      id: String(customer.id),
+      name: customer.username,
+      email: customer.email,
+      orders: 0,
+      totalSpend: 0,
+      status: customer.status,
+      joinDate: customer.createdAt.toISOString().split("T")[0],
+    })),
+    totalCustomers,
+    totalPages: Math.ceil(totalCustomers / limit),
+    currentPage: page,
   };
-}
-
-export async function changeStatus(status: CustomerStatus, email: string) {
-  // const [rows] = await pool.query<ResultSetHeader>(
-  //   `update customers
-  //   set status = ?
-  //   where email=?`,
-  //   [status, email],
-  // );
-
-  // return rows;
-
-  await prisma.customers.update({
-    where: {
-      email: email,
-    },
-    data: {
-      status: status,
-    },
-  });
-
-  return {
-    affectedRow: 1,
-  };
-}
-
-export async function checkInActiveCustomer(status: CustomerStatus) {
-  // const [rows] = await pool.query<RowDataPacket[]>(
-  //   `select id,username,email,role,status
-  //   from customers
-  //   where status=?`,
-  //   [status],
-  // );
-
-  // return rows;
-
-  return await prisma.customers.findMany({
-    where: {
-      status: status,
-    },
-    select: {
-      id: true,
-      username: true,
-      email: true,
-      role: true,
-      status: true,
-    },
-  });
 }

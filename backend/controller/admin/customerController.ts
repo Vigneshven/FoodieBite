@@ -1,122 +1,40 @@
 import {
-  changeStatus,
-  checkInActiveCustomer,
-  deleteCustomer,
+  CustomerSortBy,
+  CustomerStatus,
   getAllCustomer,
-  getCustomerByEmail,
 } from "@/backend/model/admin/customerModel";
-import type { CustomerStatus } from "@/backend/model/admin/customerModel";
 import type { Request, Response } from "express";
 
-export async function getCustomers(req: Request, res: Response) {
+export const getCustomers = async (req: Request, res: Response) => {
   try {
-    const rows = await getAllCustomer();
-    return res.json(rows);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Failed to fetch customers",
+    const page = Number(req.query.page);
+    const limit = Number(req.query.limit);
+    const search = String(req.query.search);
+    const statusValue = String(req.query.status || "All");
+    const status: CustomerStatus =
+      statusValue === "active" || statusValue === "inactive"
+        ? statusValue
+        : "All";
+    const sortByValue = String(req.query.sortBy || "newest");
+    const sortBy: CustomerSortBy =
+      sortByValue === "name" || sortByValue === "newest" ? sortByValue : "newest";
+
+    const result = await getAllCustomer({
+      page,
+      limit,
+      search,
+      status,
+      sortBy,
     });
-  }
-}
-
-export async function getCustomerEmail(req: Request, res: Response) {
-  try {
-    const email = String(req.body.email);
-    const result = await getCustomerByEmail(email);
-
-    if (!result) {
-      return res.status(404).json({
-        message: "Customer Not Found",
-      });
-    }
-    return res.json(result);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Failed to Fetch Customer",
-    });
-  }
-}
-
-export async function removeCustomer(req: Request, res: Response) {
-  try {
-    const email = String(req.params.email);
-    const result = await deleteCustomer(email);
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({
-        message: "Customer Not Found",
-      });
-    }
 
     return res.status(200).json({
-      message: "Customer Removed",
+      message: "Customer Fetch successfully",
+      data: result,
     });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
-      message: "Failed to remove customer",
+      message: "Failed to fetch customer",
     });
   }
-}
-
-export async function updateStatus(req: Request, res: Response) {
-  try {
-    const email = String(req.params.email);
-    const requestedStatus = req.params.status;
-
-    if (
-      !email ||
-      (requestedStatus !== "active" && requestedStatus !== "inactive")
-    ) {
-      return res.status(400).json({
-        message: "A valid email and status are required",
-      });
-    }
-    const result = await changeStatus(requestedStatus as CustomerStatus, email);
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({
-        message: "Email Not Found",
-      });
-    }
-
-    return res.status(200).json({
-      message: "customer status updated",
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Failed to update customer status",
-    });
-  }
-}
-
-export async function checkInActive(req: Request, res: Response) {
-  try {
-    const requestedStatus = req.params.status;
-
-    if (requestedStatus !== "active" && requestedStatus !== "inactive") {
-      return res.status(400).json({
-        message: "A Valid status are required",
-      });
-    }
-
-    const result = await checkInActiveCustomer(requestedStatus);
-    if (!result) {
-      return res.status(404).json({
-        message: "status Not Found",
-      });
-    }
-
-    return res.status(200).json({
-      message: "customer status showed",
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Not able to show inactive customer",
-    });
-  }
-}
+};

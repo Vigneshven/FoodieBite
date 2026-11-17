@@ -1,7 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingBag, TrendingUp } from "lucide-react";
 
-export default function TotalOrderCard() {
+type TotalOrderProps = {
+  totalOrders: number;
+};
+
+export default function TotalOrderCard({ totalOrders }: TotalOrderProps) {
   return (
     <Card className="border-gray-200 shadow-sm">
       <CardHeader className="flex items-center justify-center pb-2">
@@ -14,9 +18,9 @@ export default function TotalOrderCard() {
       </CardHeader>
 
       <CardContent>
-        <div className="text-2xl font-bold text-gray-900">100</div>
+        <div className="text-2xl font-bold text-gray-900">{totalOrders}</div>
         <div className="mt-2 flex items-center gap-2">
-          <TrendingUp  className="h-4 w-4 text-green-600"/>
+          <TrendingUp className="h-4 w-4 text-green-600" />
           <span className="text-xs font-medium text-green-600">+40%</span>
           <span className="text-xs text-gray-400">Compared to last month</span>
         </div>

@@ -1,22 +1,56 @@
 "use client";
 
-import CustomerFilters, {
-  CustomerSortsOption,
-  CustomerStatusFilter,
-} from "@/component/admin/customers/CustomerFilters";
+import { fetchCustomers } from "@/api/admin/customer/api";
+import {
+  Customer,
+  CustomerSortBy,
+  CustomerStatus,
+} from "@/api/type/admin/types-api";
+import CustomerFilters from "@/component/admin/customers/CustomerFilters";
 import CustomerStats from "@/component/admin/customers/CustomerStats";
 import CustomerTable from "@/component/admin/customers/CustomerTable";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export default function CustomerPage() {
-  const [activeStatus, setActiveStatus] = useState<CustomerStatusFilter>("All");
+  const [activeStatus, setActiveStatus] = useState<CustomerStatus | "All">(
+    "All",
+  );
 
   const [search, setSearch] = useState("");
 
-  const [sortBy, setSortBy] = useState<CustomerSortsOption>("newest");
+  const [sortBy, setSortBy] = useState<CustomerSortBy>("newest");
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+
+  const [customers, setCustomers] = useState<Customer[]>([]);
+
+  const [totalCustomers, setTotalCustomers] = useState(0);
+
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function loadCustomers() {
+      try {
+        setLoading(true);
+        const result = await fetchCustomers({
+          page: currentPage,
+          limit: pageSize,
+          search,
+          status: activeStatus,
+          sortBy,
+        });
+        setCustomers(result.customers);
+        setTotalCustomers(result.totalCustomers);
+      } catch {
+        toast.error("Failed to Show Customer");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadCustomers();
+  }, [currentPage, pageSize, search, activeStatus, sortBy]);
 
   return (
     <div className="space-y-3">
@@ -45,9 +79,9 @@ export default function CustomerPage() {
         }}
       />
       <CustomerTable
-        activeStatus={activeStatus}
-        search={search}
-        sortBy={sortBy}
+        customers={customers}
+        loading={loading}
+        totalItems={totalCustomers}
         currentPage={currentPage}
         pageSize={pageSize}
         onPageChange={setCurrentPage}

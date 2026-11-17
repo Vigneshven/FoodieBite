@@ -1,7 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IndianRupee, TrendingUp } from "lucide-react";
 
-export default function TotalRevenueCard() {
+type TotalRevenueCardProps = {
+  totalRevenue: number;
+};
+
+export default function TotalRevenueCard({
+  totalRevenue,
+}: TotalRevenueCardProps) {
   return (
     <Card className="border-gray-200 shadow-sm">
       <CardHeader className="flex items-center justify-center pb-2">
@@ -14,7 +20,7 @@ export default function TotalRevenueCard() {
       </CardHeader>
 
       <CardContent>
-        <div className="text-2xl font-bold text-gray-900">₹0.00</div>
+        <div className="text-2xl font-bold text-gray-900">₹{totalRevenue}</div>
         <div className="flex items-center gap-2 mt-2">
           <TrendingUp className="h-4 w-4 text-green-600" />
           <span className="text-xs font-medium text-green-600">

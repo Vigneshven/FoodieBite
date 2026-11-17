@@ -1,7 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users } from "lucide-react";
 
-export default function TotalCustomersCard() {
+type TotalCustomersCardProps = {
+  totalCustomers: number;
+};
+
+export default function TotalCustomersCard({
+  totalCustomers,
+}: TotalCustomersCardProps) {
   return (
     <Card className="border-gray-200 shadow-sm">
       <CardHeader className="flex items-center justify-center">
@@ -14,7 +20,7 @@ export default function TotalCustomersCard() {
       </CardHeader>
 
       <CardContent>
-        <div className="text-2xl font-bold text-gray-900">100</div>
+        <div className="text-2xl font-bold text-gray-900">{totalCustomers}</div>
         <div className="mt-2 flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-green-600" />
           <span className="text-xs font-medium text-green-600">+10</span>

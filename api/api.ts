@@ -79,7 +79,8 @@ export async function getCurrentUser(
     cache: "no-store",
   });
 
-  if (res.status === 401 || res.status === 403 || res.status === 404) return null;
+  if (res.status === 401 || res.status === 403 || res.status === 404)
+    return null;
   if (!res.ok) throw new Error("Failed to get current user");
 
   return res.json();

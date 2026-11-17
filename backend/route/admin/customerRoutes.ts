@@ -1,18 +1,10 @@
-import {
-  getCustomers,
-  removeCustomer,
-  updateStatus,
-} from "@/backend/controller/admin/customerController";
-import { Router } from "express";
+import { getCustomers } from "@/backend/controller/admin/customerController";
 import { requireAuth } from "@/backend/middleware/requireAuth";
 import { requireRole } from "@/backend/middleware/requireRole";
+import { Router } from "express";
 
 const router = Router();
 
-router.use(requireAuth, requireRole("admin"));
-
-router.get("/", getCustomers);
-router.delete("/:email", removeCustomer);
-router.put("/:email/:status", updateStatus);
+router.get("/", requireAuth, requireRole("admin"), getCustomers);
 
 export default router;
