@@ -12,6 +12,7 @@ type GetCustomersParams = {
   sortBy: CustomerSortBy;
 };
 
+// customer page table
 export async function getAllCustomer({
   page,
   limit,
@@ -103,4 +104,49 @@ export async function updateCustomerStatus(
   });
 
   return customer;
+}
+
+//customerpage stats
+
+export async function getCustomerStats() {
+  const currentDate = new Date();
+
+  const startOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1,
+  );
+
+  const [totalCustomers, activeCustomers, inactiveCustomers, newCustomers] =
+    await Promise.all([
+      prisma.customers.count({
+        where: { role: "customer" },
+      }),
+      prisma.customers.count({
+        where: {
+          role: "customer",
+          status: "active",
+        },
+      }),
+      prisma.customers.count({
+        where: {
+          role: "customer",
+          status: "inactive",
+        },
+      }),
+      prisma.customers.count({
+        where: {
+          role: "customer",
+          createdAt: {
+            gte: startOfMonth,
+          },
+        },
+      }),
+    ]);
+  return {
+    totalCustomers,
+    activeCustomers,
+    inactiveCustomers,
+    newCustomers,
+  };
 }

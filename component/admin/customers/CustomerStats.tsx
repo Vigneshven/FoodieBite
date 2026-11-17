@@ -1,46 +1,51 @@
+import { CustomerStatsData } from "@/api/type/admin/types-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, User, UserCheck, UserPlus, UserX } from "lucide-react";
 
-const stats = [
-  {
-    title: "Total Customers",
-    value: "10",
-    change: "+2%",
-    description: "Compared to last month",
-    icon: User,
-    color: "text-blue-600",
-    bg: "bg-blue-100",
-  },
-  {
-    title: "Active Customers",
-    value: "10",
-    change: "+2%",
-    description: "Currently Active",
-    icon: UserCheck,
-    color: "text-green-600",
-    bg: "bg-green-100",
-  },
-  {
-    title: "New This Month",
-    value: "10",
-    change: "+2%",
-    description: "Joined This month",
-    icon: UserPlus,
-    color: "text-orange-600",
-    bg: "bg-orange-100",
-  },
-  {
-    title: "Inactive Customers",
-    value: "10",
-    change: "+2%",
-    description: "No Recent Activity",
-    icon: UserX,
-    color: "text-red-600",
-    bg: "bg-red-100",
-  },
-];
+type CustomerStatsProps = {
+  statsData: CustomerStatsData;
+};
 
-export default function CustomerStats() {
+export default function CustomerStats({ statsData }: CustomerStatsProps) {
+  const stats = [
+    {
+      title: "Total Customers",
+      value: statsData.totalCustomers,
+      change: "+2%",
+      description: "Compared to last month",
+      icon: User,
+      color: "text-blue-600",
+      bg: "bg-blue-100",
+    },
+    {
+      title: "Active Customers",
+      value: statsData.activeCustomers,
+      change: "+2%",
+      description: "Currently Active",
+      icon: UserCheck,
+      color: "text-green-600",
+      bg: "bg-green-100",
+    },
+    {
+      title: "New This Month",
+      value: statsData.newCustomers,
+      change: "+2%",
+      description: "Joined This month",
+      icon: UserPlus,
+      color: "text-orange-600",
+      bg: "bg-orange-100",
+    },
+    {
+      title: "Inactive Customers",
+      value: statsData.inactiveCustomers,
+      change: "+2%",
+      description: "No Recent Activity",
+      icon: UserX,
+      color: "text-red-600",
+      bg: "bg-red-100",
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {stats.map((stat) => {

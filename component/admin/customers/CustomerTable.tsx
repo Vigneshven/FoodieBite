@@ -14,19 +14,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Eye,
-  MoreHorizontal,
-  Pencil,
-  UserCheck,
-  UserX,
-} from "lucide-react";
+import { Eye, MoreHorizontal, Pencil, UserCheck, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CustomerPagination from "./CustomerPagination";
 import { Customer } from "@/api/type/admin/types-api";
 import type { CustomerStatusFilter } from "./CustomerFilters";
 import { useState } from "react";
-import { updateCustomerStatus } from "@/api/admin/customer/api";
+import {
+  fetchCustomerStats,
+  updateCustomerStatus,
+} from "@/api/admin/customer/api";
 import { toast } from "sonner";
 import { useCustomerStore } from "@/store/admin/customerStore";
 
@@ -69,6 +66,7 @@ export default function CustomerTable({
 }: CustomersTableProps) {
   const [updateId, setUpdateId] = useState<string | null>(null);
   const updateCustomer = useCustomerStore((state) => state.updateCustomer);
+  const setStats = useCustomerStore((state) => state.setStats);
   const removeCustomer = useCustomerStore((state) => state.removeCustomer);
   async function handleStatusChange(id: string, status: "active" | "inactive") {
     const newStatus = status === "active" ? "inactive" : "active";
@@ -76,6 +74,8 @@ export default function CustomerTable({
       setUpdateId(id);
 
       await updateCustomerStatus(id, newStatus);
+      const Stats = await fetchCustomerStats();
+      setStats(Stats);
       if (activeStatus !== "All") {
         removeCustomer(id);
         onTotalItemsChange(Math.max(0, totalItems - 1));

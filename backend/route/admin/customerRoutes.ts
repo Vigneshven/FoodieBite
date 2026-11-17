@@ -1,6 +1,7 @@
 import {
   changeCustomerStatus,
   getCustomers,
+  getCustomerStatistics,
 } from "@/backend/controller/admin/customerController";
 import { requireAuth } from "@/backend/middleware/requireAuth";
 import { requireRole } from "@/backend/middleware/requireRole";
@@ -16,5 +17,7 @@ router.patch(
   requireRole("admin"),
   changeCustomerStatus,
 );
+
+router.get("/stats", requireAuth, requireRole("admin"), getCustomerStatistics);
 
 export default router;

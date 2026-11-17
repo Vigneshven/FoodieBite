@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchCustomers } from "@/api/admin/customer/api";
+import { fetchCustomers, fetchCustomerStats } from "@/api/admin/customer/api";
 import { CustomerSortBy, CustomerStatus } from "@/api/type/admin/types-api";
 import CustomerFilters from "@/component/admin/customers/CustomerFilters";
 import CustomerStats from "@/component/admin/customers/CustomerStats";
@@ -28,6 +28,9 @@ export default function CustomerPage() {
   const customers = useCustomerStore((state) => state.customers);
   const setCustomers = useCustomerStore((state) => state.setCustomers);
 
+  const stats = useCustomerStore((state) => state.stats);
+  const setStats = useCustomerStore((state) => state.setStats);
+
   useEffect(() => {
     async function loadCustomers() {
       try {
@@ -50,6 +53,18 @@ export default function CustomerPage() {
     loadCustomers();
   }, [currentPage, pageSize, search, activeStatus, sortBy, setCustomers]);
 
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const result = await fetchCustomerStats();
+        setStats(result);
+      } catch {
+        toast.error("failed to fetch customer stats");
+      }
+    }
+    loadStats();
+  }, [setStats]);
+
   return (
     <div className="space-y-3">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -58,7 +73,7 @@ export default function CustomerPage() {
           <p className="text-sm text-muted-foreground">Manage all customers</p>
         </div>
       </div>
-      <CustomerStats />
+      <CustomerStats statsData={stats} />
       <CustomerFilters
         activeStatus={activeStatus}
         onStatusChange={(status) => {

@@ -39,3 +39,12 @@ export type CustomerResponse = {
     currentPage: number;
   };
 };
+
+// customerpage stats
+
+export type CustomerStatsData = {
+  totalCustomers: number;
+  activeCustomers: number;
+  inactiveCustomers: number;
+  newCustomers: number;
+};

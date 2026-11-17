@@ -2,6 +2,7 @@
 
 import {
   CustomerResponse,
+  CustomerStatsData,
   GetCustomersParams,
 } from "@/api/type/admin/types-api";
 
@@ -46,6 +47,21 @@ export async function updateCustomerStatus(id: string, status: string) {
 
   if (!res.ok) {
     throw new Error("Failed to update customer status");
+  }
+
+  return result.data;
+}
+
+export async function fetchCustomerStats(): Promise<CustomerStatsData> {
+  const res = await fetch(`${BASE_URL}/api/admin/customers/stats`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch the customer stats");
   }
 
   return result.data;

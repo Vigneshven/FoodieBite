@@ -2,6 +2,7 @@ import {
   CustomerSortBy,
   CustomerStatus,
   getAllCustomer,
+  getCustomerStats,
   updateCustomerStatus,
 } from "@/backend/model/admin/customerModel";
 import type { Request, Response } from "express";
@@ -69,6 +70,22 @@ export const changeCustomerStatus = async (req: Request, res: Response) => {
     console.log(error);
     return res.status(500).json({
       message: "Failed to update customer status",
+    });
+  }
+};
+
+export const getCustomerStatistics = async (req: Request, res: Response) => {
+  try {
+    const stats = await getCustomerStats();
+
+    return res.status(200).json({
+      message: "Customer Stats fetched Successfully",
+      data: stats,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Failed to fetch customer stats",
     });
   }
 };
