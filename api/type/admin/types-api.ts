@@ -48,3 +48,12 @@ export type CustomerStatsData = {
   inactiveCustomers: number;
   newCustomers: number;
 };
+
+// restaurantpage stats
+
+export type RestaurantStatsData = {
+  totalRestaurants: number;
+  activeRestaurants: number;
+  pendingApproval: number;
+  suspendedRestaurants: number;
+};

@@ -1,5 +1,6 @@
 "use client";
 
+import { getRestaurantStats } from "@/api/admin/restaurant/api";
 import AddRestaurantDialog from "@/component/admin/restaurants/AddRestaurantDialog";
 import RestaurantFilters, {
   RestaurantSortOption,
@@ -7,7 +8,9 @@ import RestaurantFilters, {
 } from "@/component/admin/restaurants/RestaurantFilters";
 import RestaurantTable from "@/component/admin/restaurants/RestaurantsTable";
 import RestaurantStats from "@/component/admin/restaurants/RestaurantStats";
-import { useState } from "react";
+import { useRestaurantStore } from "@/store/admin/restaurantStore";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export default function RestaurantPage() {
   const [activeStatus, setActiveStatus] =
@@ -18,6 +21,22 @@ export default function RestaurantPage() {
   const [sortBy, setSortBy] = useState<RestaurantSortOption>("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+
+  const stats = useRestaurantStore((state) => state.stats);
+  const setStats = useRestaurantStore((state) => state.setStats);
+
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const result = await getRestaurantStats();
+        setStats(result);
+      } catch {
+        toast.error("failed to fetch restaurant stats");
+      }
+    }
+    loadStats();
+  }, [setStats]);
+
   return (
     <div className="space-y-3">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -29,7 +48,7 @@ export default function RestaurantPage() {
         </div>
         <AddRestaurantDialog />
       </div>
-      <RestaurantStats />
+      <RestaurantStats statsData={stats} />
       <RestaurantFilters
         activeStatus={activeStatus}
         onStatusChange={(status) => {

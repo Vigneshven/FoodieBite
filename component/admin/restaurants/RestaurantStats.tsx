@@ -1,3 +1,4 @@
+import { RestaurantStatsData } from "@/api/type/admin/types-api";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Ban,
@@ -8,54 +9,57 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const restaurantStats = [
-  {
-    title: "Total Restaurants",
-    value: "10",
-    change: "+2%",
-    description: "Compared to last month",
-    icon: Store,
-    iconColor: "text-blue-600",
-    iconBg: "bg-blue-100",
-    trend: "up",
-    trendColor: "text-green-600",
-  },
-  {
-    title: "Active",
-    value: "6",
-    change: "+2%",
-    description: "Compared to last month",
-    icon: CheckCircle2,
-    iconColor: "text-blue-600",
-    iconBg: "bg-blue-100",
-    trend: "up",
-    trendColor: "text-green-600",
-  },
-  {
-    title: "Pending Approval",
-    value: "2",
-    change: "0%",
-    description: "Compared to last month",
-    icon: Clock,
-    iconColor: "text-orange-600",
-    iconBg: "bg-orange-100",
-    trend: "up",
-    trendColor: "text-muted-foreground",
-  },
-  {
-    title: "Suspended",
-    value: "1",
-    change: "-2%",
-    description: "Compared to last month",
-    icon: Ban,
-    iconColor: "text-red-600",
-    iconBg: "bg-red-100",
-    trend: "down",
-    trendColor: "text-red-600",
-  },
-];
+type RestaurantStatsProps = {
+  statsData: RestaurantStatsData;
+};
 
-export default function RestaurantStats() {
+export default function RestaurantStats({ statsData }: RestaurantStatsProps) {
+  const restaurantStats = [
+    {
+      title: "Total Restaurants",
+      value: statsData.totalRestaurants,
+      change: "+2%",
+      description: "Compared to last month",
+      icon: Store,
+      iconColor: "text-blue-600",
+      iconBg: "bg-blue-100",
+      trend: "up",
+      trendColor: "text-green-600",
+    },
+    {
+      title: "Active",
+      value: statsData.activeRestaurants,
+      change: "+2%",
+      description: "Compared to last month",
+      icon: CheckCircle2,
+      iconColor: "text-blue-600",
+      iconBg: "bg-blue-100",
+      trend: "up",
+      trendColor: "text-green-600",
+    },
+    {
+      title: "Pending Approval",
+      value: statsData.pendingApproval,
+      change: "0%",
+      description: "Compared to last month",
+      icon: Clock,
+      iconColor: "text-orange-600",
+      iconBg: "bg-orange-100",
+      trend: "up",
+      trendColor: "text-muted-foreground",
+    },
+    {
+      title: "Suspended",
+      value: statsData.suspendedRestaurants,
+      change: "-2%",
+      description: "Compared to last month",
+      icon: Ban,
+      iconColor: "text-red-600",
+      iconBg: "bg-red-100",
+      trend: "down",
+      trendColor: "text-red-600",
+    },
+  ];
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {restaurantStats.map((item) => {
@@ -70,7 +74,9 @@ export default function RestaurantStats() {
                   <p className="text-sm font-bold text-muted-foreground">
                     {item.title}
                   </p>
-                  <h2 className="mt-2 text-2xl font-bold tracking-tight">{item.value}</h2>
+                  <h2 className="mt-2 text-2xl font-bold tracking-tight">
+                    {item.value}
+                  </h2>
                 </div>
                 <div
                   className={`flex h-11 w-11 items-center justify-center rounded-full ${item.iconBg}`}

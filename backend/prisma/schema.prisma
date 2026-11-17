@@ -8,20 +8,27 @@ datasource db {
 }
 
 model customers {
-  id       Int              @id @default(autoincrement())
-  username String           @db.VarChar(100)
-  email    String           @unique(map: "email") @db.VarChar(255)
-  password String           @db.VarChar(255)
-  role     customers_role   @default(customer)
-  status   customers_status @default(active)
+  id        Int              @id @default(autoincrement())
+  username  String           @db.VarChar(100)
+  email     String           @unique(map: "email") @db.VarChar(255)
+  password  String           @db.VarChar(255)
+  role      customers_role   @default(customer)
+  status    customers_status @default(active)
   createdAt DateTime         @default(now())
 }
 
 model restaurants {
-  id       Int    @id @default(autoincrement())
-  image    String @db.Text
-  name     String @db.VarChar(255)
-  category String @db.VarChar(300)
+  id       Int               @id @default(autoincrement())
+  image    String            @db.Text
+  name     String            @db.VarChar(255)
+  category String            @db.VarChar(300)
+  status   restaurant_status @default(pending)
+}
+
+enum restaurant_status {
+  active
+  pending
+  suspended
 }
 
 enum customers_role {
