@@ -1,12 +1,16 @@
 "use client";
 
 import { Search, SlidersHorizontal } from "lucide-react";
+import type {
+  CustomerSortBy,
+  CustomerStatus,
+} from "@/api/type/admin/types-api";
 
-export const customersStatuses = ["All", "Active", "Inactive"];
+export const customersStatuses = ["All", "active", "inactive"] as const;
 
-export type CustomerStatusFilter = (typeof customersStatuses)[number];
+export type CustomerStatusFilter = CustomerStatus | "All";
 
-export type CustomerSortsOption = "newest" | "name" | "orders" | "spent";
+export type CustomerSortsOption = CustomerSortBy;
 
 type CustomerFiltersProps = {
   activeStatus: CustomerStatusFilter;

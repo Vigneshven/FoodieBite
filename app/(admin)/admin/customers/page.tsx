@@ -1,14 +1,11 @@
 "use client";
 
 import { fetchCustomers } from "@/api/admin/customer/api";
-import {
-  Customer,
-  CustomerSortBy,
-  CustomerStatus,
-} from "@/api/type/admin/types-api";
+import { CustomerSortBy, CustomerStatus } from "@/api/type/admin/types-api";
 import CustomerFilters from "@/component/admin/customers/CustomerFilters";
 import CustomerStats from "@/component/admin/customers/CustomerStats";
 import CustomerTable from "@/component/admin/customers/CustomerTable";
+import { useCustomerStore } from "@/store/admin/customerStore";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -24,11 +21,12 @@ export default function CustomerPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
-  const [customers, setCustomers] = useState<Customer[]>([]);
-
   const [totalCustomers, setTotalCustomers] = useState(0);
 
   const [loading, setLoading] = useState(false);
+
+  const customers = useCustomerStore((state) => state.customers);
+  const setCustomers = useCustomerStore((state) => state.setCustomers);
 
   useEffect(() => {
     async function loadCustomers() {
@@ -50,7 +48,7 @@ export default function CustomerPage() {
       }
     }
     loadCustomers();
-  }, [currentPage, pageSize, search, activeStatus, sortBy]);
+  }, [currentPage, pageSize, search, activeStatus, sortBy, setCustomers]);
 
   return (
     <div className="space-y-3">
@@ -80,8 +78,10 @@ export default function CustomerPage() {
       />
       <CustomerTable
         customers={customers}
+        activeStatus={activeStatus}
         loading={loading}
         totalItems={totalCustomers}
+        onTotalItemsChange={setTotalCustomers}
         currentPage={currentPage}
         pageSize={pageSize}
         onPageChange={setCurrentPage}

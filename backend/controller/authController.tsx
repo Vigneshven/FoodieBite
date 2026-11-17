@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import {
   createCustomer,
   findCustomerByEmail,
-} from "@/backend/model/admin/authModel";
+} from "@/backend/model/authModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 

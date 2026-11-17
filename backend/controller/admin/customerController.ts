@@ -2,6 +2,7 @@ import {
   CustomerSortBy,
   CustomerStatus,
   getAllCustomer,
+  updateCustomerStatus,
 } from "@/backend/model/admin/customerModel";
 import type { Request, Response } from "express";
 
@@ -17,7 +18,9 @@ export const getCustomers = async (req: Request, res: Response) => {
         : "All";
     const sortByValue = String(req.query.sortBy || "newest");
     const sortBy: CustomerSortBy =
-      sortByValue === "name" || sortByValue === "newest" ? sortByValue : "newest";
+      sortByValue === "name" || sortByValue === "newest"
+        ? sortByValue
+        : "newest";
 
     const result = await getAllCustomer({
       page,
@@ -35,6 +38,37 @@ export const getCustomers = async (req: Request, res: Response) => {
     console.log(error);
     return res.status(500).json({
       message: "Failed to fetch customer",
+    });
+  }
+};
+
+export const changeCustomerStatus = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const { status } = req.body;
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        message: "Invalid customer ID",
+      });
+    }
+
+    if (status !== "active" && status !== "inactive") {
+      return res.status(400).json({
+        message: "Invalid status",
+      });
+    }
+
+    const customer = await updateCustomerStatus(id, status);
+
+    return res.status(200).json({
+      message: "Customer status updated successfully",
+      data: customer,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Failed to update customer status",
     });
   }
 };

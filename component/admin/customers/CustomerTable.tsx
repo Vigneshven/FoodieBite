@@ -1,3 +1,4 @@
+"use client";
 import {
   Table,
   TableBody,
@@ -13,10 +14,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+  Eye,
+  MoreHorizontal,
+  Pencil,
+  UserCheck,
+  UserX,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CustomerPagination from "./CustomerPagination";
 import { Customer } from "@/api/type/admin/types-api";
+import type { CustomerStatusFilter } from "./CustomerFilters";
+import { useState } from "react";
+import { updateCustomerStatus } from "@/api/admin/customer/api";
+import { toast } from "sonner";
+import { useCustomerStore } from "@/store/admin/customerStore";
 
 const statusStyles = {
   active: "bg-green-100 text-green-700 hover:bg-green-100",
@@ -34,8 +46,10 @@ function formatJoinDate(value: string) {
 
 type CustomersTableProps = {
   customers: Customer[];
+  activeStatus: CustomerStatusFilter;
   loading: boolean;
   totalItems: number;
+  onTotalItemsChange: (total: number) => void;
   currentPage: number;
   pageSize: number;
   onPageChange: (page: number) => void;
@@ -44,13 +58,37 @@ type CustomersTableProps = {
 
 export default function CustomerTable({
   customers,
+  activeStatus,
   loading,
   totalItems,
+  onTotalItemsChange,
   currentPage,
   pageSize,
   onPageChange,
   onPageSizeChange,
 }: CustomersTableProps) {
+  const [updateId, setUpdateId] = useState<string | null>(null);
+  const updateCustomer = useCustomerStore((state) => state.updateCustomer);
+  const removeCustomer = useCustomerStore((state) => state.removeCustomer);
+  async function handleStatusChange(id: string, status: "active" | "inactive") {
+    const newStatus = status === "active" ? "inactive" : "active";
+    try {
+      setUpdateId(id);
+
+      await updateCustomerStatus(id, newStatus);
+      if (activeStatus !== "All") {
+        removeCustomer(id);
+        onTotalItemsChange(Math.max(0, totalItems - 1));
+      } else {
+        updateCustomer(id, newStatus);
+      }
+    } catch {
+      toast.error("failed to update status");
+    } finally {
+      setUpdateId(null);
+    }
+  }
+
   return (
     <div className="overflow-hidden rounded-xl border bg-card">
       <div className="border-b p-5">
@@ -128,9 +166,23 @@ export default function CustomerTable({
                           <Pencil className="mr-2 h-4 w-4" />
                           Edit Customer
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete Customer
+                        <DropdownMenuItem
+                          disabled={updateId === customer.id}
+                          onClick={() =>
+                            handleStatusChange(customer.id, customer.status)
+                          }
+                        >
+                          {customer.status === "active" ? (
+                            <>
+                              <UserX className="mr-2 h-4 w-4" />
+                              Deactivate Customer
+                            </>
+                          ) : (
+                            <>
+                              <UserCheck className="mr-2 h-4 w-4" />
+                              Activate Customer
+                            </>
+                          )}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

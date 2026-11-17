@@ -81,3 +81,26 @@ export async function getAllCustomer({
     currentPage: page,
   };
 }
+
+export async function updateCustomerStatus(
+  id: number,
+  status: "active" | "inactive",
+) {
+  const customer = await prisma.customers.update({
+    where: {
+      id: id,
+      role: "customer",
+    },
+    data: {
+      status: status,
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      status: true,
+    },
+  });
+
+  return customer;
+}

@@ -1,4 +1,7 @@
-import { getCustomers } from "@/backend/controller/admin/customerController";
+import {
+  changeCustomerStatus,
+  getCustomers,
+} from "@/backend/controller/admin/customerController";
 import { requireAuth } from "@/backend/middleware/requireAuth";
 import { requireRole } from "@/backend/middleware/requireRole";
 import { Router } from "express";
@@ -6,5 +9,12 @@ import { Router } from "express";
 const router = Router();
 
 router.get("/", requireAuth, requireRole("admin"), getCustomers);
+
+router.patch(
+  "/:id/status",
+  requireAuth,
+  requireRole("admin"),
+  changeCustomerStatus,
+);
 
 export default router;

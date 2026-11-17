@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { findCustomerById } from "@/backend/model/admin/authModel";
+import { findCustomerById } from "@/backend/model/authModel";
 
 export async function requireAuth(
   req: Request,

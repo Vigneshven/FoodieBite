@@ -1,6 +1,9 @@
 // customer page
 
-import { CustomerResponse, GetCustomersParams } from "@/api/type/admin/types-api";
+import {
+  CustomerResponse,
+  GetCustomersParams,
+} from "@/api/type/admin/types-api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -22,6 +25,27 @@ export async function fetchCustomers(params: GetCustomersParams) {
 
   if (!res.ok) {
     throw new Error("Failed to fetch customers");
+  }
+
+  return result.data;
+}
+
+// update the customer status
+
+export async function updateCustomerStatus(id: string, status: string) {
+  const res = await fetch(`${BASE_URL}/api/admin/customers/${id}/status`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status }),
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error("Failed to update customer status");
   }
 
   return result.data;
