@@ -1,12 +1,13 @@
 "use client";
 
+import { RestaurantSortBy, RestaurantStatus } from "@/api/type/admin/types-api";
 import { Search, SlidersHorizontal } from "lucide-react";
 
-export const restaurantStatuses = ["All", "Active", "Pending", "Suspended"];
+export const restaurantStatuses = ["All", "active", "pending", "suspended"];
 
-export type RestaurantStatusFilter = (typeof restaurantStatuses)[number];
+export type RestaurantStatusFilter = RestaurantStatus | "All";
 
-export type RestaurantSortOption = "newest" | "name" | "rating";
+export type RestaurantSortOption = RestaurantSortBy;
 
 type RestaurantFiltersProps = {
   activeStatus: RestaurantStatusFilter;
@@ -32,7 +33,7 @@ export default function RestaurantFilters({
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search Restaurants"
+            placeholder="Search Restaurants,Category"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             className="h-10 w-full rounded-lg bg-background pl-10 pr-3 text-sm outline-none"
@@ -51,7 +52,9 @@ export default function RestaurantFilters({
                 : "text-sm font-medium "
             }`}
           >
-            {status}
+            {status !== "All"
+              ? status.charAt(0).toUpperCase() + status.slice(1)
+              : status}
           </button>
         ))}
       </div>
@@ -64,7 +67,7 @@ export default function RestaurantFilters({
         >
           <option value="newest">Newest</option>
           <option value="name">Restaurant Name</option>
-          <option value="rating">Highest Rating</option>
+          <option value="highest-rating">Highest Rating</option>
         </select>
       </div>
     </div>

@@ -34,35 +34,52 @@ export async function getRestaurantStats() {
   };
 }
 
+// restaurant table
+
+export type RestaurantStatusFilter = "All" | "active" | "pending" | "suspended";
+
+export type RestaurantSortOptions = "newest" | "name" | "highest-rating";
+
 export type GetRestaurantsParams = {
   page: number;
   limit: number;
   search: string;
+  status: RestaurantStatusFilter;
+  sortBy: RestaurantSortOptions;
 };
 
 export async function getAllRestaurants({
   page,
   limit,
   search,
+  status,
+  sortBy,
 }: GetRestaurantsParams) {
   const skip = (page - 1) * limit;
+  const where = {
+    ...(status !== "All" && {
+      status,
+    }),
+    ...(search && {
+      OR: [{ name: { contains: search } }, { category: { contains: search } }],
+    }),
+  };
   const restaurants = await prisma.restaurants.findMany({
-    where: {
-      ...(search && {
-        OR: [
-          { name: { contains: search } },
-          { category: { contains: search } },
-        ],
-      }),
-    },
+    where,
     skip,
     take: limit,
-    orderBy: {
-      id: "desc",
-    },
+    orderBy:
+      sortBy === "name"
+        ? { name: "asc" }
+        : sortBy === "highest-rating"
+          ? { rating: "desc" }
+          : { createdAt: "desc" },
   });
   const totalRestaurants = await prisma.restaurants.count({
     where: {
+      ...(status !== "All" && {
+        status,
+      }),
       ...(search && {
         OR: [
           { name: { contains: search } },
@@ -72,9 +89,37 @@ export async function getAllRestaurants({
     },
   });
   return {
-    restaurants,
+    restaurants: restaurants.map((restaurant) => ({
+      id: restaurant.id,
+      name: restaurant.name,
+      cuisine: restaurant.category,
+      rating: restaurant.rating,
+      status: restaurant.status,
+      contact: restaurant.phone,
+      joinDate: restaurant.createdAt.toISOString().split("T")[0],
+    })),
     totalRestaurants,
     totalPages: Math.ceil(totalRestaurants / limit),
     currentPage: page,
   };
+}
+
+export async function updateRestaurantStatus(
+  id: number,
+  status: "active" | "pending" | "suspended",
+) {
+  const restaurant = await prisma.restaurants.update({
+    where: {
+      id: id,
+    },
+    data: {
+      status: status,
+    },
+    select: {
+      id: true,
+      name: true,
+      status: true,
+    },
+  });
+  return restaurant;
 }

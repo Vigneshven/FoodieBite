@@ -74,6 +74,7 @@ export default function CustomerTable({
       setUpdateId(id);
 
       await updateCustomerStatus(id, newStatus);
+      toast.success("Customer status updated successfully");
       const Stats = await fetchCustomerStats();
       setStats(Stats);
       if (activeStatus !== "All") {

@@ -22,7 +22,10 @@ model restaurants {
   image    String            @db.Text
   name     String            @db.VarChar(255)
   category String            @db.VarChar(300)
+  phone    String?           @unique
   status   restaurant_status @default(pending)
+  createdAt DateTime          @default(now())
+  rating    Float             @default(0)
 }
 
 enum restaurant_status {

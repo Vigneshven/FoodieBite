@@ -1,11 +1,12 @@
 "use client";
 
-import { getRestaurantStats } from "@/api/admin/restaurant/api";
+import {
+  fetchRestaurants,
+  getRestaurantStats,
+} from "@/api/admin/restaurant/api";
+import { RestaurantSortBy, RestaurantStatus } from "@/api/type/admin/types-api";
 import AddRestaurantDialog from "@/component/admin/restaurants/AddRestaurantDialog";
-import RestaurantFilters, {
-  RestaurantSortOption,
-  RestaurantStatusFilter,
-} from "@/component/admin/restaurants/RestaurantFilters";
+import RestaurantFilters from "@/component/admin/restaurants/RestaurantFilters";
 import RestaurantTable from "@/component/admin/restaurants/RestaurantsTable";
 import RestaurantStats from "@/component/admin/restaurants/RestaurantStats";
 import { useRestaurantStore } from "@/store/admin/restaurantStore";
@@ -13,17 +14,47 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 export default function RestaurantPage() {
-  const [activeStatus, setActiveStatus] =
-    useState<RestaurantStatusFilter>("All");
+  const [activeStatus, setActiveStatus] = useState<RestaurantStatus | "All">(
+    "All",
+  );
 
   const [search, setSearch] = useState("");
 
-  const [sortBy, setSortBy] = useState<RestaurantSortOption>("newest");
+  const [sortBy, setSortBy] = useState<RestaurantSortBy>("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
+  const [totalRestaurants, setTotalRestaurants] = useState(0);
+
+  const [loading, setLoading] = useState(false);
+
+  const restaurants = useRestaurantStore((state) => state.restaurants);
+  const setRestaurants = useRestaurantStore((state) => state.setRestaurants);
+
   const stats = useRestaurantStore((state) => state.stats);
   const setStats = useRestaurantStore((state) => state.setStats);
+
+  useEffect(() => {
+    async function loadRestaurants() {
+      try {
+        setLoading(true);
+        const result = await fetchRestaurants({
+          page: currentPage,
+          limit: pageSize,
+          search,
+          status: activeStatus,
+          sortBy,
+        });
+        setRestaurants(result.restaurants);
+        setTotalRestaurants(result.totalRestaurants);
+      } catch {
+        toast.error("Failed to Show Restaurants");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadRestaurants();
+  }, [currentPage, pageSize, search, activeStatus, sortBy, setRestaurants]);
 
   useEffect(() => {
     async function loadStats() {
@@ -68,9 +99,11 @@ export default function RestaurantPage() {
       />
 
       <RestaurantTable
+        restaurants={restaurants}
         activeStatus={activeStatus}
-        search={search}
-        sortBy={sortBy}
+        loading={loading}
+        totalItems={totalRestaurants}
+        onTotalItemsChange={setTotalRestaurants}
         currentPage={currentPage}
         pageSize={pageSize}
         onPageChange={setCurrentPage}

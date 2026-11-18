@@ -57,3 +57,37 @@ export type RestaurantStatsData = {
   pendingApproval: number;
   suspendedRestaurants: number;
 };
+
+// restaurantpage table
+
+export type RestaurantStatus = "active" | "pending" | "suspended";
+
+export type RestaurantSortBy = "newest" | "name" | "highest-rating";
+
+export type Restaurant = {
+  id: number;
+  name: string;
+  cuisine: string;
+  rating: number;
+  status: RestaurantStatus;
+  contact: string;
+  joinDate: string;
+};
+
+export type GetRestaurantsParams = {
+  page: number;
+  limit: number;
+  search: string;
+  status: RestaurantStatus | "All";
+  sortBy: RestaurantSortBy;
+};
+
+export type RestaurantResponse = {
+  message: string;
+  data: {
+    restaurants: Restaurant[];
+    totalRestaurants: number;
+    totalPages: number;
+    currentPage: number;
+  };
+};
