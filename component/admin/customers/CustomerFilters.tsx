@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import type {
   CustomerSortBy,
   CustomerStatus,
-} from "@/api/type/admin/types-api";
+} from "@/api/admin/type/admin/types-api";
 
 export const customersStatuses = ["All", "active", "inactive"] as const;
 

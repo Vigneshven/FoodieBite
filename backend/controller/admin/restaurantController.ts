@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import {
+  createRestaurant,
+  findRestaurantByName,
+  findRestaurantByPhone,
   getAllRestaurants,
   getRestaurantStats,
   RestaurantSortOptions,
@@ -89,6 +92,63 @@ export const changeRestaurantStatus = async (req: Request, res: Response) => {
     console.log(error);
     return res.status(500).json({
       message: "Failed to update restaurant status",
+    });
+  }
+};
+
+// adding restaurant
+
+export const addRestaurant = async (req: Request, res: Response) => {
+  try {
+    const { name, email, phone, cuisine } = req.body;
+
+    if (!name || !email || !phone || !cuisine) {
+      return res.status(400).json({
+        message: "All Fields are required",
+      });
+    }
+
+    const restaurantName = name.trim();
+    const existingRestaurant = await findRestaurantByName(restaurantName);
+    if (existingRestaurant) {
+      return res.status(409).json({
+        message: "Restaurant Already Exist",
+      });
+    }
+
+    const restaurantPhone = phone.trim();
+    const existingRestaurantPhone =
+      await findRestaurantByPhone(restaurantPhone);
+
+    if (existingRestaurantPhone) {
+      return res.status(409).json({
+        message: "Phone Already Exist",
+      });
+    }
+
+    const restaurant = await createRestaurant({
+      name: name.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      category: cuisine.trim(),
+    });
+
+    return res.status(201).json({
+      message: "Restaurant created successfully",
+      data: {
+        id: restaurant.id,
+        name: restaurant.name,
+        cuisine: restaurant.category,
+        rating: restaurant.rating,
+        status: restaurant.status,
+        contact: restaurant.phone,
+        joinDate: restaurant.createdAt.toISOString().split("T")[0],
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Failed to add restaurant",
     });
   }
 };

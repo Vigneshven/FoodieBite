@@ -1,7 +1,7 @@
 "use client";
 
 import { fetchCustomers, fetchCustomerStats } from "@/api/admin/customer/api";
-import { CustomerSortBy, CustomerStatus } from "@/api/type/admin/types-api";
+import { CustomerSortBy, CustomerStatus } from "@/api/admin/type/admin/types-api";
 import CustomerFilters from "@/component/admin/customers/CustomerFilters";
 import CustomerStats from "@/component/admin/customers/CustomerStats";
 import CustomerTable from "@/component/admin/customers/CustomerTable";

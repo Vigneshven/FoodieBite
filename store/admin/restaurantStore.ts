@@ -1,4 +1,4 @@
-import { Restaurant, RestaurantStatsData } from "@/api/type/admin/types-api";
+import { Restaurant, RestaurantStatsData } from "@/api/admin/type/admin/types-api";
 import { create } from "zustand";
 
 type RestaurantStore = {
@@ -11,6 +11,11 @@ type RestaurantStore = {
     status: "active" | "pending" | "suspended",
   ) => void;
   removeRestaurant: (id: number) => void;
+  isAddDialogOpen: boolean;
+  isAddingRestaurant: boolean;
+  setAddDialogOpen: (open: boolean) => void;
+  setIsAddingRestaurant: (loading: boolean) => void;
+  addRestaurant: (restaurant: Restaurant) => void;
 };
 
 export const useRestaurantStore = create<RestaurantStore>((set) => ({
@@ -34,5 +39,18 @@ export const useRestaurantStore = create<RestaurantStore>((set) => ({
       restaurants: state.restaurants.filter(
         (restaurant) => restaurant.id !== id,
       ),
+    })),
+  isAddDialogOpen: false,
+  isAddingRestaurant: false,
+  setAddDialogOpen: (open) => set({ isAddDialogOpen: open }),
+  setIsAddingRestaurant: (loading) => set({ isAddingRestaurant: loading }),
+  addRestaurant: (restaurant) =>
+    set((state) => ({
+      restaurants: [restaurant, ...state.restaurants],
+      stats: {
+        ...state.stats,
+        totalRestaurants: state.stats.totalRestaurants + 1,
+        pendingApproval: state.stats.pendingApproval + 1,
+      },
     })),
 }));

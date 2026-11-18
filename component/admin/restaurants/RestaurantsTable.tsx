@@ -32,7 +32,7 @@ import { Button } from "@/components/ui/button";
 
 import type { RestaurantStatusFilter } from "./RestaurantFilters";
 import RestaurantPagination from "./RestaurantPagination";
-import { Restaurant } from "@/api/type/admin/types-api";
+import { Restaurant } from "@/api/admin/type/admin/types-api";
 import { useRestaurantStore } from "@/store/admin/restaurantStore";
 import {
   getRestaurantStats,

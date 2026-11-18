@@ -17,7 +17,7 @@ import {
 import { Eye, MoreHorizontal, Pencil, UserCheck, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CustomerPagination from "./CustomerPagination";
-import { Customer } from "@/api/type/admin/types-api";
+import { Customer } from "@/api/admin/type/admin/types-api";
 import type { CustomerStatusFilter } from "./CustomerFilters";
 import { useState } from "react";
 import {

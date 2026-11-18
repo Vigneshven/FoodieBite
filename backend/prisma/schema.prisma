@@ -21,11 +21,27 @@ model restaurants {
   id       Int               @id @default(autoincrement())
   image    String            @db.Text
   name     String            @db.VarChar(255)
+  email    String?          @db.VarChar(255)
   category String            @db.VarChar(300)
   phone    String?           @unique
   status   restaurant_status @default(pending)
   createdAt DateTime          @default(now())
   rating    Float             @default(0)
+
+  description    String?  @db.Text
+  restaurantType String?  @db.VarChar(100)
+  cuisines       String?  @db.VarChar(500)
+
+  streetAddress  String?  @db.VarChar(255)
+  landmark       String?  @db.VarChar(255)
+  city           String?  @db.VarChar(100)
+  state          String?  @db.VarChar(100)
+  postalCode     String?  @db.VarChar(20)
+  country        String?  @default("India") @db.VarChar(100)
+
+  logo           String?  @db.Text
+  openingHours   Json?
+
 }
 
 enum restaurant_status {

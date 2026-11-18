@@ -1,5 +1,5 @@
-import { Restaurant } from "@/api/type/restaurant";
-import { Customer } from "./type/customer";
+import { Restaurant } from "@/api/admin/type/restaurant";
+import { Customer } from "./admin/type/customer";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 

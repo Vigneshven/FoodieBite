@@ -1,4 +1,4 @@
-import { CustomerStatsData } from "@/api/type/admin/types-api";
+import { CustomerStatsData } from "@/api/admin/type/admin/types-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, User, UserCheck, UserPlus, UserX } from "lucide-react";
 

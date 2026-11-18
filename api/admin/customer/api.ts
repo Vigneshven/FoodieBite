@@ -4,7 +4,7 @@ import {
   CustomerResponse,
   CustomerStatsData,
   GetCustomersParams,
-} from "@/api/type/admin/types-api";
+} from "@/api/admin/type/admin/types-api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 

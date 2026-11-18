@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Customer, CustomerStatsData } from "@/api/type/admin/types-api";
+import type { Customer, CustomerStatsData } from "@/api/admin/type/admin/types-api";
 
 type CustomerStore = {
   customers: Customer[];

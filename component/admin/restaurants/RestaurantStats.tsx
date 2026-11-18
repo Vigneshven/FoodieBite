@@ -1,4 +1,4 @@
-import { RestaurantStatsData } from "@/api/type/admin/types-api";
+import { RestaurantStatsData } from "@/api/admin/type/admin/types-api";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Ban,

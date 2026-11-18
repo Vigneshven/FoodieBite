@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import {
   DashBoardStats,
-} from "../../type/admin/types-api";
+} from "../type/admin/types-api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 

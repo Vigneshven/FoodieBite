@@ -1,5 +1,5 @@
 import { getDashboardStats } from "@/api/admin/dashboard/api";
-import { DashBoardStats } from "@/api/type/admin/types-api";
+import { DashBoardStats } from "@/api/admin/type/admin/types-api";
 import OrderStatusAnalytics from "@/component/admin/OrderStatusAnalytics";
 import RevenueAnalytics from "@/component/admin/RevenueAnalytics";
 import TotalCustomersCard from "@/component/admin/TotalCustomersCard";

@@ -123,3 +123,41 @@ export async function updateRestaurantStatus(
   });
   return restaurant;
 }
+
+// restaurant add using form
+
+export async function findRestaurantByName(name: string) {
+  const restaurant = await prisma.restaurants.findFirst({
+    where: {
+      name: name,
+    },
+  });
+  return restaurant;
+}
+
+export async function findRestaurantByPhone(phone: string) {
+  const restaurant = await prisma.restaurants.findFirst({
+    where: {
+      phone: phone,
+    },
+  });
+  return restaurant;
+}
+
+export async function createRestaurant(data: {
+  name: string;
+  email: string;
+  phone: string;
+  category: string;
+}) {
+  const restaurant = await prisma.restaurants.create({
+    data: {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      category: data.category,
+      image: "",
+    },
+  });
+  return restaurant;
+}

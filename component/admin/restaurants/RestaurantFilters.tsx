@@ -1,6 +1,6 @@
 "use client";
 
-import { RestaurantSortBy, RestaurantStatus } from "@/api/type/admin/types-api";
+import { RestaurantSortBy, RestaurantStatus } from "@/api/admin/type/admin/types-api";
 import { Search, SlidersHorizontal } from "lucide-react";
 
 export const restaurantStatuses = ["All", "active", "pending", "suspended"];

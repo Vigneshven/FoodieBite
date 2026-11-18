@@ -1,8 +1,9 @@
 import {
+  CreateRestaurantData,
   GetRestaurantsParams,
   RestaurantResponse,
   RestaurantStatsData,
-} from "@/api/type/admin/types-api";
+} from "@/api/admin/type/admin/types-api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -60,6 +61,27 @@ export async function updateRestaurantStatus(id: string, status: string) {
 
   if (!res.ok) {
     throw new Error("Failed to update restaurants status");
+  }
+
+  return result.data;
+}
+
+// add restaurant in restaurant page using form
+
+export async function createRestaurant(data: CreateRestaurantData) {
+  const res = await fetch(`${BASE_URL}/api/admin/restaurants`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error("Failed to add restaurants");
   }
 
   return result.data;

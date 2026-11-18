@@ -7,7 +7,8 @@ declare global {
         id: number;
         username: string;
         role: string;
-        status: "active" | "inactive";
+        email: string;
+        phone: string;
       };
     }
   }

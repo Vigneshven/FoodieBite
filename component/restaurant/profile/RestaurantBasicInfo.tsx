@@ -4,8 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
+import { useEffect } from "react";
+import { getMyRestaurant, updateMyRestaurant } from "@/api/restaurantOwner/api";
+import { toast } from "sonner";
 
 export const restaurantType = ["Restaurant", "Cafe", "Fast Food", "Bakery"];
 
@@ -46,6 +50,7 @@ const restaurantSchema = z.object({
     .min(20, "Description at least 20 characters")
     .max(500, "Description cannot exceed 500 characters"),
   restaurantType: z.string().min(1, "Please select a restaurant type"),
+  category: z.string().min(1, "Please select food category"),
   cuisines: z.string().min(1, "Select at least one cuisine"),
   phone: z.string().regex(/^\d{10}$/, "Enter a valid 10 digit number"),
   email: z.string().email("Enter a valid email address"),
@@ -70,7 +75,8 @@ export default function RestaurantBasicInfo() {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors, dirtyFields },
   } = useForm<RestaurantForm>({
     resolver: zodResolver(restaurantSchema),
     defaultValues: {
@@ -78,6 +84,7 @@ export default function RestaurantBasicInfo() {
       description: "",
       restaurantType: "",
       cuisines: "",
+      category: "",
       phone: "",
       email: "",
       streetAddress: "",
@@ -142,8 +149,24 @@ export default function RestaurantBasicInfo() {
     },
   });
 
-  const onSubmit = (data: RestaurantForm) => {
-    console.log("Restaurant information:", data);
+  const onSubmit = async (data: RestaurantForm) => {
+    try {
+      const updatedData = Object.keys(dirtyFields).reduce((result, key) => {
+        if (dirtyFields[key as keyof RestaurantForm]) {
+          Object.assign(result, {
+            [key]: data[key as keyof RestaurantForm],
+          });
+        }
+        return result;
+      }, {} as Partial<RestaurantForm>);
+      if (Object.keys(updatedData).length === 0) {
+        return;
+      }
+      await updateMyRestaurant(data);
+      reset(data);
+    } catch {
+      toast.error("failed to update restaurant");
+    }
   };
 
   const logoUrl = useWatch({
@@ -155,6 +178,34 @@ export default function RestaurantBasicInfo() {
     control,
     name: "image",
   });
+
+  useEffect(() => {
+    async function fetchRestaurant() {
+      try {
+        const restaurant = await getMyRestaurant();
+
+        reset({
+          name: restaurant.name ?? "",
+          description: restaurant.description ?? "",
+          restaurantType: restaurant.restaurantType ?? "",
+          cuisines: restaurant.cuisines ?? "",
+          phone: restaurant.phone ?? "",
+          streetAddress: restaurant.streetAddress ?? "",
+          landmark: restaurant.landmark ?? "",
+          city: restaurant.city ?? "",
+          state: restaurant.state ?? "",
+          postalCode: restaurant.postalCode ?? "",
+          country: restaurant.country ?? "",
+          logo: restaurant.logo ?? "",
+          image: restaurant.image ?? "",
+          openingHours: restaurant.openingHours ?? "",
+        });
+      } catch {
+        toast.error("Failed to fetch restaurant");
+      }
+    }
+    fetchRestaurant();
+  }, [reset]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -219,6 +270,21 @@ export default function RestaurantBasicInfo() {
         </select>
         {errors.cuisines && (
           <p className="text-sm text-red-500">{errors.cuisines.message}</p>
+        )}
+      </div>
+      <div className="space-y-2">
+        <Label>Food Category</Label>
+        <select
+          {...register("category")}
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+        >
+          <option value="">Select food category</option>
+          <option value="Veg">Veg</option>
+          <option value="Non-Veg">Non-Veg</option>
+          <option value="Both">Both</option>
+        </select>
+        {errors.category && (
+          <p className="text-sm text-red-500">{errors.category.message}</p>
         )}
       </div>
       <div className="grid gap-5 md:grid-cols-2">
@@ -314,8 +380,10 @@ export default function RestaurantBasicInfo() {
 
           <div className="flex h-40 items-center justify-center rounded-lg border bg-muted/30 p-4">
             {logoUrl ? (
-              <img
+              <Image
                 src={logoUrl}
+                width={400}
+                height={400}
                 alt="Restaurant logo preview"
                 className="h-full max-w-full object-contain"
               />
@@ -339,8 +407,10 @@ export default function RestaurantBasicInfo() {
 
           <div className="flex h-40 items-center justify-center overflow-hidden rounded-lg border bg-muted/30">
             {imageUrl ? (
-              <img
+              <Image
                 src={imageUrl}
+                width={400}
+                height={400}
                 alt="Restaurant cover preview"
                 className="h-full w-full object-cover"
               />

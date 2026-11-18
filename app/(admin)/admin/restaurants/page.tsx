@@ -4,7 +4,7 @@ import {
   fetchRestaurants,
   getRestaurantStats,
 } from "@/api/admin/restaurant/api";
-import { RestaurantSortBy, RestaurantStatus } from "@/api/type/admin/types-api";
+import { RestaurantSortBy, RestaurantStatus } from "@/api/admin/type/admin/types-api";
 import AddRestaurantDialog from "@/component/admin/restaurants/AddRestaurantDialog";
 import RestaurantFilters from "@/component/admin/restaurants/RestaurantFilters";
 import RestaurantTable from "@/component/admin/restaurants/RestaurantsTable";

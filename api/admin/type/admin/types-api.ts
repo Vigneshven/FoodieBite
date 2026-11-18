@@ -91,3 +91,12 @@ export type RestaurantResponse = {
     currentPage: number;
   };
 };
+
+// add restaurant in restaurant page using form
+
+export type CreateRestaurantData = {
+  name: string;
+  email: string;
+  phone: string;
+  cuisine: string;
+};
