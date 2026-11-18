@@ -188,17 +188,19 @@ export default function RestaurantBasicInfo() {
           name: restaurant.name ?? "",
           description: restaurant.description ?? "",
           restaurantType: restaurant.restaurantType ?? "",
+          category: restaurant.category ?? "",
           cuisines: restaurant.cuisines ?? "",
           phone: restaurant.phone ?? "",
+          email: restaurant.email ?? "",
           streetAddress: restaurant.streetAddress ?? "",
           landmark: restaurant.landmark ?? "",
           city: restaurant.city ?? "",
           state: restaurant.state ?? "",
           postalCode: restaurant.postalCode ?? "",
-          country: restaurant.country ?? "",
+          country: restaurant.country ?? "India",
           logo: restaurant.logo ?? "",
           image: restaurant.image ?? "",
-          openingHours: restaurant.openingHours ?? "",
+          openingHours: restaurant.openingHours,
         });
       } catch {
         toast.error("Failed to fetch restaurant");
@@ -262,7 +264,7 @@ export default function RestaurantBasicInfo() {
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
         >
           <option value="">Select cuisine</option>
-          {restaurantType.map((type) => (
+          {cuisineType.map((type) => (
             <option key={type} value={type}>
               {type}
             </option>
@@ -279,9 +281,9 @@ export default function RestaurantBasicInfo() {
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
         >
           <option value="">Select food category</option>
-          <option value="Veg">Veg</option>
-          <option value="Non-Veg">Non-Veg</option>
-          <option value="Both">Both</option>
+          <option value="veg">Veg</option>
+          <option value="non-veg">Non-Veg</option>
+          <option value="both">Both</option>
         </select>
         {errors.category && (
           <p className="text-sm text-red-500">{errors.category.message}</p>
