@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import {
-  createRestaurant,
+  createRestaurantWithOwner,
   findRestaurantByName,
   findRestaurantByPhone,
   getAllRestaurants,
@@ -9,6 +9,9 @@ import {
   RestaurantStatusFilter,
   updateRestaurantStatus,
 } from "@/backend/model/admin/restaurantModel";
+import { findCustomerByEmail } from "@/backend/model/authModel";
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
 
 export async function getRestaurantStatistics(req: Request, res: Response) {
   try {
@@ -125,23 +128,38 @@ export const addRestaurant = async (req: Request, res: Response) => {
         message: "Phone Already Exist",
       });
     }
+    const existingCustomer = await findCustomerByEmail(email);
 
-    const restaurant = await createRestaurant({
+    if (existingCustomer) {
+      return res.status(409).json({
+        message: "Account with this owner email already exists",
+      });
+    }
+
+    const tempPassword = crypto
+      .randomInt(0, 1000000)
+      .toString()
+      .padStart(8, "0");
+
+    const passwordHash = await bcrypt.hash(tempPassword, 12);
+
+    const result = await createRestaurantWithOwner({
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim(),
+      passwordHash,
     });
 
     return res.status(201).json({
-      message: "Restaurant created successfully",
+      message: "Restaurant and owner account  created successfully",
       data: {
-        id: restaurant.id,
-        name: restaurant.name,
-        cuisine: restaurant.category,
-        rating: restaurant.rating,
-        status: restaurant.status,
-        contact: restaurant.phone,
-        joinDate: restaurant.createdAt.toISOString().split("T")[0],
+        id: result.restaurant.id,
+        name: result.restaurant.name,
+        cuisine: result.restaurant.category,
+        rating: result.restaurant.rating,
+        status: result.restaurant.status,
+        contact: result.restaurant.phone,
+        joinDate: result.restaurant.createdAt.toISOString().split("T")[0],
       },
     });
   } catch (error) {

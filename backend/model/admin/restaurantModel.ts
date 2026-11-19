@@ -144,18 +144,39 @@ export async function findRestaurantByPhone(phone: string) {
   return restaurant;
 }
 
-export async function createRestaurant(data: {
+// allow admin to create restaurant and automatically create restaurantowner account
+
+export async function createRestaurantWithOwner(data: {
   name: string;
   email: string;
   phone: string;
+  passwordHash: string;
 }) {
-  const restaurant = await prisma.restaurants.create({
-    data: {
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      image: "",
-    },
+  return prisma.$transaction(async (tx) => {
+    const restaurant = await tx.restaurants.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        image: "",
+      },
+    });
+    const owner = await tx.customers.create({
+      data: {
+        username: data.name,
+        email: data.email,
+        password: data.passwordHash,
+        role: "restaurant_owner",
+        status: "active",
+        mustChangePassword: true,
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+      },
+    });
+    return { restaurant, owner };
   });
-  return restaurant;
 }

@@ -117,7 +117,11 @@ export default function AddRestaurantDialog() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-2">
             <Label>Restaurant Name</Label>
-            <Input placeholder="Enter restaurant name" {...register("name")} />
+            <Input
+              placeholder="Enter restaurant name"
+              {...register("name")}
+              className="bg-card"
+            />
             {errors.name && (
               <p className="text-sm text-red-500">{errors.name.message}</p>
             )}
@@ -129,6 +133,7 @@ export default function AddRestaurantDialog() {
                 type="email"
                 placeholder="example@gmail.com"
                 {...register("email")}
+                className="bg-card"
               />
               {errors.email && (
                 <p className="text-sm text-red-500">{errors.email.message}</p>
@@ -140,24 +145,25 @@ export default function AddRestaurantDialog() {
                 type="tel"
                 placeholder="Enter phone"
                 {...register("phone")}
+                className="bg-card"
               />
               {errors.phone && (
                 <p className="text-sm text-red-500">{errors.phone.message}</p>
               )}
             </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                onClick={() => handleDialogChange(false)}
-                disabled={isAdding}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isAdding}>
-                {isAdding ? "Adding..." : "Add Restaurants"}
-              </Button>
-            </DialogFooter>
           </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              onClick={() => handleDialogChange(false)}
+              disabled={isAdding}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isAdding}>
+              {isAdding ? "Adding..." : "Add Restaurants"}
+            </Button>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

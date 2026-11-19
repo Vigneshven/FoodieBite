@@ -1,8 +1,5 @@
 import type { Request, Response } from "express";
-import {
-  createCustomer,
-  findCustomerByEmail,
-} from "@/backend/model/authModel";
+import { createCustomer, findCustomerByEmail } from "@/backend/model/authModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -10,7 +7,7 @@ export async function register(req: Request, res: Response) {
   try {
     const { username, email, password, role } = req.body;
 
-    const allowedRoles = ["customer", "restaurant_owner", "delivery_partner"];
+    const allowedRoles = ["customer", "delivery_partner"];
 
     if (!allowedRoles.includes(role)) {
       return res.status(400).json({
@@ -91,6 +88,14 @@ export async function login(req: Request, res: Response) {
       });
     }
 
+    if (user.mustChangePassword) {
+      return res.status(200).json({
+        message: "Change your temporary password",
+        role: user.role,
+        mustChangePassword: true,
+      });
+    }
+
     if (user.status === "inactive") {
       return res.status(403).json({
         message: "Your account is suspended. Please contact an admin.",
@@ -121,6 +126,7 @@ export async function login(req: Request, res: Response) {
       message: "Login Successfully",
       role: user.role,
       status: user.status,
+      mustChagePassword: user.mustChangePassword,
     });
   } catch (error) {
     console.log(error);

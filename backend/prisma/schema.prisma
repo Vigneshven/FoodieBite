@@ -15,6 +15,7 @@ model customers {
   role      customers_role   @default(customer)
   status    customers_status @default(active)
   createdAt DateTime         @default(now())
+  mustChangePassword Boolean @default(false)
 }
 
 model restaurants {

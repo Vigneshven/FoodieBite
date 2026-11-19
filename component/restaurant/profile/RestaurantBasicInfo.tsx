@@ -41,24 +41,15 @@ const openingHoursSchema = z.object({
 });
 
 const restaurantSchema = z.object({
-  name: z
-    .string()
-    .min(3, "Restaurant name at least 3 characters")
-    .max(100, "Restaurant name cannot exceed 100 characters"),
-  description: z
-    .string()
-    .min(20, "Description at least 20 characters")
-    .max(500, "Description cannot exceed 500 characters"),
+  name: z.string().min(3, "Restaurant name at least 3 characters"),
+  description: z.string().min(3, "Description at least 3 characters"),
   restaurantType: z.string().min(1, "Please select a restaurant type"),
   category: z.string().min(1, "Please select food category"),
   cuisines: z.string().min(1, "Select at least one cuisine"),
   phone: z.string().regex(/^\d{10}$/, "Enter a valid 10 digit number"),
   email: z.string().email("Enter a valid email address"),
-  streetAddress: z
-    .string()
-    .min(5, "Enter a valid street address")
-    .max(200, "Street address cannot exceed 200 characters"),
-  landmark: z.string().max(100, "Landmark cannot exceed 100 characters"),
+  streetAddress: z.string().min(5, "Enter a valid street address"),
+  landmark: z.string().min(6, "Landmark name at least 3 characters"),
   city: z.string().min(2, "Enter your city"),
   state: z.string().min(2, "Enter your state"),
   postalCode: z.string().regex(/^\d{6}$/, "Enter a valid 6-digit PIN code"),
