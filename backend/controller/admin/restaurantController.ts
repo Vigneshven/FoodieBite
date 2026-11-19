@@ -100,9 +100,9 @@ export const changeRestaurantStatus = async (req: Request, res: Response) => {
 
 export const addRestaurant = async (req: Request, res: Response) => {
   try {
-    const { name, email, phone, cuisine } = req.body;
+    const { name, email, phone } = req.body;
 
-    if (!name || !email || !phone || !cuisine) {
+    if (!name || !email || !phone) {
       return res.status(400).json({
         message: "All Fields are required",
       });
@@ -130,7 +130,6 @@ export const addRestaurant = async (req: Request, res: Response) => {
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim(),
-      category: cuisine.trim(),
     });
 
     return res.status(201).json({

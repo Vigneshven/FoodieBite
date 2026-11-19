@@ -16,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { useRestaurantStore } from "@/store/admin/restaurantStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
-import { type SubmitEvent } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -38,15 +37,12 @@ export const restaurantSchema = z.object({
     .min(10, "Phone number must contains at least 10 digit")
     .max(15, "Phone number cannot exceeds 15 digits")
     .regex(/^[0-9]+$/, "Phone must be contains only digits"),
-
-  cuisine: z.string().min(1, "Please select a cuisine"),
 });
 
 type RestaurantFormValue = {
   name: string;
   email: string;
   phone: string;
-  cuisine: string;
 };
 
 export default function AddRestaurantDialog() {
@@ -65,7 +61,6 @@ export default function AddRestaurantDialog() {
   const {
     register,
     handleSubmit,
-    watch,
     reset,
     formState: { errors },
   } = useForm<RestaurantFormValue>({
@@ -74,7 +69,6 @@ export default function AddRestaurantDialog() {
       name: "",
       email: "",
       phone: "",
-      cuisine: "",
     },
   });
 
@@ -112,7 +106,7 @@ export default function AddRestaurantDialog() {
           </Button>
         }
       />
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-150">
+      <DialogContent className="overflow-y-auto min-w-150">
         <DialogHeader>
           <DialogTitle>Add New Restaurant</DialogTitle>
           <DialogDescription>
@@ -151,30 +145,10 @@ export default function AddRestaurantDialog() {
                 <p className="text-sm text-red-500">{errors.phone.message}</p>
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="cuisine">Cuisine Type</Label>
-              <select
-                defaultValue=""
-                className="h-10 w-full rounded-md border-input bg-background px-3 text-sm outline-none"
-                {...register("cuisine")}
-              >
-                <option value="" disabled>
-                  Select Cuisine
-                </option>
-                <option value="Indian">Indian</option>
-                <option value="American">American</option>
-                <option value="Japanese">Japanese</option>
-                <option value="Italian">Italian</option>
-                <option value="natural">natural</option>
-              </select>
-              {errors.cuisine && (
-                <p className="text-sm text-red-500">{errors.cuisine.message}</p>
-              )}
-            </div>
             <DialogFooter>
               <Button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => handleDialogChange(false)}
                 disabled={isAdding}
               >
                 Cancel

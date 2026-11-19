@@ -22,7 +22,7 @@ model restaurants {
   image    String            @db.Text
   name     String            @db.VarChar(255)
   email    String?          @db.VarChar(255)
-  category String            @db.VarChar(300)
+  category String?            @db.VarChar(300)
   phone    String?           @unique
   status   restaurant_status @default(pending)
   createdAt DateTime          @default(now())

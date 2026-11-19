@@ -148,14 +148,12 @@ export async function createRestaurant(data: {
   name: string;
   email: string;
   phone: string;
-  category: string;
 }) {
   const restaurant = await prisma.restaurants.create({
     data: {
       name: data.name,
       email: data.email,
       phone: data.phone,
-      category: data.category,
       image: "",
     },
   });
