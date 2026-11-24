@@ -19,6 +19,7 @@ model customers {
 
   onboardingStatus restaurant_onboarding_status @default(not_required)
   invitations      restaurant_invitations[]
+  restaurant       restaurants?
 }
 
 model restaurants {
@@ -43,8 +44,10 @@ model restaurants {
   postalCode    String? @db.VarChar(20)
   country       String? @default("India") @db.VarChar(100)
 
-  logo         String? @db.Text
+  logo         String?    @db.Text
   openingHours Json?
+  ownerId      Int?       @unique
+  owner        customers? @relation(fields: [ownerId], references: [id])
 }
 
 model restaurant_invitations {

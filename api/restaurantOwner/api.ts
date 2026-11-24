@@ -29,7 +29,7 @@ export async function updateMyRestaurant(data: Partial<RestaurantForm>) {
     body: JSON.stringify(data),
   });
 
-  const result = res.json();
+  const result = await res.json();
 
   if (!res.ok) {
     throw new Error("Failed to update restaurant details");
@@ -50,10 +50,28 @@ export async function acceptRestaurantInvitation(
     body: JSON.stringify({ token }),
   });
 
-  const result = res.json();
+  const result = await res.json();
 
   if (!res.ok) {
     throw new Error("Failed to accept restaurant invitation");
+  }
+
+  return result;
+}
+
+export async function createMyRestaurant(data: RestaurantForm) {
+  const res = await fetch(`${BASE_URL}/api/restaurant-owner/restaurant`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error("Failed to submit restaurant profile");
   }
 
   return result;

@@ -96,9 +96,7 @@ export default function Register() {
       router.refresh();
     } catch (error) {
       console.error(error);
-      toast.error(
-        error instanceof Error ? error.message : "Registration failed",
-      );
+      toast.error("Registration failed");
     } finally {
       setIsLoading(false);
     }

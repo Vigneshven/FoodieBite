@@ -1,4 +1,5 @@
 import {
+  createMyRestaurant,
   getMyRestaurant,
   updateMyRestaurant,
 } from "@/backend/controller/restaurantOwner/restaurantController";
@@ -20,6 +21,13 @@ router.patch(
   requireAuth,
   requireRole("restaurant_owner"),
   updateMyRestaurant,
+);
+
+router.post(
+  "/restaurant",
+  requireAuth,
+  requireRole("restaurant_owner"),
+  createMyRestaurant,
 );
 
 export default router;
