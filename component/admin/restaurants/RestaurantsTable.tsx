@@ -32,14 +32,19 @@ import { Button } from "@/components/ui/button";
 
 import type { RestaurantStatusFilter } from "./RestaurantFilters";
 import RestaurantPagination from "./RestaurantPagination";
-import { Restaurant } from "@/api/admin/type/admin/types-api";
+import {
+  Restaurant,
+  RestaurantOwnerRequest,
+} from "@/api/admin/type/admin/types-api";
 import { useRestaurantStore } from "@/store/admin/restaurantStore";
 import {
   getRestaurantStats,
+  sendRestaurantOwnerInvitation,
   updateRestaurantStatus,
 } from "@/api/admin/restaurant/api";
 import { toast } from "sonner";
 import { useState } from "react";
+import { onboardingStatusStyles } from "./utils/restaurantsTableStatusStyles";
 
 const statusStyles = {
   active: "border-green-200 bg-green-50 text-green-700",
@@ -49,6 +54,8 @@ const statusStyles = {
 
 type RestaurantsTableProps = {
   restaurants: Restaurant[];
+  ownerRequests: RestaurantOwnerRequest[];
+  onOwnerRequestsChange: (requests: RestaurantOwnerRequest[]) => void;
   activeStatus: RestaurantStatusFilter;
   loading: boolean;
   totalItems: number;
@@ -61,6 +68,8 @@ type RestaurantsTableProps = {
 
 export default function RestaurantsTable({
   restaurants,
+  ownerRequests,
+  onOwnerRequestsChange,
   activeStatus,
   loading,
   totalItems,
@@ -75,6 +84,7 @@ export default function RestaurantsTable({
   };
 
   const [updateId, setUpdateId] = useState<string | null>(null);
+  const [invitingId, setInvitingId] = useState<number | null>(null);
   const setStats = useRestaurantStore((state) => state.setStats);
   const removeRestaurant = useRestaurantStore(
     (state) => state.removeRestaurant,
@@ -103,6 +113,28 @@ export default function RestaurantsTable({
       toast.error("failed to update restaurant");
     } finally {
       setUpdateId(null);
+    }
+  }
+
+  async function handleSendInvitation(userId: number) {
+    try {
+      setInvitingId(userId);
+
+      await sendRestaurantOwnerInvitation(userId);
+
+      onOwnerRequestsChange(
+        ownerRequests.map((owner) =>
+          owner.id === userId
+            ? { ...owner, onboardingStatus: "invited" }
+            : owner,
+        ),
+      );
+
+      toast.success("Invitation sent successfully");
+    } catch {
+      toast.error("Failed to send invitation");
+    } finally {
+      setInvitingId(null);
     }
   }
 
@@ -241,6 +273,93 @@ export default function RestaurantsTable({
                   className="h-32 text-center text-muted-foreground"
                 >
                   No restaurants found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="border-t p-5">
+        <h2 className="text-lg font-semibold">Restaurant Owner Onboarding</h2>
+
+        <p className="mt-1 text-sm text-muted-foreground">
+          Track restaurant owner invitations and onboarding progress.
+        </p>
+      </div>
+
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Owner</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Onboarding Status</TableHead>
+              <TableHead>Registered Date</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {ownerRequests.length > 0 ? (
+              ownerRequests.map((owner) => {
+                const status = onboardingStatusStyles[owner.onboardingStatus];
+
+                return (
+                  <TableRow key={owner.id}>
+                    <TableCell className="font-medium">{owner.id}</TableCell>
+
+                    <TableCell className="font-medium">
+                      {owner.username}
+                    </TableCell>
+
+                    <TableCell>{owner.email}</TableCell>
+
+                    <TableCell>
+                      <Badge variant="outline" className={status.className}>
+                        {status.label}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell className="text-muted-foreground">
+                      {new Date(owner.createdAt).toLocaleDateString()}
+                    </TableCell>
+
+                    <TableCell className="text-right">
+                      {owner.onboardingStatus === "pending_invitation" && (
+                        <Button
+                          size="sm"
+                          disabled={invitingId === owner.id}
+                          onClick={() => handleSendInvitation(owner.id)}
+                        >
+                          {invitingId === owner.id
+                            ? "Sending..."
+                            : "Send Invitation"}
+                        </Button>
+                      )}
+
+                      {owner.onboardingStatus === "invited" && (
+                        <Badge variant="secondary">Invitation Sent</Badge>
+                      )}
+
+                      {owner.onboardingStatus === "profile_pending" && (
+                        <Badge variant="secondary">Awaiting Profile</Badge>
+                      )}
+
+                      {owner.onboardingStatus === "pending_review" && (
+                        <Badge variant="secondary">Review Required</Badge>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  No restaurant owner requests found.
                 </TableCell>
               </TableRow>
             )}

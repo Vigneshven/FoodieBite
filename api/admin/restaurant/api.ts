@@ -1,6 +1,7 @@
 import {
   CreateRestaurantData,
   GetRestaurantsParams,
+  RestaurantOwnerRequest,
   RestaurantResponse,
   RestaurantStatsData,
 } from "@/api/admin/type/admin/types-api";
@@ -82,6 +83,43 @@ export async function createRestaurant(data: CreateRestaurantData) {
 
   if (!res.ok) {
     throw new Error("Failed to add restaurants");
+  }
+
+  return result.data;
+}
+
+// get restaurant owner requests
+
+export async function fetchRestaurantOwnerRequests(): Promise<
+  RestaurantOwnerRequest[]
+> {
+  const res = await fetch(`${BASE_URL}/api/admin/restaurants/owner-requests`, {
+    method: "GET",
+    credentials: "include",
+  });
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch restaurants owner requests");
+  }
+
+  return result.data;
+}
+
+// send invitation to restaurant owner via emails
+
+export async function sendRestaurantOwnerInvitation(userId: number) {
+  const res = await fetch(
+    `${BASE_URL}/api/admin/restaurants/owner-requests/${userId}/invite`,
+    {
+      method: "POST",
+      credentials: "include",
+    },
+  );
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error("Failed to send restaurants owner invitation");
   }
 
   return result.data;

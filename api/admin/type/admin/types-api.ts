@@ -72,6 +72,7 @@ export type Restaurant = {
   status: RestaurantStatus;
   contact: string;
   joinDate: string;
+  onboardingStatus?: RestaurantOnboardingStatus;
 };
 
 export type GetRestaurantsParams = {
@@ -98,4 +99,23 @@ export type CreateRestaurantData = {
   name: string;
   email: string;
   phone: string;
+};
+
+// restaurant owner onboarding
+
+export type RestaurantOnboardingStatus =
+  | "not_required"
+  | "pending_invitation"
+  | "invited"
+  | "profile_pending"
+  | "pending_review"
+  | "completed"
+  | "rejected";
+
+export type RestaurantOwnerRequest = {
+  id: number;
+  username: string;
+  email: string;
+  onboardingStatus: RestaurantOnboardingStatus;
+  createdAt: string;
 };

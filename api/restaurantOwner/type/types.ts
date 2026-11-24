@@ -22,3 +22,14 @@ export type RestaurantForm = {
     closeTime: string;
   }[];
 };
+
+export type AcceptRestaurantInvitationResponse = {
+  message: string;
+  data: {
+    id: number;
+    username: string;
+    email: string;
+    role: "restaurant_owner";
+    onboardingStatus: string;
+  };
+};

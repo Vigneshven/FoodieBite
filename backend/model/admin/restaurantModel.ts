@@ -185,7 +185,16 @@ export async function getPendingRestauranOwnerRequest() {
   return prisma.customers.findMany({
     where: {
       role: "restaurant_owner",
-      onboardingStatus: "pending_invitation",
+      onboardingStatus: {
+        in: [
+          "pending_invitation",
+          "invited",
+          "profile_pending",
+          "pending_review",
+          "completed",
+          "rejected",
+        ],
+      },
     },
     select: {
       id: true,

@@ -4,10 +4,10 @@ import { login, LoginCustomer } from "@/api/api";
 import LoginLayout from "@/component/auth/login/LoginLayout";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -26,6 +26,8 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isInvitedOwner, setIsInvitedOwner] = useState(false);
+  const [invitationError, setInvitationError] = useState("");
 
   const router = useRouter();
 
@@ -33,6 +35,7 @@ export default function Login() {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -41,6 +44,31 @@ export default function Login() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const email = params.get("email");
+    const invitation = params.get("invitation");
+
+    if (invitation === "accepted" && email) {
+      setValue("email", email, {
+        shouldValidate: true,
+      });
+      setIsInvitedOwner(true);
+    }
+    if (invitation === "invalid") {
+      setInvitationError(
+        "Your invitation link is invalid, expired, or already used.Please contact the administrator.",
+      );
+    }
+
+    if (invitation === "error") {
+      setInvitationError(
+        "Unable to verify your invitation. Please try again or contact the administrator.",
+      );
+    }
+  }, [setValue]);
 
   const handleLogin = async (data: LoginCustomer) => {
     try {
@@ -67,8 +95,8 @@ export default function Login() {
                 : "/";
       router.replace(dashboardPath);
       router.refresh();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Login Failed");
+    } catch {
+      toast.error("Login Failed");
     } finally {
       setIsLoading(false);
     }
@@ -92,6 +120,24 @@ export default function Login() {
             favourite food.
           </p>
         </div>
+        {isInvitedOwner && (
+          <div className="flex gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+            <CheckCircle2 className="mt-1 size-5 shrink-0" />
+
+            <div>
+              <p className="font-semibold">Restaurant invitation accepted!</p>
+
+              <p className="mt-1">
+                Please sign in using your invited email address.
+              </p>
+            </div>
+          </div>
+        )}
+        {invitationError && (
+          <div className="rounded-lg border border-red-30 bg-red-50 p-4 text-sm text-red-500">
+            {invitationError}
+          </div>
+        )}
         <form
           onSubmit={handleSubmit(handleLogin)}
           className="space-y-5"
@@ -108,13 +154,23 @@ export default function Login() {
                 type="email"
                 autoComplete="email"
                 placeholder="you@example.com"
+                readOnly={isInvitedOwner}
                 {...register("email")}
-                className="h-12 pl-10"
+                className={`h-12 pl-10 ${
+                  isInvitedOwner
+                    ? "cursor-not-allowed bg-muted text-muted-foreground"
+                    : ""
+                }`}
               />
             </div>
 
             {errors.email && (
               <p className="text-sm text-destructive">{errors.email.message}</p>
+            )}
+            {isInvitedOwner && (
+              <p className="text-xs text-muted-foreground">
+                This email address is linked to your restaurant invitation.
+              </p>
             )}
           </div>
           <div className="space-y-2">

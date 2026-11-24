@@ -1,10 +1,15 @@
 "use client";
 
 import {
+  fetchRestaurantOwnerRequests,
   fetchRestaurants,
   getRestaurantStats,
 } from "@/api/admin/restaurant/api";
-import { RestaurantSortBy, RestaurantStatus } from "@/api/admin/type/admin/types-api";
+import {
+  RestaurantOwnerRequest,
+  RestaurantSortBy,
+  RestaurantStatus,
+} from "@/api/admin/type/admin/types-api";
 import AddRestaurantDialog from "@/component/admin/restaurants/AddRestaurantDialog";
 import RestaurantFilters from "@/component/admin/restaurants/RestaurantFilters";
 import RestaurantTable from "@/component/admin/restaurants/RestaurantsTable";
@@ -16,6 +21,10 @@ import { toast } from "sonner";
 export default function RestaurantPage() {
   const [activeStatus, setActiveStatus] = useState<RestaurantStatus | "All">(
     "All",
+  );
+
+  const [ownerRequests, setOwnerRequests] = useState<RestaurantOwnerRequest[]>(
+    [],
   );
 
   const [search, setSearch] = useState("");
@@ -68,6 +77,19 @@ export default function RestaurantPage() {
     loadStats();
   }, [setStats]);
 
+  useEffect(() => {
+    async function loadOwnerRequests() {
+      try {
+        const result = await fetchRestaurantOwnerRequests();
+        setOwnerRequests(result);
+      } catch {
+        toast.error("Failed to fetch restaurant owner requests");
+      }
+    }
+
+    loadOwnerRequests();
+  }, []);
+
   return (
     <div className="space-y-3">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -100,6 +122,8 @@ export default function RestaurantPage() {
 
       <RestaurantTable
         restaurants={restaurants}
+        ownerRequests={ownerRequests}
+        onOwnerRequestsChange={setOwnerRequests}
         activeStatus={activeStatus}
         loading={loading}
         totalItems={totalRestaurants}
