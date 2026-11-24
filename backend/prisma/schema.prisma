@@ -8,41 +8,57 @@ datasource db {
 }
 
 model customers {
-  id        Int              @id @default(autoincrement())
-  username  String           @db.VarChar(100)
-  email     String           @unique(map: "email") @db.VarChar(255)
-  password  String           @db.VarChar(255)
-  role      customers_role   @default(customer)
-  status    customers_status @default(active)
-  createdAt DateTime         @default(now())
-  mustChangePassword Boolean @default(false)
+  id                 Int              @id @default(autoincrement())
+  username           String           @db.VarChar(100)
+  email              String           @unique(map: "email") @db.VarChar(255)
+  password           String           @db.VarChar(255)
+  role               customers_role   @default(customer)
+  status             customers_status @default(active)
+  createdAt          DateTime         @default(now())
+  mustChangePassword Boolean          @default(false)
+
+  onboardingStatus restaurant_onboarding_status @default(not_required)
+  invitations      restaurant_invitations[]
 }
 
 model restaurants {
-  id       Int               @id @default(autoincrement())
-  image    String            @db.Text
-  name     String            @db.VarChar(255)
-  email    String?          @db.VarChar(255)
-  category String?            @db.VarChar(300)
-  phone    String?           @unique
-  status   restaurant_status @default(pending)
+  id        Int               @id @default(autoincrement())
+  image     String            @db.Text
+  name      String            @db.VarChar(255)
+  email     String?           @db.VarChar(255)
+  category  String?           @db.VarChar(300)
+  phone     String?           @unique
+  status    restaurant_status @default(pending)
   createdAt DateTime          @default(now())
   rating    Float             @default(0)
 
-  description    String?  @db.Text
-  restaurantType String?  @db.VarChar(100)
-  cuisines       String?  @db.VarChar(500)
+  description    String? @db.Text
+  restaurantType String? @db.VarChar(100)
+  cuisines       String? @db.VarChar(500)
 
-  streetAddress  String?  @db.VarChar(255)
-  landmark       String?  @db.VarChar(255)
-  city           String?  @db.VarChar(100)
-  state          String?  @db.VarChar(100)
-  postalCode     String?  @db.VarChar(20)
-  country        String?  @default("India") @db.VarChar(100)
+  streetAddress String? @db.VarChar(255)
+  landmark      String? @db.VarChar(255)
+  city          String? @db.VarChar(100)
+  state         String? @db.VarChar(100)
+  postalCode    String? @db.VarChar(20)
+  country       String? @default("India") @db.VarChar(100)
 
-  logo           String?  @db.Text
-  openingHours   Json?
+  logo         String? @db.Text
+  openingHours Json?
+}
 
+model restaurant_invitations {
+  id     Int       @id @default(autoincrement())
+  userId Int
+  user   customers @relation(fields: [userId], references: [id])
+
+  tokenHash String @unique @db.VarChar(255)
+
+  expireAt   DateTime
+  acceptedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
 }
 
 enum restaurant_status {
@@ -61,4 +77,14 @@ enum customers_role {
 enum customers_status {
   active
   inactive
+}
+
+enum restaurant_onboarding_status {
+  not_required
+  pending_invitation
+  invited
+  profile_pending
+  pending_review
+  completed
+  rejected
 }

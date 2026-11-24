@@ -180,3 +180,98 @@ export async function createRestaurantWithOwner(data: {
     return { restaurant, owner };
   });
 }
+
+export async function getPendingRestauranOwnerRequest() {
+  return prisma.customers.findMany({
+    where: {
+      role: "restaurant_owner",
+      onboardingStatus: "pending_invitation",
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      onboardingStatus: true,
+      createdAt: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}
+
+export async function createRestaurantOwnerInvitation(data: {
+  userId: number;
+  tokenHash: string;
+  expireAt: Date;
+}) {
+  return prisma.$transaction(async (tx) => {
+    const owner = await tx.customers.findFirst({
+      where: {
+        id: data.userId,
+        role: "restaurant_owner",
+        onboardingStatus: "pending_invitation",
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+      },
+    });
+    if (!owner) return null;
+
+    const update = await tx.customers.updateMany({
+      where: {
+        id: data.userId,
+        role: "restaurant_owner",
+        onboardingStatus: "pending_invitation",
+      },
+      data: {
+        onboardingStatus: "invited",
+      },
+    });
+    if (update.count !== 1) {
+      return null;
+    }
+    const invitation = await tx.restaurant_invitations.create({
+      data: {
+        userId: data.userId,
+        tokenHash: data.tokenHash,
+        expireAt: data.expireAt,
+      },
+      select: {
+        id: true,
+      },
+    });
+    return {
+      owner,
+      invitation,
+    };
+  });
+}
+
+// if the email cannot be sent
+
+export async function rollbackRestaurantOwnerInvitation(
+  invitationId: number,
+  userId: number,
+) {
+  return prisma.$transaction(async (tx) => {
+    await tx.restaurant_invitations.delete({
+      where: {
+        id: invitationId,
+      },
+    });
+
+    await tx.customers.update({
+      where: {
+        id: userId,
+        role: "restaurant_owner",
+        onboardingStatus: "invited",
+      },
+      data: {
+        onboardingStatus: "pending_invitation",
+      },
+    });
+  });
+}

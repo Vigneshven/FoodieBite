@@ -20,6 +20,7 @@ export async function findCustomerByEmail(email: string) {
       role: true,
       status: true,
       mustChangePassword: true,
+      onboardingStatus: true,
     },
   });
 }
@@ -58,6 +59,8 @@ export async function createCustomer(
       email,
       password: passwordHash,
       role,
+      onboardingStatus:
+        role === "restaurant_owner" ? "pending_invitation" : "not_required",
     },
     select: {
       id: true,
@@ -65,4 +68,68 @@ export async function createCustomer(
   });
 
   return customer.id;
+}
+
+export async function acceptRestaurantInvitationModel(tokenHash: string) {
+  return prisma.$transaction(async (tx) => {
+    const now = new Date();
+
+    const invitation = await tx.restaurant_invitations.findUnique({
+      where: {
+        tokenHash,
+      },
+      select: {
+        id: true,
+        userId: true,
+        acceptedAt: true,
+        expireAt: true,
+      },
+    });
+    if (!invitation || invitation.acceptedAt || invitation.expireAt <= now) {
+      return null;
+    }
+
+    const accepted = await tx.restaurant_invitations.updateMany({
+      where: {
+        id: invitation.id,
+        tokenHash,
+        acceptedAt: null,
+        expireAt: {
+          gt: now,
+        },
+      },
+      data: {
+        acceptedAt: now,
+      },
+    });
+    if (accepted.count !== 1) {
+      return null;
+    }
+    const updateOwner = await tx.customers.updateMany({
+      where: {
+        id: invitation.userId,
+        role: "restaurant_owner",
+        status: "active",
+        onboardingStatus: "invited",
+      },
+      data: {
+        onboardingStatus: "profile_pending",
+      },
+    });
+    if (updateOwner.count !== 1) {
+      throw new Error("Restaurant owner is not eligible for onboarding");
+    }
+    return tx.customers.findUnique({
+      where: {
+        id: invitation.userId,
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        onboardingStatus: true,
+      },
+    });
+  });
 }

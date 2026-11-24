@@ -1,13 +1,19 @@
 import type { Request, Response } from "express";
-import { createCustomer, findCustomerByEmail } from "@/backend/model/authModel";
+import {
+  acceptRestaurantInvitationModel,
+  createCustomer,
+  findCustomerByEmail,
+} from "@/backend/model/authModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { errorResponse, successResponse } from "../utils/apiResponse";
+import { hashInvitationToken } from "../utils/invitationToken";
 
 export async function register(req: Request, res: Response) {
   try {
     const { username, email, password, role } = req.body;
 
-    const allowedRoles = ["customer", "delivery_partner"];
+    const allowedRoles = ["customer", "restaurant_owner", "delivery_partner"];
 
     if (!allowedRoles.includes(role)) {
       return res.status(400).json({
@@ -57,6 +63,44 @@ export async function register(req: Request, res: Response) {
   }
 }
 
+export async function acceptRestaurantInvitation(req: Request, res: Response) {
+  try {
+    const { token } = req.body;
+
+    if (typeof token !== "string") {
+      return errorResponse(res, {
+        message: "Invalid token invitation",
+        statusCode: 400,
+      });
+    }
+
+    const tokenHash = hashInvitationToken(token);
+    const owner = await acceptRestaurantInvitationModel(tokenHash);
+
+    if (!owner) {
+      return errorResponse(res, {
+        message: "Invalid or expired invitation token",
+        statusCode: 400,
+      });
+    }
+    return successResponse(res, {
+      message: "Restaurant invitation accepted successfully",
+      data: {
+        id: owner.id,
+        username: owner.username,
+        email: owner.email,
+        role: owner.role,
+        onboardingStatus: owner.onboardingStatus,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return errorResponse(res, {
+      message: "Failed to accept restaurant invitation",
+    });
+  }
+}
+
 export async function login(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
@@ -102,6 +146,16 @@ export async function login(req: Request, res: Response) {
       });
     }
 
+    if (
+      user.role === "restaurant_owner" &&
+      ["pending_invitations", "invited"].includes(user.onboardingStatus)
+    ) {
+      return errorResponse(res, {
+        message:
+          "Please accept your restaurant owner invitation before logging in.",
+        statusCode: 403,
+      });
+    }
     const secret = process.env.JWT_SECRET;
 
     if (!secret) {

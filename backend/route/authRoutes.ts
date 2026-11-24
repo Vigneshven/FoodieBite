@@ -1,10 +1,13 @@
 import { Router } from "express";
-import { login, register } from "../controller/authController";
+import { acceptRestaurantInvitation, login, register } from "../controller/authController";
 import { requireAuth } from "../middleware/requireAuth";
 
 const router = Router();
 
 router.post("/register", register);
+
+router.post("/accept-restaurant-invitation", acceptRestaurantInvitation);
+
 router.post("/login", login);
 
 router.get("/me", requireAuth, async (req, res) => {

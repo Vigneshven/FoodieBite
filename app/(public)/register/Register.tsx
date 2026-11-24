@@ -18,12 +18,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 
-const registerSchema = z.object({
-  username: z.string().trim().min(3, "Username must be at least 3 characters"),
-  email: z.string().trim().email("Enter a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["customer", "restaurant_owner", "delivery_partner"]),
-});
+const registerSchema = z
+  .object({
+    username: z
+      .string()
+      .trim()
+      .min(3, "Username must be at least 3 characters"),
+    email: z.string().trim().email("Enter a valid email"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+    role: z.enum(["customer", "restaurant_owner", "delivery_partner"]),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
@@ -53,6 +62,7 @@ export default function Register() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -66,6 +76,7 @@ export default function Register() {
       username: "",
       email: "",
       password: "",
+      confirmPassword: "",
       role: "customer",
     },
   });
@@ -181,7 +192,7 @@ export default function Register() {
             </div>
 
             {errors.role && (
-              <p className="text-sm text-destructive">{errors.role.message}</p>
+              <p className="text-sm text-red-500">{errors.role.message}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -196,9 +207,7 @@ export default function Register() {
             />
 
             {errors.username && (
-              <p className="text-sm text-destructive">
-                {errors.username.message}
-              </p>
+              <p className="text-sm text-red-500">{errors.username.message}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -213,7 +222,7 @@ export default function Register() {
             />
 
             {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
+              <p className="text-sm text-red-500">{errors.email.message}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -246,14 +255,37 @@ export default function Register() {
             </div>
 
             {errors.password && (
-              <p className="text-sm text-destructive">
-                {errors.password.message}
+              <p className="text-sm text-red-500">{errors.password.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label>Confirm Password</Label>
+            <div className="relative">
+              <Input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm your password"
+                {...register("confirmPassword")}
+                className="pr-11"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className="absolute right-1 top-1/2 size-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
+              </Button>
+            </div>
+            {errors.confirmPassword && (
+              <p className="text-sm text-red-500">
+                {errors.confirmPassword.message}
               </p>
             )}
-
-            <p className="text-xs text-muted-foreground">
-              Password must contain at least 8 characters.
-            </p>
           </div>
           <Button type="submit" disabled={isLoading} className="h-11 w-full">
             {isLoading ? "Creating Account..." : "Create Account"}
