@@ -1,15 +1,5 @@
 import type { Response } from "express";
-
-type SuccessResponseData<T> = {
-  message: string;
-  data?: T;
-  statusCode?: number;
-};
-
-type ErrorResponseData = {
-  message: string;
-  statusCode?: number;
-};
+import { ErrorResponseData, SuccessResponseData } from "../types/type";
 
 export function successResponse<T>(
   res: Response,

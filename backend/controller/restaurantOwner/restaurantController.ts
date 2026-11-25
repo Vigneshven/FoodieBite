@@ -6,7 +6,7 @@ import {
 } from "@/backend/model/restaurantOwner/restaurantModel";
 import { CreateRestaurantData } from "@/backend/model/restaurantOwner/types/types";
 import { Prisma } from "@/backend/prisma/generated/prisma/client";
-import { errorResponse, successResponse } from "@/backend/utils/apiResponse";
+import { errorResponse, successResponse } from "@/backend/utils/api/apiResponse";
 import { Request, Response } from "express";
 
 export const createMyRestaurant = async (req: Request, res: Response) => {

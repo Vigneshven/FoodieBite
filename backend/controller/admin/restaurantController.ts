@@ -15,9 +15,9 @@ import {
 import { findCustomerByEmail } from "@/backend/model/authModel";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
-import { errorResponse, successResponse } from "@/backend/utils/apiResponse";
-import { generateInvitationToken } from "@/backend/utils/invitationToken";
-import { sendEmail } from "@/backend/utils/email";
+import { errorResponse, successResponse } from "@/backend/utils/api/apiResponse";
+import { generateInvitationToken } from "@/backend/utils/email/invitationToken";
+import { sendEmail } from "@/backend/utils/email/email";
 
 export async function getRestaurantStatistics(req: Request, res: Response) {
   try {

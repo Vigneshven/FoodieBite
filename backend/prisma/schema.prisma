@@ -17,9 +17,11 @@ model customers {
   createdAt          DateTime         @default(now())
   mustChangePassword Boolean          @default(false)
 
-  onboardingStatus restaurant_onboarding_status @default(not_required)
-  invitations      restaurant_invitations[]
-  restaurant       restaurants?
+  onboardingStatus         restaurant_onboarding_status @default(not_required)
+  invitations              restaurant_invitations[]
+  acceptanceJobs           invitation_acceptance_jobs[] @relation("CustomerAcceptanceJobs")
+  restaurant               restaurants?
+  invitationAcceptanceJobs invitation_acceptance_jobs[]
 }
 
 model restaurants {
@@ -61,6 +63,8 @@ model restaurant_invitations {
   acceptedAt DateTime?
   createdAt  DateTime  @default(now())
 
+  acceptanceJob invitation_acceptance_jobs?
+
   @@index([userId])
 }
 
@@ -86,8 +90,81 @@ enum restaurant_onboarding_status {
   not_required
   pending_invitation
   invited
+  acceptance_processing
   profile_pending
   pending_review
   completed
   rejected
+}
+
+// email queue for sending invitation email to owner
+
+enum email_job_status {
+  pending
+  processing
+  completed
+  failed
+}
+
+model email_jobs {
+  id      Int    @id @default(autoincrement())
+  to      String @db.VarChar(255)
+  subject String @db.VarChar(255)
+  html    String @db.LongText
+
+  status email_job_status @default(pending)
+
+  attempts    Int @default(0)
+  maxAttempts Int @default(5)
+
+  scheduledAt DateTime @default(now())
+
+  lockedAt    DateTime?
+  processedAt DateTime?
+
+  error String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, scheduledAt, createdAt, id])
+}
+
+// email queue for invitation acceptance
+
+enum invitation_acceptance_job_status {
+  pending
+  processing
+  completed
+  failed
+}
+
+model invitation_acceptance_jobs {
+  id Int @id @default(autoincrement())
+
+  invitationId Int @unique
+  userId       Int
+
+  invitation restaurant_invitations @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  user customers @relation("CustomerAcceptanceJobs", fields: [userId], references: [id], onDelete: Cascade)
+
+  status invitation_acceptance_job_status @default(pending)
+
+  attempts    Int @default(0)
+  maxAttempts Int @default(5)
+
+  scheduledAt DateTime @default(now())
+
+  lockedAt    DateTime?
+  processedAt DateTime?
+
+  error String? @db.Text
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  customers   customers? @relation(fields: [customersId], references: [id])
+  customersId Int?
+
+  @@index([status, scheduledAt, createdAt, id])
 }

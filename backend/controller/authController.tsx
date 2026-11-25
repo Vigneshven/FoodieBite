@@ -6,8 +6,8 @@ import {
 } from "@/backend/model/authModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { errorResponse, successResponse } from "../utils/apiResponse";
-import { hashInvitationToken } from "../utils/invitationToken";
+import { errorResponse, successResponse } from "../utils/api/apiResponse";
+import { hashInvitationToken } from "../utils/email/invitationToken";
 
 export async function register(req: Request, res: Response) {
   try {
