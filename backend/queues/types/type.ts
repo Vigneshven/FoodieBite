@@ -3,3 +3,12 @@ export type EmailJobData = {
   subject: string;
   html: string;
 };
+
+// notification
+
+export type NotificationJobData = {
+  recipientId: number;
+  title: string;
+  message: string;
+  type: string;
+};

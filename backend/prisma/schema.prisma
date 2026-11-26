@@ -22,6 +22,7 @@ model customers {
   acceptanceJobs           invitation_acceptance_jobs[] @relation("CustomerAcceptanceJobs")
   restaurant               restaurants?
   invitationAcceptanceJobs invitation_acceptance_jobs[]
+  notifications            notifications[]              @relation("NotificationRecipient")
 }
 
 model restaurants {
@@ -167,4 +168,22 @@ model invitation_acceptance_jobs {
   customersId Int?
 
   @@index([status, scheduledAt, createdAt, id])
+}
+
+// for notifications
+
+model notifications {
+  id          Int @id @default(autoincrement())
+  recipientId Int
+
+  title   String @db.VarChar(255)
+  message String @db.Text
+  type    String @db.VarChar(100)
+
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  recipient customers @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, isRead, createdAt])
 }

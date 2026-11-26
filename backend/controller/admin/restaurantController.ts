@@ -15,9 +15,12 @@ import {
 import { findCustomerByEmail } from "@/backend/model/authModel";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
-import { errorResponse, successResponse } from "@/backend/utils/api/apiResponse";
+import {
+  errorResponse,
+  successResponse,
+} from "@/backend/utils/api/apiResponse";
 import { generateInvitationToken } from "@/backend/utils/email/invitationToken";
-import { sendEmail } from "@/backend/utils/email/email";
+import { enqueueEmail } from "@/backend/queues/producer/emailProducer";
 
 export async function getRestaurantStatistics(req: Request, res: Response) {
   try {
@@ -246,7 +249,7 @@ export const sendRestaurantOwnerInvitation = async (
     const invitationLink = `${frontendUrl}/restaurant/invitation/accept?token=${token}`;
 
     try {
-      await sendEmail({
+      await enqueueEmail({
         to: createInvitation.owner.email,
         subject: "You are invited to join FoodieBite as an Restaurant Owner",
         html: `
@@ -268,14 +271,14 @@ export const sendRestaurantOwnerInvitation = async (
         `,
       });
     } catch (error) {
-      console.log(error);
+      console.log("failed to add invitation in queue", error);
       try {
         await rollbackRestaurantOwnerInvitation(
           createInvitation.invitation.id,
           userId,
         );
       } catch (error) {
-        console.log(error);
+        console.log("failed to rollback invitation", error);
       }
       return errorResponse(res, {
         message: "Failed to send invitation email",
@@ -283,7 +286,7 @@ export const sendRestaurantOwnerInvitation = async (
       });
     }
     return successResponse(res, {
-      message: "Restaurant owner invitation sent successfully",
+      message: "Restaurant owner invitation queued successfully",
       statusCode: 200,
       data: {
         userId: createInvitation.owner.id,

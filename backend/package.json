@@ -5,6 +5,7 @@
   "scripts": {
     "server": "tsx watch server.ts",
     "start": "tsx server.ts",
+    "build": "tsc && tsc-alias -p tsconfig.json --resolve-full-paths",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
     "prisma:migrate": "prisma migrate dev",
@@ -26,6 +27,7 @@
     "ioredis": "^6.1.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^10.6.1",
+    "tsc-alias": "^1.9.11",
     "tsx": "^4.23.15",
     "zod": "^4.6.7"
   },

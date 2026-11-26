@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  connectNotificationStream,
+  getNotification,
+} from "@/api/notification/api";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,8 +16,41 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Bell, ChevronDown, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import NotificationDropDown from "../NotificationDropdown";
 
 export default function AdminHeader() {
+  const [unreadCount, setUnreadCount] = useState(0);
+  useEffect(() => {
+    let isMouted = true;
+
+    async function fetchNotification() {
+      try {
+        const result = await getNotification();
+
+        if (isMouted) {
+          setUnreadCount(result.data.unreadCount);
+        }
+      } catch {
+        toast.error("Failed to fetch notification");
+      }
+    }
+    fetchNotification();
+    return () => {
+      isMouted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const eventSource = connectNotificationStream(() => {
+      setUnreadCount((previousCount) => previousCount + 1);
+    });
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
   return (
     <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b bg-white px-4 sm:px-6 lg:px-8">
       <div className="flex items-center gap-4">
@@ -35,8 +72,7 @@ export default function AdminHeader() {
         </div>
 
         <Button className="relative">
-          <Bell size={18} />
-          <span className="absolute right-2 top-1 h-2 w-2 bg-orange-500 rounded-full"></span>
+          <NotificationDropDown />
         </Button>
 
         <DropdownMenu>

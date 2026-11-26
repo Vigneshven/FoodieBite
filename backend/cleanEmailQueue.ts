@@ -1,5 +1,5 @@
+import { emailQueue } from "@/backend/queues/emailQueue";
 import "./config/env";
-import { emailQueue } from "./queues/emailQueue";
 
 async function cleanEmailQueue() {
   try {

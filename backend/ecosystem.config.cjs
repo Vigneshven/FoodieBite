@@ -1,0 +1,28 @@
+module.exports = {
+    apps:[
+        {
+            name:"foodiebite-api",
+            script:"./dist/server.js",
+            cwd:__dirname,
+            instances:1,
+            exec_mode:"fork",
+            autorestart:true,
+        },
+        {
+            name:"foodiebite-email-worker",
+            script:"./dist/workers/emailWorkers.js",
+            cwd:__dirname,
+            instances:1,
+            exec_mode:"fork",
+            autorestart:true,
+        },
+        {
+            name:"foodiebite-notification-worker",
+            script:"./dist/workers/notificationWorkers.js",
+            cwd:__dirname,
+            instances:1,
+            exec_mode:"fork",
+            autorestart:true,
+        }
+    ]
+}

@@ -3,36 +3,70 @@ import { Worker } from "bullmq";
 import type { EmailJobData } from "../queues/types/type";
 import redis from "../lib/redis";
 import { sendEmail } from "../utils/email/email";
-import { EmailError } from "../utils/types/type";
 import { handleEmailError } from "../utils/email/emailErrorHandler";
 
 const emailWorker = new Worker<EmailJobData>(
   "email-queue",
-  //   async (job) => {
-  //     console.log("Processing email job :", job.id);
+  // async (job) => {
+  //   console.log("Processing email job :", job.id);
 
-  //     const { to, subject, html } = job.data;
+  //   const { to, subject, html } = job.data;
 
-  //     await sendEmail({
-  //       to,
-  //       subject,
-  //       html,
-  //     });
-  //     console.log("email sent succesfully: ", job.id);
-  //     return {
-  //       success: true,
-  //       recepient: to,
-  //     };
-  //   },
+  //   await sendEmail({
+  //     to,
+  //     subject,
+  //     html,
+  //   });
+  //   console.log("email sent succesfully: ", job.id);
+  //   return {
+  //     success: true,
+  //     recepient: to,
+  //   };
+  // },
+
   async (job) => {
-    console.log(`Processing job: ${job.id}, attempt: ${job.attemptsMade + 1}`);
+    const { to, subject, html } = job.data;
 
-    const error = new Error("SMTP connection timed out") as EmailError;
+    const attemptedNumber = job.attemptsMade + 1;
 
-    error.code = "ETIMEDOUT";
-    error.responseCode = 421;
+    console.log(
+      JSON.stringify({
+        event: "email_job_started",
+        jobId: job.id,
+        attempt: attemptedNumber,
+        timeStamp: new Date().toISOString(),
+      }),
+    );
 
-    handleEmailError(error);
+    try {
+      await sendEmail({ to, subject, html });
+      console.log(
+        JSON.stringify({
+          event: "email_job_send",
+          jobId: job.id,
+          attempt: attemptedNumber,
+          timeStamp: new Date().toISOString(),
+        }),
+      );
+      return {
+        success: true,
+        recipient: to,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(
+          JSON.stringify({
+            event: "email_job_processing_failed",
+            jobId: job.id,
+            attempt: attemptedNumber,
+            message: error.message,
+            timeStamp: new Date().toISOString(),
+          }),
+        );
+        handleEmailError(error);
+      }
+    }
+    throw new Error("Email sending failed");
   },
 
   {
@@ -42,17 +76,41 @@ const emailWorker = new Worker<EmailJobData>(
 );
 
 emailWorker.on("completed", (job, result) => {
-  console.log(`job ${job.id} completed`);
-  console.log(`Result : `, result);
+  // console.log(`job ${job.id} completed`);
+  // console.log(`Result : `, result);
+  console.log(
+    JSON.stringify({
+      event: "email_job_completed",
+      jobId: job.id,
+      result,
+      timestamp: new Date().toISOString(),
+    }),
+  );
 });
 
 emailWorker.on("failed", (job, error) => {
-  console.log(`job ${job?.id} failed`);
-  console.log(`error : ${error}`);
+  // console.log(`job ${job?.id} failed`);
+  // console.log(`error : ${error}`);
+  console.log(
+    JSON.stringify({
+      event: "email_job_failed",
+      jobId: job?.id,
+      attemptsMade: job?.attemptsMade,
+      failureReason: error.message,
+      timestamp: new Date().toISOString(),
+    }),
+  );
 });
 
 emailWorker.on("error", (error) => {
-  console.log(`Email worker error : ${error}`);
+  // console.log(`Email worker error : ${error}`);
+  console.error(
+    JSON.stringify({
+      event: "email_worker_error",
+      message: error.message,
+      timestamp: new Date().toISOString(),
+    }),
+  );
 });
 
 async function shutdown(signal: string) {

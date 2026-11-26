@@ -4,6 +4,7 @@ import cors from "cors";
 import authRoutes from "@/backend/route/authRoutes";
 import adminRoutes from "@/backend/route/admin/adminRoutes";
 import restaurantOwnerRoutes from "@/backend/route/restaurantOwner/restaurantOwnerRoutes";
+import notificationRoutes from "@/backend/route/notification/notificationRoutes";
 
 const app = express();
 const PORT = 4000;
@@ -17,6 +18,9 @@ app.use("/api/admin", adminRoutes);
 
 // for restaurant_owner
 app.use("/api/restaurant-owner", restaurantOwnerRoutes);
+
+// for notification
+app.use("/api/notifications", notificationRoutes);
 
 app.listen(PORT, () => {
   console.log(`server running on http://localhost:${PORT}`);

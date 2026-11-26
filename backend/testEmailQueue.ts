@@ -1,6 +1,6 @@
 import "./config/env";
-import { emailQueue } from "./queues/emailQueue";
-import { enqueueEmail } from "./queues/emailProducer";
+import { enqueueEmail } from "@/backend/queues/producer/emailProducer";
+import { emailQueue } from "@/backend/queues/emailQueue";
 
 async function testEmailQueue() {
   try {
@@ -15,7 +15,7 @@ async function testEmailQueue() {
 
     console.log("job waiting count in queue", waitingCount);
 
-    const savedJob = await emailQueue.getJob("20");
+    const savedJob = await emailQueue.getJob("29");
 
     console.log("Saved job data : ", savedJob?.data);
 
