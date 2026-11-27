@@ -1,5 +1,4 @@
-import { Restaurant } from "@/api/admin/type/restaurant";
-import { Customer } from "./admin/type/customer";
+import { Customer, Restaurant } from "./admin/type/admin/types-api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -18,7 +17,9 @@ export type LoginCustomer = {
 export type LoginResponse = {
   message: string;
   role: "customer" | "restaurant_owner" | "delivery_partner" | "admin";
-  status: "active" | "inactive";
+  status?: "active" | "inactive";
+  onboardingStatus?: string;
+  mustChangePassword?: boolean;
 };
 
 export type CurrentUser = {

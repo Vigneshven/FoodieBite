@@ -242,7 +242,6 @@ export default function Register() {
                 size="icon"
                 onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute right-1 top-1/2 size-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <EyeOff className="size-4" />

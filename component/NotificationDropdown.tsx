@@ -92,10 +92,22 @@ export default function NotificationDropDown() {
   }
 
   function formatDate(date: string) {
-    return new Date(date).toISOString();
+    return new Date(date).toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
   }
 
-  const latestNotifications = notifications.slice(0, 5);
+  const unreadNotifications = notifications.filter(
+    (notification) => !notification.isRead,
+  );
+
+  const latestNotifications = unreadNotifications.slice(0, 5);
 
   return (
     <>
@@ -128,7 +140,7 @@ export default function NotificationDropDown() {
 
             {latestNotifications.length === 0 ? (
               <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-                No notifications yet
+                No unread notifications yet
               </div>
             ) : (
               latestNotifications.map((notification) => (
@@ -143,7 +155,11 @@ export default function NotificationDropDown() {
                     <span className="font-medium">{notification.title}</span>
 
                     {!notification.isRead && (
-                      <span className="h-2 w-2 shrink-0 rounded-full bg-orange-500" />
+                      <>
+                        <span className="inline-flex shrink-0 items-center rounded-full bg-orange-500 px-2 py-0.5 text-xs font-medium text-white">
+                          unread
+                        </span>
+                      </>
                     )}
                   </div>
                   <span className="text-sm text-muted-foreground">
@@ -156,7 +172,7 @@ export default function NotificationDropDown() {
                 </DropdownMenuItem>
               ))
             )}
-            {notifications.length > 5 && (
+            {notifications.length > 0 && (
               <>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -195,7 +211,11 @@ export default function NotificationDropDown() {
                     <span className="font-medium">{notification.title}</span>
 
                     {!notification.isRead && (
-                      <span className="h-2 w-2 shrink-0 rounded-full bg-orange-500" />
+                      <>
+                        <span className="inline-flex shrink-0 items-center rounded-full bg-orange-500 px-2 py-0.5 text-xs font-medium text-white">
+                          unread
+                        </span>
+                      </>
                     )}
                   </div>
 

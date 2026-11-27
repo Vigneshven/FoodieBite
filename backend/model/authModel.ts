@@ -133,3 +133,17 @@ export async function acceptRestaurantInvitationModel(tokenHash: string) {
     });
   });
 }
+
+export async function findAdminId() {
+  const admin = await prisma.customers.findFirst({
+    where: {
+      role: "admin",
+      status: "active",
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return admin?.id ?? null;
+}
