@@ -8,6 +8,7 @@ export async function getRestaurantStats() {
     activeRestaurants,
     pendingApproval,
     suspendedRestaurants,
+    rejectedApproval,
   ] = await Promise.all([
     prisma.restaurants.count(),
     prisma.restaurants.count({
@@ -25,18 +26,29 @@ export async function getRestaurantStats() {
         status: "suspended",
       },
     }),
+    prisma.restaurants.count({
+      where: {
+        status: "rejected",
+      },
+    }),
   ]);
   return {
     totalRestaurants,
     activeRestaurants,
     pendingApproval,
     suspendedRestaurants,
+    rejectedApproval,
   };
 }
 
 // restaurant table
 
-export type RestaurantStatusFilter = "All" | "active" | "pending" | "suspended";
+export type RestaurantStatusFilter =
+  | "All"
+  | "active"
+  | "pending"
+  | "suspended"
+  | "rejected";
 
 export type RestaurantSortOptions = "newest" | "name" | "highest-rating";
 
@@ -202,6 +214,11 @@ export async function getPendingRestauranOwnerRequest() {
       email: true,
       onboardingStatus: true,
       createdAt: true,
+      restaurant: {
+        select: {
+          id: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
@@ -281,6 +298,107 @@ export async function rollbackRestaurantOwnerInvitation(
       data: {
         onboardingStatus: "pending_invitation",
       },
+    });
+  });
+}
+
+// review for restaurants
+
+export async function getRestaurantForReview(id: number) {
+  return prisma.restaurants.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      owner: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
+    },
+  });
+}
+
+// approvement for restaurants
+
+export async function approveRestaurant(id: number) {
+  return prisma.$transaction(async (tx) => {
+    const restaurant = await tx.restaurants.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        ownerId: true,
+        status: true,
+      },
+    });
+    if (!restaurant || restaurant.status !== "pending") {
+      return null;
+    }
+
+    const updated = await tx.restaurants.updateMany({
+      where: {
+        id,
+        status: "pending",
+      },
+      data: {
+        status: "active",
+        rejectionReason: null,
+      },
+    });
+    if (updated.count !== 1) {
+      return null;
+    }
+    if (restaurant.ownerId !== null) {
+      await tx.customers.update({
+        where: { id: restaurant.ownerId },
+        data: { onboardingStatus: "completed" },
+      });
+    }
+    return tx.restaurants.findUnique({
+      where: { id },
+    });
+  });
+}
+
+// rejecting the restaurants
+
+export async function rejectRestaurant(id: number, reason: string) {
+  return prisma.$transaction(async (tx) => {
+    const restaurant = await tx.restaurants.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        ownerId: true,
+        status: true,
+      },
+    });
+    if (!restaurant || restaurant.status !== "pending") {
+      return null;
+    }
+
+    const updated = await tx.restaurants.updateMany({
+      where: {
+        id,
+        status: "pending",
+      },
+      data: {
+        status: "rejected",
+        rejectionReason: reason,
+      },
+    });
+    if (updated.count !== 1) {
+      return null;
+    }
+    if (restaurant.ownerId !== null) {
+      await tx.customers.update({
+        where: { id: restaurant.ownerId },
+        data: { onboardingStatus: "rejected" },
+      });
+    }
+    return tx.restaurants.findUnique({
+      where: { id },
     });
   });
 }

@@ -45,11 +45,12 @@ import {
 import { toast } from "sonner";
 import { useState } from "react";
 import { onboardingStatusStyles } from "./utils/restaurantsTableStatusStyles";
-
+import RestaurantReviewDialog from "./RestaurantReviewDialog";
 const statusStyles = {
   active: "border-green-200 bg-green-50 text-green-700",
   pending: "border-orange-200 bg-orange-50 text-orange-700",
   suspended: "border-red-200 bg-red-50 text-red-700",
+  rejected: "border-red-300 bg-red-100 text-red-900",
 };
 
 type RestaurantsTableProps = {
@@ -92,6 +93,10 @@ export default function RestaurantsTable({
   const updateRestaurant = useRestaurantStore(
     (state) => state.updateRestaurant,
   );
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<
+    number | null
+  >(null);
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
 
   async function handleStatusChange(
     id: string,
@@ -237,30 +242,35 @@ export default function RestaurantsTable({
                           Edit
                         </DropdownMenuItem>
 
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          disabled={Number(updateId) === restaurant.id}
-                          onClick={() =>
-                            handleStatusChange(
-                              String(restaurant.id),
-                              restaurant.status === "active"
-                                ? "suspended"
-                                : "active",
-                            )
-                          }
-                        >
-                          {restaurant.status === "active" ? (
-                            <>
-                              <Ban className="mr-2 h-4 w-4" />
-                              Suspend Restaurant
-                            </>
-                          ) : (
-                            <>
-                              <CheckCircle className="mr-2 h-4 w-4" />
-                              Activate Restaurant
-                            </>
-                          )}
-                        </DropdownMenuItem>
+                        {(restaurant.status === "active" ||
+                          restaurant.status === "suspended") && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              disabled={Number(updateId) === restaurant.id}
+                              onClick={() =>
+                                handleStatusChange(
+                                  String(restaurant.id),
+                                  restaurant.status === "active"
+                                    ? "suspended"
+                                    : "active",
+                                )
+                              }
+                            >
+                              {restaurant.status === "active" ? (
+                                <>
+                                  <Ban className="mr-2 h-4 w-4" />
+                                  Suspend Restaurant
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="mr-2 h-4 w-4" />
+                                  Activate Restaurant
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                          </>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -310,7 +320,21 @@ export default function RestaurantsTable({
                     <TableCell className="font-medium">{owner.id}</TableCell>
 
                     <TableCell className="font-medium">
-                      {owner.username}
+                      {owner.onboardingStatus === "pending_review" &&
+                      owner.restaurant?.id ? (
+                        <button
+                          type="button"
+                          className="text-primary underline hover:text-primary/80"
+                          onClick={() => {
+                            setSelectedRestaurantId(owner.restaurant?.id);
+                            setReviewDialogOpen(true);
+                          }}
+                        >
+                          {owner.username}
+                        </button>
+                      ) : (
+                        owner.username
+                      )}
                     </TableCell>
 
                     <TableCell>{owner.email}</TableCell>
@@ -365,6 +389,12 @@ export default function RestaurantsTable({
             )}
           </TableBody>
         </Table>
+
+        <RestaurantReviewDialog
+          restaurantId={selectedRestaurantId}
+          open={reviewDialogOpen}
+          onOpenChange={setReviewDialogOpen}
+        />
       </div>
       <RestaurantPagination
         currentPage={currentPage}

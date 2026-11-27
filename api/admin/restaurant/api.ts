@@ -3,6 +3,7 @@ import {
   GetRestaurantsParams,
   RestaurantOwnerRequest,
   RestaurantResponse,
+  RestaurantReview,
   RestaurantStatsData,
 } from "@/api/admin/type/admin/types-api";
 
@@ -120,6 +121,57 @@ export async function sendRestaurantOwnerInvitation(userId: number) {
 
   if (!res.ok) {
     throw new Error("Failed to send restaurants owner invitation");
+  }
+
+  return result.data;
+}
+
+//get the restaurant details for admin review
+
+export async function getRestaurantReviewDetails(
+  id: number,
+): Promise<RestaurantReview> {
+  const res = await fetch(`${BASE_URL}/api/admin/restaurants/${id}/review`, {
+    method: "GET",
+    credentials: "include",
+  });
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch restaurant review details");
+  }
+
+  return result.data;
+}
+
+// restaurant approval after profile submitted
+export async function approveRestaurantProfile(id: number) {
+  const res = await fetch(`${BASE_URL}/api/admin/restaurants/${id}/approve`, {
+    method: "PATCH",
+    credentials: "include",
+  });
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error("Failed to approve restaurant");
+  }
+
+  return result.data;
+}
+
+export async function rejectRestaurantProfile(id: number, reason: string) {
+  const res = await fetch(`${BASE_URL}/api/admin/restaurants/${id}/reject`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ reason }),
+  });
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error("Failed to reject restaurant");
   }
 
   return result.data;

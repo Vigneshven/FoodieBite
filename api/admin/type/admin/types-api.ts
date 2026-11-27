@@ -56,11 +56,12 @@ export type RestaurantStatsData = {
   activeRestaurants: number;
   pendingApproval: number;
   suspendedRestaurants: number;
+  rejectedApproval: number;
 };
 
 // restaurantpage table
 
-export type RestaurantStatus = "active" | "pending" | "suspended";
+export type RestaurantStatus = "active" | "pending" | "suspended" | "rejected";
 
 export type RestaurantSortBy = "newest" | "name" | "highest-rating";
 
@@ -118,4 +119,53 @@ export type RestaurantOwnerRequest = {
   email: string;
   onboardingStatus: RestaurantOnboardingStatus;
   createdAt: string;
+  restaurant: {
+    id: number;
+  } | null;
+};
+
+export type RestaurantReview = {
+  id: number;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  image: string;
+  logo: string | null;
+  description: string | null;
+  restaurantType: string | null;
+  category: string | null;
+  cuisines: string | null;
+
+  streetAddress: string | null;
+  landmark: string | null;
+  city: string | null;
+  state: string | null;
+  postalCode: string | null;
+  country: string | null;
+
+  status: "active" | "pending" | "suspended" | "rejected";
+  rejectionReason: string | null;
+
+  openingHours: OpeningHours[] | null;
+
+  owner: {
+    id: number;
+    username: string;
+    email: string;
+  } | null;
+};
+
+export type OpeningHours = {
+  day:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
+  isClosed: boolean;
+  is24Hours: boolean;
+  openTime: string;
+  closeTime: string;
 };

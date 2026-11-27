@@ -1,9 +1,18 @@
 "use client";
 
-import { RestaurantSortBy, RestaurantStatus } from "@/api/admin/type/admin/types-api";
+import {
+  RestaurantSortBy,
+  RestaurantStatus,
+} from "@/api/admin/type/admin/types-api";
 import { Search, SlidersHorizontal } from "lucide-react";
 
-export const restaurantStatuses = ["All", "active", "pending", "suspended"];
+export const restaurantStatuses = [
+  "All",
+  "active",
+  "pending",
+  "suspended",
+  "rejected",
+];
 
 export type RestaurantStatusFilter = RestaurantStatus | "All";
 
@@ -45,7 +54,7 @@ export default function RestaurantFilters({
           <button
             key={status}
             type="button"
-            onClick={() => onStatusChange(status)}
+            onClick={() => onStatusChange(status as RestaurantStatusFilter)}
             className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition ${
               activeStatus === status
                 ? "bg-orange-600 text-white font-medium shadow-sm text-lg"

@@ -1,12 +1,15 @@
 import { Request, Response } from "express";
 import {
+  approveRestaurant,
   createRestaurantOwnerInvitation,
   createRestaurantWithOwner,
   findRestaurantByName,
   findRestaurantByPhone,
   getAllRestaurants,
   getPendingRestauranOwnerRequest,
+  getRestaurantForReview,
   getRestaurantStats,
+  rejectRestaurant,
   RestaurantSortOptions,
   RestaurantStatusFilter,
   rollbackRestaurantOwnerInvitation,
@@ -46,7 +49,8 @@ export const getRestaurant = async (req: Request, res: Response) => {
     const status: RestaurantStatusFilter =
       statusValue === "active" ||
       statusValue === "pending" ||
-      statusValue === "suspended"
+      statusValue === "suspended" ||
+      statusValue === "rejected"
         ? statusValue
         : "All";
     const sortByValue = String(req.query.sortBy || "newest");
@@ -299,6 +303,120 @@ export const sendRestaurantOwnerInvitation = async (
     console.log(error);
     return errorResponse(res, {
       message: "Failed to send restaurant owner invitation",
+      statusCode: 500,
+    });
+  }
+};
+
+// for restaurantReview
+
+export const getRestaurantReviewDetails = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return errorResponse(res, {
+        message: "Invalid restaurant ID",
+        statusCode: 400,
+      });
+    }
+    const restaurant = await getRestaurantForReview(id);
+
+    if (!restaurant) {
+      return errorResponse(res, {
+        message: "Restaurant not found",
+        statusCode: 404,
+      });
+    }
+
+    return successResponse(res, {
+      message: "Restaurant details retrieved successfully",
+      statusCode: 200,
+      data: restaurant,
+    });
+  } catch (error) {
+    console.log(error);
+    return errorResponse(res, {
+      message: "Failed to retrieve restaurant details",
+      statusCode: 500,
+    });
+  }
+};
+
+// for restaurant approval
+
+export const approveRestaurantProfile = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return errorResponse(res, {
+        message: "Invalid restaurant ID",
+        statusCode: 400,
+      });
+    }
+
+    const restaurant = await approveRestaurant(id);
+
+    if (!restaurant) {
+      return errorResponse(res, {
+        message: "Restaurant not found or is no longer pending review",
+        statusCode: 409,
+      });
+    }
+    return successResponse(res, {
+      message: "Restaurant approved successfully",
+      statusCode: 200,
+      data: restaurant,
+    });
+  } catch (error) {
+    console.log(error);
+    return errorResponse(res, {
+      message: "Failed to approve restaurant",
+      statusCode: 500,
+    });
+  }
+};
+
+export const rejectRestaurantProfile = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const reason = req.body.reason;
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return errorResponse(res, {
+        message: "Invalid restaurant ID",
+        statusCode: 400,
+      });
+    }
+
+    if (typeof reason !== "string" || !reason.trim()) {
+      return errorResponse(res, {
+        message: "Rejection reason is required",
+        statusCode: 400,
+      });
+    }
+
+    const restaurant = await rejectRestaurant(id, reason.trim());
+
+    if (!restaurant) {
+      return errorResponse(res, {
+        message: "Restaurant not found or is no longer pending review",
+        statusCode: 409,
+      });
+    }
+    return successResponse(res, {
+      message: "Restaurant rejected successfully",
+      statusCode: 200,
+      data: restaurant,
+    });
+  } catch (error) {
+    console.log(error);
+    return errorResponse(res, {
+      message: "Failed to reject restaurant",
       statusCode: 500,
     });
   }

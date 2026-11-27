@@ -1,4 +1,7 @@
-import { Restaurant, RestaurantStatsData } from "@/api/admin/type/admin/types-api";
+import {
+  Restaurant,
+  RestaurantStatsData,
+} from "@/api/admin/type/admin/types-api";
 import { create } from "zustand";
 
 type RestaurantStore = {
@@ -8,7 +11,7 @@ type RestaurantStore = {
   setStats: (stats: RestaurantStatsData) => void;
   updateRestaurant: (
     id: number,
-    status: "active" | "pending" | "suspended",
+    status: "active" | "pending" | "suspended" | "rejected",
   ) => void;
   removeRestaurant: (id: number) => void;
   isAddDialogOpen: boolean;
@@ -25,6 +28,7 @@ export const useRestaurantStore = create<RestaurantStore>((set) => ({
     activeRestaurants: 0,
     pendingApproval: 0,
     suspendedRestaurants: 0,
+    rejectedApproval: 0,
   },
   setRestaurants: (restaurants) => set({ restaurants }),
   setStats: (stats) => set({ stats }),

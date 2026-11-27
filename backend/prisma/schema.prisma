@@ -26,15 +26,16 @@ model customers {
 }
 
 model restaurants {
-  id        Int               @id @default(autoincrement())
-  image     String            @db.Text
-  name      String            @db.VarChar(255)
-  email     String?           @db.VarChar(255)
-  category  String?           @db.VarChar(300)
-  phone     String?           @unique
-  status    restaurant_status @default(pending)
-  createdAt DateTime          @default(now())
-  rating    Float             @default(0)
+  id              Int               @id @default(autoincrement())
+  image           String            @db.Text
+  name            String            @db.VarChar(255)
+  email           String?           @db.VarChar(255)
+  category        String?           @db.VarChar(300)
+  phone           String?           @unique
+  status          restaurant_status @default(pending)
+  rejectionReason String?           @db.Text
+  createdAt       DateTime          @default(now())
+  rating          Float             @default(0)
 
   description    String? @db.Text
   restaurantType String? @db.VarChar(100)
@@ -73,6 +74,7 @@ enum restaurant_status {
   active
   pending
   suspended
+  rejected
 }
 
 enum customers_role {

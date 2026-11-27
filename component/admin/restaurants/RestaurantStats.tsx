@@ -59,9 +59,20 @@ export default function RestaurantStats({ statsData }: RestaurantStatsProps) {
       trend: "down",
       trendColor: "text-red-600",
     },
+    {
+      title: "Rejected",
+      value: statsData.rejectedApproval,
+      change: "-2%",
+      description: "Compared to last month",
+      icon: Ban,
+      iconColor: "text-red-600",
+      iconBg: "bg-red-100",
+      trend: "down",
+      trendColor: "text-red-600",
+    },
   ];
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
       {restaurantStats.map((item) => {
         const Icon = item.icon;
         const TrendIcon = item.trend === "up" ? TrendingUp : TrendingDown;
@@ -75,7 +86,7 @@ export default function RestaurantStats({ statsData }: RestaurantStatsProps) {
                     {item.title}
                   </p>
                   <h2 className="mt-2 text-2xl font-bold tracking-tight">
-                    {item.value}
+                    {item.value ?? 0}
                   </h2>
                 </div>
                 <div

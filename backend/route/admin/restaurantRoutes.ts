@@ -1,9 +1,12 @@
 import {
   addRestaurant,
+  approveRestaurantProfile,
   changeRestaurantStatus,
   getRestaurant,
   getRestaurantOwnerRequests,
+  getRestaurantReviewDetails,
   getRestaurantStatistics,
+  rejectRestaurantProfile,
   sendRestaurantOwnerInvitation,
 } from "@/backend/controller/admin/restaurantController";
 import { requireAuth } from "@/backend/middleware/requireAuth";
@@ -27,6 +30,30 @@ router.patch(
   requireAuth,
   requireRole("admin"),
   changeRestaurantStatus,
+);
+
+// restaurant profile review
+router.get(
+  "/:id/review",
+  requireAuth,
+  requireRole("admin"),
+  getRestaurantReviewDetails,
+);
+
+// restaurant approve
+router.patch(
+  "/:id/approve",
+  requireAuth,
+  requireRole("admin"),
+  approveRestaurantProfile,
+);
+
+// restaurant reject
+router.patch(
+  "/:id/reject",
+  requireAuth,
+  requireRole("admin"),
+  rejectRestaurantProfile,
 );
 
 // restaurant page add form
