@@ -5,7 +5,6 @@ import {
   getNotification,
 } from "@/api/notification/api";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -71,9 +70,7 @@ export default function AdminHeader() {
           />
         </div>
 
-        <Button className="relative">
-          <NotificationDropDown />
-        </Button>
+        <NotificationDropDown />
 
         <DropdownMenu>
           <DropdownMenuTrigger

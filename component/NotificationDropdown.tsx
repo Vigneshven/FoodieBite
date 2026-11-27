@@ -15,6 +15,7 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -116,55 +117,57 @@ export default function NotificationDropDown() {
           }
         />
         <DropdownMenuContent align="end" className="w-80">
-          <DropdownMenuLabel className="flex items-center justify-between">
-            Notifications
-            <span className="text-xs font-normal text-muted-foreground">
-              {unreadCount} unread
-            </span>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="flex items-center justify-between">
+              Notifications
+              <span className="text-xs font-normal text-muted-foreground">
+                {unreadCount} unread
+              </span>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
 
-          {latestNotifications.length === 0 ? (
-            <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-              No notifications yet
-            </div>
-          ) : (
-            latestNotifications.map((notification) => (
-              <DropdownMenuItem
-                key={notification.id}
-                onClick={() => handleNotificationClick(notification)}
-                className={`flex cursor-pointer flex-col items-start gap-1  py-3 ${
-                  !notification.isRead ? "bg-orange-50" : ""
-                }`}
-              >
-                <div className="flex w-full items-center justify-between gap-2">
-                  <span className="font-medium">{notification.title}</span>
+            {latestNotifications.length === 0 ? (
+              <div className="px-3 py-6 text-center text-sm text-muted-foreground">
+                No notifications yet
+              </div>
+            ) : (
+              latestNotifications.map((notification) => (
+                <DropdownMenuItem
+                  key={notification.id}
+                  onClick={() => handleNotificationClick(notification)}
+                  className={`flex cursor-pointer flex-col items-start gap-1  py-3 ${
+                    !notification.isRead ? "bg-orange-50" : ""
+                  }`}
+                >
+                  <div className="flex w-full items-center justify-between gap-2">
+                    <span className="font-medium">{notification.title}</span>
 
-                  {!notification.isRead && (
-                    <span className="h-2 w-2 shrink-0 rounded-full bg-orange-500" />
-                  )}
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  {notification.message}
-                </span>
+                    {!notification.isRead && (
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-orange-500" />
+                    )}
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {notification.message}
+                  </span>
 
-                <span className="text-xs text-muted-foreground">
-                  {formatDate(notification.createdAt)}
-                </span>
-              </DropdownMenuItem>
-            ))
-          )}
-          {notifications.length > 5 && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={handleSeeAll}
-                className="cursor-pointer justify-center font-medium text-orange-600"
-              >
-                See all notifications
-              </DropdownMenuItem>
-            </>
-          )}
+                  <span className="text-xs text-muted-foreground">
+                    {formatDate(notification.createdAt)}
+                  </span>
+                </DropdownMenuItem>
+              ))
+            )}
+            {notifications.length > 5 && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleSeeAll}
+                  className="cursor-pointer justify-center font-medium text-orange-600"
+                >
+                  See all notifications
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
