@@ -2,12 +2,14 @@ import type { Request, Response } from "express";
 import {
   acceptRestaurantInvitationModel,
   createCustomer,
+  findAdminId,
   findCustomerByEmail,
 } from "@/backend/model/authModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { errorResponse, successResponse } from "../utils/api/apiResponse";
 import { hashInvitationToken } from "../utils/email/invitationToken";
+import { enqueueNotification } from "../queues/producer/notificationProducer";
 
 export async function register(req: Request, res: Response) {
   try {
@@ -52,6 +54,23 @@ export async function register(req: Request, res: Response) {
 
     await createCustomer(username, email, passwordHash, role);
 
+    if (role === "restaurant_owner") {
+      try {
+        const adminId = await findAdminId();
+        if (adminId !== null) {
+          await enqueueNotification({
+            recipientId: adminId,
+            title: "New Restaurant Owner Registration",
+            message: `${username} has registered as a restaurant owner.Please review the registration request`,
+            type: "owner_registration",
+          });
+        } else {
+          console.log("No admin found for registration notification");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
     return res.status(201).json({
       message: "Registeration Successfull",
     });
@@ -82,6 +101,21 @@ export async function acceptRestaurantInvitation(req: Request, res: Response) {
         message: "Invalid or expired invitation token",
         statusCode: 400,
       });
+    }
+    try {
+      const adminId = await findAdminId();
+      if (adminId !== null) {
+        await enqueueNotification({
+          recipientId: adminId,
+          title: "Restaurant Invitation Accepted",
+          message: `${owner.username} has accept the restaurant owner invitation.They can now complete their restaurant profile`,
+          type: "restaurant_invitation_accepted",
+        });
+      } else {
+        console.log("No admin found for invitation acceptance notification");
+      }
+    } catch (error) {
+      console.log(error);
     }
     return successResponse(res, {
       message: "Restaurant invitation accepted successfully",
@@ -180,7 +214,8 @@ export async function login(req: Request, res: Response) {
       message: "Login Successfully",
       role: user.role,
       status: user.status,
-      mustChagePassword: user.mustChangePassword,
+      onboardingStatus: user.onboardingStatus,
+      mustChangePassword: user.mustChangePassword,
     });
   } catch (error) {
     console.log(error);

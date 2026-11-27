@@ -11,7 +11,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body>
         <main>{children}</main>
-        <Toaster position="top-right" richColors />
+        <Toaster position="bottom-right" richColors />
       </body>
     </html>
   );

@@ -19,14 +19,11 @@ export async function getMyRestaurant() {
   return result.data;
 }
 
-export async function updateMyRestaurant(data: Partial<RestaurantForm>) {
+export async function updateMyRestaurant(data: FormData) {
   const res = await fetch(`${BASE_URL}/api/restaurant-owner/restaurant`, {
     method: "PATCH",
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
+    body: data,
   });
 
   const result = await res.json();
@@ -59,14 +56,11 @@ export async function acceptRestaurantInvitation(
   return result;
 }
 
-export async function createMyRestaurant(data: RestaurantForm) {
+export async function createMyRestaurant(data: FormData) {
   const res = await fetch(`${BASE_URL}/api/restaurant-owner/restaurant`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     credentials: "include",
-    body: JSON.stringify(data),
+    body: data,
   });
   const result = await res.json();
 

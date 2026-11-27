@@ -1,4 +1,5 @@
 import { findRestaurantByPhone } from "@/backend/model/admin/restaurantModel";
+import { findAdminId } from "@/backend/model/authModel";
 import {
   createRestaurantForOwner,
   getRestaurantByOwnerEmail,
@@ -6,7 +7,11 @@ import {
 } from "@/backend/model/restaurantOwner/restaurantModel";
 import { CreateRestaurantData } from "@/backend/model/restaurantOwner/types/types";
 import { Prisma } from "@/backend/prisma/generated/prisma/client";
-import { errorResponse, successResponse } from "@/backend/utils/api/apiResponse";
+import { enqueueNotification } from "@/backend/queues/producer/notificationProducer";
+import {
+  errorResponse,
+  successResponse,
+} from "@/backend/utils/api/apiResponse";
 import { Request, Response } from "express";
 
 export const createMyRestaurant = async (req: Request, res: Response) => {
@@ -19,6 +24,22 @@ export const createMyRestaurant = async (req: Request, res: Response) => {
         statusCode: 401,
       });
     }
+
+    const files = (req.files ?? {}) as {
+      logo?: Express.Multer.File[];
+      image?: Express.Multer.File[];
+    };
+
+    const logoFile = files.logo?.[0];
+    const imageFile = files.image?.[0];
+
+    if (!logoFile || !imageFile) {
+      return errorResponse(res, {
+        message: "Restaurant logo and image are required",
+        statusCode: 400,
+      });
+    }
+
     const {
       name,
       description,
@@ -33,8 +54,6 @@ export const createMyRestaurant = async (req: Request, res: Response) => {
       state,
       postalCode,
       country,
-      logo,
-      image,
       openingHours,
     } = req.body;
 
@@ -49,8 +68,6 @@ export const createMyRestaurant = async (req: Request, res: Response) => {
       state,
       postalCode,
       country,
-      logo,
-      image,
     };
 
     for (const [field, value] of Object.entries(requiredFields)) {
@@ -83,16 +100,29 @@ export const createMyRestaurant = async (req: Request, res: Response) => {
       });
     }
 
-    if (
-      openingHours === null ||
-      typeof openingHours !== "object" ||
-      Array.isArray(openingHours)
-    ) {
+    let parsedOpeningHours: Prisma.InputJsonValue;
+
+    try {
+      if (typeof openingHours !== "string") {
+        throw new Error("Invalid opening hours");
+      }
+
+      parsedOpeningHours = JSON.parse(openingHours) as Prisma.InputJsonValue;
+    } catch (error) {
+      console.log(error);
       return errorResponse(res, {
         message: "Invalid openingHours",
         statusCode: 400,
       });
     }
+
+    if (!Array.isArray(parsedOpeningHours) || parsedOpeningHours.length !== 7) {
+      return errorResponse(res, {
+        message: "Opening hours must contain 7 days",
+        statusCode: 400,
+      });
+    }
+
     const existingPhone = await findRestaurantByPhone(phone.trim());
 
     if (existingPhone) {
@@ -116,12 +146,28 @@ export const createMyRestaurant = async (req: Request, res: Response) => {
       state: state.trim(),
       postalCode: postalCode.trim(),
       country: country.trim(),
-      logo: logo.trim(),
-      image: image.trim(),
-      openingHours,
+      logo: `/uploads/restaurants/logo/${logoFile.filename}`,
+      image: `/uploads/restaurants/image/${imageFile.filename}`,
+      openingHours: parsedOpeningHours,
     };
 
     const restaurant = await createRestaurantForOwner(ownerId, restaurantData);
+
+    try {
+      const adminId = await findAdminId();
+      if (adminId !== null) {
+        await enqueueNotification({
+          recipientId: adminId,
+          title: "New Restaurant Profile Submitted",
+          message: `${restaurant.name} has submitted its restaurant profile and is waiting for your review`,
+          type: "restaurant_profile_submitted",
+        });
+      } else {
+        console.log("No admin found for restuarant profile notification");
+      }
+    } catch (error) {
+      console.log(error);
+    }
 
     return successResponse(res, {
       message: "Restaurant Profile submmitted successfully",
@@ -148,6 +194,7 @@ export const createMyRestaurant = async (req: Request, res: Response) => {
         });
       }
     }
+
     return errorResponse(res, {
       message: "Failed to submit restaurant profile",
       statusCode: 500,
@@ -166,8 +213,9 @@ export const getMyRestaurant = async (req: Request, res: Response) => {
 
     const restaurant = await getRestaurantByOwnerEmail(email);
     if (!restaurant) {
-      return res.status(404).json({
-        message: "Restaurant not found",
+      return res.status(200).json({
+        message: "Restaurant profile not created yet",
+        data: null,
       });
     }
     return res.status(200).json({
@@ -191,6 +239,14 @@ export const updateMyRestaurant = async (req: Request, res: Response) => {
       });
     }
 
+    const files = (req.files ?? {}) as {
+      logo?: Express.Multer.File[];
+      image?: Express.Multer.File[];
+    };
+
+    const logoFile = files.logo?.[0];
+    const imageFile = files.image?.[0];
+
     const currentRestaurant = await getRestaurantByOwnerEmail(email);
 
     if (!currentRestaurant) {
@@ -212,8 +268,6 @@ export const updateMyRestaurant = async (req: Request, res: Response) => {
       state,
       postalCode,
       country,
-      logo,
-      image,
       openingHours,
     } = req.body;
 
@@ -239,17 +293,18 @@ export const updateMyRestaurant = async (req: Request, res: Response) => {
       state,
       postalCode,
       country,
-      logo,
-      image,
     };
 
     const hasFields = Object.values(Fields).some(
       (value) => value !== undefined,
     );
 
-    if (!hasFields && openingHours === undefined) {
-      return res.status(400).json({
+    const hasFiles = Boolean(logoFile || imageFile);
+
+    if (!hasFields && openingHours === undefined && !hasFiles) {
+      return errorResponse(res, {
         message: "Provide at least one field to update",
+        statusCode: 400,
       });
     }
 
@@ -267,15 +322,31 @@ export const updateMyRestaurant = async (req: Request, res: Response) => {
       });
     }
 
-    if (
-      openingHours !== undefined &&
-      (openingHours === null ||
-        typeof openingHours !== "object" ||
-        Array.isArray(openingHours))
-    ) {
-      return res.status(400).json({
-        message: "Invalid opening hours",
-      });
+    let parsedOpeningHours: Prisma.InputJsonValue | undefined;
+
+    if (openingHours !== undefined) {
+      try {
+        if (typeof openingHours !== "string") {
+          throw new Error("Invalid opening hours");
+        }
+
+        parsedOpeningHours = JSON.parse(openingHours) as Prisma.InputJsonValue;
+      } catch {
+        return errorResponse(res, {
+          message: "Invalid opening hours",
+          statusCode: 400,
+        });
+      }
+
+      if (
+        !Array.isArray(parsedOpeningHours) ||
+        parsedOpeningHours.length !== 7
+      ) {
+        return errorResponse(res, {
+          message: "Opening hours must contain 7 days",
+          statusCode: 400,
+        });
+      }
     }
 
     const updatedRestaurant = await updateRestaurantByOwnerEmail(email, {
@@ -294,12 +365,14 @@ export const updateMyRestaurant = async (req: Request, res: Response) => {
       ...(state !== undefined && { state: state.trim() }),
       ...(postalCode !== undefined && { postalCode: postalCode.trim() }),
       ...(country !== undefined && { country: country.trim() }),
-      ...(logo !== undefined && { logo: logo.trim() }),
-      ...(category !== undefined && { category: category.trim() }),
-      ...(image !== undefined && { image: image.trim() }),
-      ...(openingHours !== undefined && {
-        openingHours: openingHours as Prisma.InputJsonValue,
+      ...(logoFile && {
+        logo: `/uploads/restaurants/${logoFile.filename}`,
       }),
+      ...(category !== undefined && { category: category.trim() }),
+      ...(imageFile && {
+        image: `/uploads/restaurants/${imageFile.filename}`,
+      }),
+      ...(openingHours !== undefined && { openingHours: parsedOpeningHours }),
     });
 
     if (!updatedRestaurant) {

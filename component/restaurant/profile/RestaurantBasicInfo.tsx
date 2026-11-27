@@ -7,8 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
-import { useEffect } from "react";
-import { getMyRestaurant, updateMyRestaurant } from "@/api/restaurantOwner/api";
+import { useEffect, useState } from "react";
+import {
+  createMyRestaurant,
+  getMyRestaurant,
+  updateMyRestaurant,
+} from "@/api/restaurantOwner/api";
 import { toast } from "sonner";
 
 export const restaurantType = ["Restaurant", "Cafe", "Fast Food", "Bakery"];
@@ -54,20 +58,45 @@ const restaurantSchema = z.object({
   state: z.string().min(2, "Enter your state"),
   postalCode: z.string().regex(/^\d{6}$/, "Enter a valid 6-digit PIN code"),
   country: z.string().min(2, "Enter your country"),
-  logo: z.string().url("Enter a valid logo image URL"),
-  image: z.string().url("Enter a valid cover image URL"),
+  logo: z.string(),
+  image: z.string(),
   openingHours: z.array(openingHoursSchema).length(7),
 });
 
 type RestaurantForm = z.infer<typeof restaurantSchema>;
 
 export default function RestaurantBasicInfo() {
+  const [isNewRestaurant, setIsNewRestaurant] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+  function useFilePreview(file: File | null) {
+    const [preview, setPreview] = useState<string>("");
+    useEffect(() => {
+      if (!file) {
+        setPreview("");
+        return;
+      }
+      const previewUrl = URL.createObjectURL(file);
+      setPreview(previewUrl);
+
+      return () => {
+        URL.revokeObjectURL(previewUrl);
+      };
+    }, [file]);
+    return preview;
+  }
+
+  const logoPreview = useFilePreview(logoFile);
+  const imagePreview = useFilePreview(imageFile);
+
   const {
     register,
     control,
     handleSubmit,
     reset,
-    formState: { errors, dirtyFields },
+    formState: { errors },
   } = useForm<RestaurantForm>({
     resolver: zodResolver(restaurantSchema),
     defaultValues: {
@@ -142,21 +171,50 @@ export default function RestaurantBasicInfo() {
 
   const onSubmit = async (data: RestaurantForm) => {
     try {
-      const updatedData = Object.keys(dirtyFields).reduce((result, key) => {
-        if (dirtyFields[key as keyof RestaurantForm]) {
-          Object.assign(result, {
-            [key]: data[key as keyof RestaurantForm],
-          });
-        }
-        return result;
-      }, {} as Partial<RestaurantForm>);
-      if (Object.keys(updatedData).length === 0) {
+      if (isNewRestaurant && (!logoFile || !imageFile)) {
+        toast.error("Please upload both logo and image file");
         return;
       }
-      await updateMyRestaurant(data);
+
+      const formData = new FormData();
+
+      Object.entries(data).forEach(([key, value]) => {
+        if (key !== "logo" && key !== "image" && key !== "openingHours") {
+          formData.append(key, value as string);
+        }
+      });
+
+      formData.append("openingHours", JSON.stringify(data.openingHours));
+
+      if (logoFile) {
+        formData.append("logo", logoFile);
+      }
+
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+
+      if (isNewRestaurant) {
+        await createMyRestaurant(formData);
+
+        toast.success("Restaurant Profile submitted successfully");
+        setIsNewRestaurant(false);
+        setLogoFile(null);
+        setImageFile(null);
+        reset(data);
+        return;
+      }
+      await updateMyRestaurant(formData);
+      toast.success("Restaurant Profile updated successfully");
+      setLogoFile(null);
+      setImageFile(null);
       reset(data);
-    } catch {
-      toast.error("failed to update restaurant");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("failed to save restaurant details");
+      }
     }
   };
 
@@ -174,6 +232,13 @@ export default function RestaurantBasicInfo() {
     async function fetchRestaurant() {
       try {
         const restaurant = await getMyRestaurant();
+
+        if (!restaurant) {
+          setIsNewRestaurant(true);
+          return;
+        }
+
+        setIsNewRestaurant(false);
 
         reset({
           name: restaurant.name ?? "",
@@ -195,6 +260,8 @@ export default function RestaurantBasicInfo() {
         });
       } catch {
         toast.error("Failed to fetch restaurant");
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchRestaurant();
@@ -362,9 +429,11 @@ export default function RestaurantBasicInfo() {
           <Label>Restaurant Logo URL</Label>
 
           <Input
-            type="url"
-            placeholder="Enter a valid url"
-            {...register("logo")}
+            type="file"
+            accept="jpeg,png"
+            onChange={(event) => {
+              setLogoFile(event.target.files?.[0] ?? null);
+            }}
           />
 
           {errors.logo && (
@@ -372,12 +441,21 @@ export default function RestaurantBasicInfo() {
           )}
 
           <div className="flex h-40 items-center justify-center rounded-lg border bg-muted/30 p-4">
-            {logoUrl ? (
+            {logoPreview ? (
               <Image
-                src={logoUrl}
+                src={logoPreview}
                 width={400}
                 height={400}
                 alt="Restaurant logo preview"
+                className="h-full max-w-full object-contain"
+              />
+            ) : logoUrl ? (
+              <Image
+                src={`${process.env.NEXT_PUBLIC_API_URL}${logoUrl}`}
+                width={400}
+                height={400}
+                alt="Current restaurant logo"
+                unoptimized
                 className="h-full max-w-full object-contain"
               />
             ) : (
@@ -389,9 +467,11 @@ export default function RestaurantBasicInfo() {
           <Label>Image URL</Label>
 
           <Input
-            type="url"
-            placeholder="enter a valid url"
-            {...register("image")}
+            type="file"
+            accept="jpeg,png"
+            onChange={(event) => {
+              setImageFile(event.target.files?.[0] ?? null);
+            }}
           />
 
           {errors.image && (
@@ -399,13 +479,22 @@ export default function RestaurantBasicInfo() {
           )}
 
           <div className="flex h-40 items-center justify-center overflow-hidden rounded-lg border bg-muted/30">
-            {imageUrl ? (
+            {imagePreview ? (
               <Image
-                src={imageUrl}
+                src={imagePreview}
                 width={400}
                 height={400}
                 alt="Restaurant cover preview"
                 className="h-full w-full object-cover"
+              />
+            ) : imageUrl ? (
+              <Image
+                src={`${process.env.NEXT_PUBLIC_API_URL}${imageUrl}`}
+                width={400}
+                height={400}
+                alt="Current restaurant logo"
+                unoptimized
+                className="h-full max-w-full object-contain"
               />
             ) : (
               <p className="text-sm text-muted-foreground">Image preview</p>
@@ -461,7 +550,13 @@ export default function RestaurantBasicInfo() {
         </div>
       </div>
       <div className="flex justify-end">
-        <Button type="submit">Save Restaurant Information</Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading
+            ? "Loading..."
+            : isNewRestaurant
+              ? "Submit Profile"
+              : "Update Restaurant"}
+        </Button>
       </div>
     </form>
   );

@@ -83,16 +83,20 @@ export default function Login() {
 
       toast.success("Login Successfully");
 
-      const dashboardPath =
-        res.role === "admin"
-          ? "/admin"
-          : res.role === "customer"
-            ? "/customer"
-            : res.role === "restaurant_owner"
-              ? "/restaurant"
-              : res.role === "delivery_partner"
-                ? "/deliverypartner"
-                : "/";
+      let dashboardPath = "/";
+
+      if (res.role === "admin") {
+        dashboardPath = "/admin";
+      } else if (res.role === "customer") {
+        dashboardPath = "/customer";
+      } else if (res.role === "restaurant_owner") {
+        dashboardPath =
+          res.onboardingStatus === "profile_pending"
+            ? "/restaurant/profile"
+            : "/restaurant";
+      } else if (res.role === "delivery_partner") {
+        dashboardPath = "/deliverypartner";
+      }
       router.replace(dashboardPath);
       router.refresh();
     } catch {
