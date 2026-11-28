@@ -49,3 +49,4 @@ backend/public/uploads/restaurants/image/*.jpg
 backend/public/uploads/restaurants/logo/*.jpg
 
 /.opencode
+AGENTS.md
