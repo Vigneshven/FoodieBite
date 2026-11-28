@@ -47,3 +47,7 @@ next-env.d.ts
 # Ignore all jpg files inside the restaurant upload directories
 backend/public/uploads/restaurants/image/*.jpg
 backend/public/uploads/restaurants/logo/*.jpg
+
+readme.md
+analysis-skill.md
+skill.md
