@@ -1,3 +1,4 @@
+import { subscribeToNotification } from "@/backend/lib/notificationPubSub";
 import {
   countUnReadNotification,
   findLastestNotificationId,
@@ -34,28 +35,30 @@ export async function streamNotification(
 
   console.log("SSE client connected", req.id);
 
-  const polling = setInterval(async () => {
-    if (isPolling || res.destroyed) return;
+  let unsubscribe: (() => void) | undefined;
 
-    isPolling = true;
+  try {
+    unsubscribe = await subscribeToNotification((message) => {
+      if (res.destroyed || res.writableEnded) return;
 
-    try {
-      const notifications = await findNewNotifications(req.id, lastSentId);
+      const notifications = JSON.parse(message);
 
-      for (const notification of notifications) {
-        if (res.destroyed) break;
-
-        res.write(
-          `id: ${notification.id}\nevent: notifications\ndata: ${JSON.stringify(notification)}\n\n`,
-        );
-        lastSentId = notification.id;
+      if (notifications.recipientId !== req.id) {
+        return;
       }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      isPolling = false;
+
+      res.write(
+        `id:${notifications.id}\nevent: notifications\ndata :${message}\n\n`,
+      );
+    });
+  } catch (error) {
+    console.log("Redis subscription failed: ", error);
+    if(!res.destroyed || !res.writableEnded){
+      res.write(`event: error\data: ${JSON.stringify({
+        message:"Notification service temporary unavailable"
+      })}\n\n`)
     }
-  }, 3000);
+  }
 
   const heartbeat = setInterval(() => {
     if (!res.destroyed) {
@@ -64,7 +67,6 @@ export async function streamNotification(
   }, 25000);
 
   res.on("close", () => {
-    clearInterval(polling);
     clearInterval(heartbeat);
     console.log("SSE client disconnected");
   });

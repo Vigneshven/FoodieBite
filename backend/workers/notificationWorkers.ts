@@ -2,7 +2,8 @@ import { Worker } from "bullmq";
 import "../config/env";
 import { NotificationJobData } from "../queues/types/type";
 import { prisma } from "../lib/prisma";
-import redis from "../lib/redis";
+import redis, { redisPublisher } from "../lib/redis";
+import { publishNotification } from "../lib/notificationPubSub";
 
 const notificationWorker = new Worker<NotificationJobData>(
   "notification-queue",
@@ -18,6 +19,12 @@ const notificationWorker = new Worker<NotificationJobData>(
       },
     });
     console.log("Notification saved :", notification.id);
+    try {
+      await publishNotification(JSON.stringify(notification));
+      console.log("Notification event published:", notification.id);
+    } catch (error) {
+      console.log("Failed to publish notification:", error);
+    }
     return {
       success: true,
       notification: notification.id,
@@ -42,6 +49,7 @@ async function shutdown(signal: string) {
   try {
     await notificationWorker.close();
     await redis.quit();
+    await redisPublisher.quit();
     console.log("Notification worker shutdown succesfully");
     process.exit(0);
   } catch (error) {

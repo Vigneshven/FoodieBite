@@ -1,6 +1,6 @@
 import Redis from "ioredis";
 
-const redis = new Redis({
+const redisOptions = {
   host: process.env.REDIS_HOST,
   port: Number(process.env.REDIS_PORT),
 
@@ -8,11 +8,20 @@ const redis = new Redis({
 
   enableReadyCheck: true, //needed check redis loaded from disk
 
-  retryStrategy(times) {
+  retryStrategy(times: number) {
     return Math.min(times * 500, 5000); //needed for redis connection if failed retry after +5s
-                                        //Incremental backoff for reconnecting, capped at a max of 5 seconds
+    //Incremental backoff for reconnecting, capped at a max of 5 seconds
   },
-});
+};
+
+// bullmq
+const redis = new Redis(redisOptions);
+
+// publishing events
+export const redisPublisher = new Redis(redisOptions);
+
+// subscribing to events
+export const redisSubscriber = new Redis(redisOptions);
 
 redis.on("connect", () => {
   console.log("redis connection establised");
