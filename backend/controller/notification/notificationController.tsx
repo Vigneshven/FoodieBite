@@ -30,7 +30,7 @@ export async function streamNotification(
   res.write(
     `event: connected\ndata: ${JSON.stringify({
       message: "Notification stream connected",
-    })}`,
+    })}\n\n`,
   );
 
   console.log("SSE client connected", req.id);
@@ -48,27 +48,32 @@ export async function streamNotification(
       }
 
       res.write(
-        `id:${notifications.id}\nevent: notifications\ndata :${message}\n\n`,
+        `id:${notifications.id}\nevent: notifications\ndata: ${message}\n\n`,
       );
     });
   } catch (error) {
     console.log("Redis subscription failed: ", error);
-    if(!res.destroyed || !res.writableEnded){
-      res.write(`event: error\data: ${JSON.stringify({
-        message:"Notification service temporary unavailable"
-      })}\n\n`)
+    if (!res.destroyed || !res.writableEnded) {
+      res.write(
+        `event: error\data: ${JSON.stringify({
+          message: "Notification service temporary unavailable",
+        })}\n\n`,
+      );
+      res.end();
     }
+    return;
   }
 
   const heartbeat = setInterval(() => {
-    if (!res.destroyed) {
+    if (!res.destroyed && !res.writableEnded) {
       res.write(": heartbeat\n\n");
     }
   }, 25000);
 
   res.on("close", () => {
     clearInterval(heartbeat);
-    console.log("SSE client disconnected");
+    unsubscribe?.();
+    console.log("SSE client disconnected", req.id);
   });
 }
 

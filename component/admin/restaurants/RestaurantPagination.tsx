@@ -7,6 +7,7 @@ type RestaurantPaginationProps = {
   pageSize: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
+  itemLabel?: string;
 };
 
 export default function RestaurantPagination({
@@ -15,6 +16,7 @@ export default function RestaurantPagination({
   pageSize,
   onPageChange,
   onPageSizeChange,
+  itemLabel = "restaurants",
 }: RestaurantPaginationProps) {
   const totalPages = Math.ceil(totalItems / pageSize);
 
@@ -32,7 +34,7 @@ export default function RestaurantPagination({
           {startItem}-{endItem}
         </span>{" "}
         of <span className="font-medium text-foreground">{totalItems}</span>{" "}
-        restaurants
+        {itemLabel}
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">

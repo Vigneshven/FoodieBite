@@ -23,7 +23,10 @@ type RestaurantStore = {
   removeRestaurant: (id: number) => void;
   ownerRequests: RestaurantOwnerRequest[];
   setOwnerRequests: (requests: RestaurantOwnerRequest[]) => void;
-  refreshData: (params: GetRestaurantsParams) => Promise<void>;
+  totalRestaurants: number;
+  setTotalRestaurants: (total: number) => void;
+  isLoading: boolean;
+  refreshData: (params: GetRestaurantsParams) => Promise<number>;
   isAddDialogOpen: boolean;
   isAddingRestaurant: boolean;
   setAddDialogOpen: (open: boolean) => void;
@@ -56,17 +59,29 @@ export const useRestaurantStore = create<RestaurantStore>((set) => ({
     })),
   ownerRequests: [],
   setOwnerRequests: (requests) => set({ ownerRequests: requests }),
+  totalRestaurants: 0,
+  setTotalRestaurants: (total) => set({ totalRestaurants: total }),
+  isLoading: false,
   refreshData: async (params) => {
-    const [restaurant, stats, ownerRequest] = await Promise.all([
-      fetchRestaurants(params),
-      getRestaurantStats(),
-      fetchRestaurantOwnerRequests(),
-    ]);
-    set({
-      restaurants: restaurant.restaurants,
-      stats: stats,
-      ownerRequests: ownerRequest,
-    });
+    set({ isLoading: true });
+    try {
+      const [restaurant, stats, ownerRequest] = await Promise.all([
+        fetchRestaurants(params),
+        getRestaurantStats(),
+        fetchRestaurantOwnerRequests(),
+      ]);
+      set({
+        restaurants: restaurant.restaurants,
+        stats: stats,
+        ownerRequests: ownerRequest,
+        totalRestaurants: restaurant.totalRestaurants,
+        isLoading: false,
+      });
+      return restaurant.totalRestaurants;
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
   },
   isAddDialogOpen: false,
   isAddingRestaurant: false,

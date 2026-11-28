@@ -62,10 +62,15 @@ type RestaurantsTableProps = {
   loading: boolean;
   totalItems: number;
   onTotalItemsChange: (total: number) => void;
-  currentPage: number;  
+  currentPage: number;
   pageSize: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
+  ownerTotalItems: number;
+  ownerCurrentPage: number;
+  ownerPageSize: number;
+  onOwnerPageChange: (page: number) => void;
+  onOwnerPageSizeChange: (size: number) => void;
 };
 
 export default function RestaurantsTable({
@@ -81,6 +86,11 @@ export default function RestaurantsTable({
   pageSize,
   onPageChange,
   onPageSizeChange,
+  ownerTotalItems,
+  ownerCurrentPage,
+  ownerPageSize,
+  onOwnerPageChange,
+  onOwnerPageSizeChange,
 }: RestaurantsTableProps) {
   const handleAction = (action: string, restaurant: Restaurant) => {
     console.log(`${action}: ${restaurant.name}`);
@@ -291,6 +301,13 @@ export default function RestaurantsTable({
           </TableBody>
         </Table>
       </div>
+      <RestaurantPagination
+        currentPage={currentPage}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
       <div className="border-t p-5">
         <h2 className="text-lg font-semibold">Restaurant Owner Onboarding</h2>
 
@@ -400,11 +417,12 @@ export default function RestaurantsTable({
         />
       </div>
       <RestaurantPagination
-        currentPage={currentPage}
-        totalItems={totalItems}
-        pageSize={pageSize}
-        onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
+        currentPage={ownerCurrentPage}
+        totalItems={ownerTotalItems}
+        pageSize={ownerPageSize}
+        onPageChange={onOwnerPageChange}
+        onPageSizeChange={onOwnerPageSizeChange}
+        itemLabel="owner requests"
       />
     </div>
   );

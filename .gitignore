@@ -48,6 +48,4 @@ next-env.d.ts
 backend/public/uploads/restaurants/image/*.jpg
 backend/public/uploads/restaurants/logo/*.jpg
 
-readme.md
-analysis-skill.md
-skill.md
+/.opencode

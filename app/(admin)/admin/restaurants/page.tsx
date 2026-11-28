@@ -1,15 +1,17 @@
 "use client";
 
 import {
+  GetRestaurantsParams,
   RestaurantSortBy,
   RestaurantStatus,
 } from "@/api/admin/type/admin/types-api";
+import { connectNotificationStream } from "@/api/notification/api";
 import AddRestaurantDialog from "@/component/admin/restaurants/AddRestaurantDialog";
 import RestaurantFilters from "@/component/admin/restaurants/RestaurantFilters";
 import RestaurantTable from "@/component/admin/restaurants/RestaurantsTable";
 import RestaurantStats from "@/component/admin/restaurants/RestaurantStats";
 import { useRestaurantStore } from "@/store/admin/restaurantStore";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "sonner";
 
 export default function RestaurantPage() {
@@ -21,10 +23,8 @@ export default function RestaurantPage() {
   const [sortBy, setSortBy] = useState<RestaurantSortBy>("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
-
-  const [totalRestaurants, setTotalRestaurants] = useState(0);
-
-  const [loading, setLoading] = useState(false);
+  const [ownerCurrentPage, setOwnerCurrentPage] = useState(1);
+  const [ownerPageSize, setOwnerPageSize] = useState(5);
 
   const restaurants = useRestaurantStore((state) => state.restaurants);
   const stats = useRestaurantStore((state) => state.stats);
@@ -35,26 +35,60 @@ export default function RestaurantPage() {
   );
 
   const refreshData = useRestaurantStore((state) => state.refreshData);
+  const totalRestaurants = useRestaurantStore((state) => state.totalRestaurants);
+  const setTotalRestaurants = useRestaurantStore(
+    (state) => state.setTotalRestaurants,
+  );
+  const isLoading = useRestaurantStore((state) => state.isLoading);
+
+  const paramsRef = useRef<GetRestaurantsParams>({
+    page: currentPage,
+    limit: pageSize,
+    search,
+    status: activeStatus,
+    sortBy,
+  });
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
-        await refreshData({
-          page: currentPage,
-          limit: pageSize,
-          search,
-          status: activeStatus,
-          sortBy,
-        });
-      } catch {
-        toast.error("Failed to fetch restaurant data");
-      } finally {
-        setLoading(false);
-      }
+    paramsRef.current = {
+      page: currentPage,
+      limit: pageSize,
+      search,
+      status: activeStatus,
+      sortBy,
+    };
+  }, [currentPage, pageSize, search, activeStatus, sortBy]);
+
+  const loadData = useCallback(async () => {
+    try {
+      await refreshData(paramsRef.current);
+    } catch {
+      toast.error("Failed to fetch restaurant data");
     }
-    loadData();
-  }, [currentPage, pageSize, search, activeStatus, sortBy, refreshData]);
+  }, [refreshData]);
+
+  useEffect(() => {
+    void loadData();
+  }, [currentPage, pageSize, search, activeStatus, sortBy, loadData]);
+
+  useEffect(() => {
+    const eventSource = connectNotificationStream((notification) => {
+      if (notification.type === "restaurant_profile_submitted") {
+        void loadData();
+      }
+    });
+
+    return () => eventSource.close();
+  }, [loadData]);
+
+  const safeOwnerPage = Math.min(
+    ownerCurrentPage,
+    Math.max(1, Math.ceil(ownerRequests.length / ownerPageSize)),
+  );
+  const paginatedOwnerRequests = ownerRequests.slice(
+    (safeOwnerPage - 1) * ownerPageSize,
+    safeOwnerPage * ownerPageSize,
+  );
 
   return (
     <div className="space-y-3">
@@ -88,19 +122,11 @@ export default function RestaurantPage() {
 
       <RestaurantTable
         restaurants={restaurants}
-        ownerRequests={ownerRequests}
+        ownerRequests={paginatedOwnerRequests}
         onOwnerRequestsChange={setOwnerRequests}
-        onReviewComplete={() =>
-          refreshData({
-            page: currentPage,
-            limit: pageSize,
-            search,
-            status: activeStatus,
-            sortBy,
-          })
-        }
+        onReviewComplete={loadData}
         activeStatus={activeStatus}
-        loading={loading}
+        loading={isLoading}
         totalItems={totalRestaurants}
         onTotalItemsChange={setTotalRestaurants}
         currentPage={currentPage}
@@ -109,6 +135,14 @@ export default function RestaurantPage() {
         onPageSizeChange={(size) => {
           setPageSize(size);
           setCurrentPage(1);
+        }}
+        ownerTotalItems={ownerRequests.length}
+        ownerCurrentPage={safeOwnerPage}
+        ownerPageSize={ownerPageSize}
+        onOwnerPageChange={setOwnerCurrentPage}
+        onOwnerPageSizeChange={(size) => {
+          setOwnerPageSize(size);
+          setOwnerCurrentPage(1);
         }}
       />
     </div>
