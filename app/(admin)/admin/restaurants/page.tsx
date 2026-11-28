@@ -1,12 +1,6 @@
 "use client";
 
 import {
-  fetchRestaurantOwnerRequests,
-  fetchRestaurants,
-  getRestaurantStats,
-} from "@/api/admin/restaurant/api";
-import {
-  RestaurantOwnerRequest,
   RestaurantSortBy,
   RestaurantStatus,
 } from "@/api/admin/type/admin/types-api";
@@ -22,11 +16,6 @@ export default function RestaurantPage() {
   const [activeStatus, setActiveStatus] = useState<RestaurantStatus | "All">(
     "All",
   );
-
-  const [ownerRequests, setOwnerRequests] = useState<RestaurantOwnerRequest[]>(
-    [],
-  );
-
   const [search, setSearch] = useState("");
 
   const [sortBy, setSortBy] = useState<RestaurantSortBy>("newest");
@@ -38,57 +27,34 @@ export default function RestaurantPage() {
   const [loading, setLoading] = useState(false);
 
   const restaurants = useRestaurantStore((state) => state.restaurants);
-  const setRestaurants = useRestaurantStore((state) => state.setRestaurants);
-
   const stats = useRestaurantStore((state) => state.stats);
-  const setStats = useRestaurantStore((state) => state.setStats);
+
+  const ownerRequests = useRestaurantStore((state) => state.ownerRequests);
+  const setOwnerRequests = useRestaurantStore(
+    (state) => state.setOwnerRequests,
+  );
+
+  const refreshData = useRestaurantStore((state) => state.refreshData);
 
   useEffect(() => {
-    async function loadRestaurants() {
+    async function loadData() {
       try {
         setLoading(true);
-        const result = await fetchRestaurants({
+        await refreshData({
           page: currentPage,
           limit: pageSize,
           search,
           status: activeStatus,
           sortBy,
         });
-        setRestaurants(result.restaurants);
-        setTotalRestaurants(result.totalRestaurants);
       } catch {
-        toast.error("Failed to Show Restaurants");
+        toast.error("Failed to fetch restaurant data");
       } finally {
         setLoading(false);
       }
     }
-    loadRestaurants();
-  }, [currentPage, pageSize, search, activeStatus, sortBy, setRestaurants]);
-
-  useEffect(() => {
-    async function loadStats() {
-      try {
-        const result = await getRestaurantStats();
-        setStats(result);
-      } catch {
-        toast.error("failed to fetch restaurant stats");
-      }
-    }
-    loadStats();
-  }, [setStats]);
-
-  useEffect(() => {
-    async function loadOwnerRequests() {
-      try {
-        const result = await fetchRestaurantOwnerRequests();
-        setOwnerRequests(result);
-      } catch {
-        toast.error("Failed to fetch restaurant owner requests");
-      }
-    }
-
-    loadOwnerRequests();
-  }, []);
+    loadData();
+  }, [currentPage, pageSize, search, activeStatus, sortBy, refreshData]);
 
   return (
     <div className="space-y-3">
@@ -124,6 +90,15 @@ export default function RestaurantPage() {
         restaurants={restaurants}
         ownerRequests={ownerRequests}
         onOwnerRequestsChange={setOwnerRequests}
+        onReviewComplete={() =>
+          refreshData({
+            page: currentPage,
+            limit: pageSize,
+            search,
+            status: activeStatus,
+            sortBy,
+          })
+        }
         activeStatus={activeStatus}
         loading={loading}
         totalItems={totalRestaurants}

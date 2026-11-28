@@ -43,3 +43,7 @@ yarn-error.log*
 next-env.d.ts
 
 /.vscode
+
+# Ignore all jpg files inside the restaurant upload directories
+backend/public/uploads/restaurants/image/*.jpg
+backend/public/uploads/restaurants/logo/*.jpg

@@ -23,12 +23,14 @@ type RestaurantReviewDialogProps = {
   restaurantId: number | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onReviewComplete: () => Promise<void>;
 };
 
 export default function RestaurantReviewDialog({
   restaurantId,
   open,
   onOpenChange,
+  onReviewComplete,
 }: RestaurantReviewDialogProps) {
   const [restaurant, setRestaurant] = useState<RestaurantReview | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,15 +40,16 @@ export default function RestaurantReviewDialog({
 
   useEffect(() => {
     if (!open || restaurantId === null) {
-      setRestaurant(null);
       return;
     }
+
+    const reviewRestaurantId = restaurantId;
 
     async function fetchRestaurantDetails() {
       try {
         setIsLoading(true);
 
-        const data = await getRestaurantReviewDetails(restaurantId);
+        const data = await getRestaurantReviewDetails(reviewRestaurantId);
         setRestaurant(data);
       } catch (error) {
         console.log(error);
@@ -64,6 +67,7 @@ export default function RestaurantReviewDialog({
     try {
       setIsSubmitting(true);
       await approveRestaurantProfile(restaurantId);
+      await onReviewComplete();
       toast.success("Restaurant approved successfully");
       onOpenChange(false);
     } catch {
@@ -82,14 +86,15 @@ export default function RestaurantReviewDialog({
     }
 
     try {
-      setIsLoading(true);
+      setIsSubmitting(true);
       await rejectRestaurantProfile(restaurantId, rejectionReason.trim());
+      await onReviewComplete();
       toast.success("Restaurant rejected successfully");
       onOpenChange(false);
     } catch {
       toast.error("Failed to reject the restaurant");
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   }
 

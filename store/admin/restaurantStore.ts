@@ -1,5 +1,12 @@
 import {
+  fetchRestaurantOwnerRequests,
+  fetchRestaurants,
+  getRestaurantStats,
+} from "@/api/admin/restaurant/api";
+import {
+  GetRestaurantsParams,
   Restaurant,
+  RestaurantOwnerRequest,
   RestaurantStatsData,
 } from "@/api/admin/type/admin/types-api";
 import { create } from "zustand";
@@ -14,6 +21,9 @@ type RestaurantStore = {
     status: "active" | "pending" | "suspended" | "rejected",
   ) => void;
   removeRestaurant: (id: number) => void;
+  ownerRequests: RestaurantOwnerRequest[];
+  setOwnerRequests: (requests: RestaurantOwnerRequest[]) => void;
+  refreshData: (params: GetRestaurantsParams) => Promise<void>;
   isAddDialogOpen: boolean;
   isAddingRestaurant: boolean;
   setAddDialogOpen: (open: boolean) => void;
@@ -44,6 +54,20 @@ export const useRestaurantStore = create<RestaurantStore>((set) => ({
         (restaurant) => restaurant.id !== id,
       ),
     })),
+  ownerRequests: [],
+  setOwnerRequests: (requests) => set({ ownerRequests: requests }),
+  refreshData: async (params) => {
+    const [restaurant, stats, ownerRequest] = await Promise.all([
+      fetchRestaurants(params),
+      getRestaurantStats(),
+      fetchRestaurantOwnerRequests(),
+    ]);
+    set({
+      restaurants: restaurant.restaurants,
+      stats: stats,
+      ownerRequests: ownerRequest,
+    });
+  },
   isAddDialogOpen: false,
   isAddingRestaurant: false,
   setAddDialogOpen: (open) => set({ isAddDialogOpen: open }),

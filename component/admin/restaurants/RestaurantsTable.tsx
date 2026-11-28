@@ -57,11 +57,12 @@ type RestaurantsTableProps = {
   restaurants: Restaurant[];
   ownerRequests: RestaurantOwnerRequest[];
   onOwnerRequestsChange: (requests: RestaurantOwnerRequest[]) => void;
+  onReviewComplete: () => Promise<void>;
   activeStatus: RestaurantStatusFilter;
   loading: boolean;
   totalItems: number;
   onTotalItemsChange: (total: number) => void;
-  currentPage: number;
+  currentPage: number;  
   pageSize: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
@@ -71,6 +72,7 @@ export default function RestaurantsTable({
   restaurants,
   ownerRequests,
   onOwnerRequestsChange,
+  onReviewComplete,
   activeStatus,
   loading,
   totalItems,
@@ -326,7 +328,7 @@ export default function RestaurantsTable({
                           type="button"
                           className="text-primary underline hover:text-primary/80"
                           onClick={() => {
-                            setSelectedRestaurantId(owner.restaurant?.id);
+                            setSelectedRestaurantId(owner.restaurant!.id);
                             setReviewDialogOpen(true);
                           }}
                         >
@@ -394,6 +396,7 @@ export default function RestaurantsTable({
           restaurantId={selectedRestaurantId}
           open={reviewDialogOpen}
           onOpenChange={setReviewDialogOpen}
+          onReviewComplete={onReviewComplete}
         />
       </div>
       <RestaurantPagination
